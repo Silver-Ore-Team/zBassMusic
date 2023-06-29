@@ -23,30 +23,27 @@ HOOKSPACE(Gothic_II_Addon, GetGameVersion() == ENGINE);
 HOOKSPACE(Global, true);
 
 EXTERN_C_START
-__declspec(dllexport) void Game_Init() {
-#ifdef __G1
-    Gothic_I_Classic::InitInstances();
-#endif
-#ifdef __G2A
-    Gothic_II_Addon::InitInstances();
-#endif
-}
-
 __declspec(dllexport) void Game_ApplyOptions() {
-#ifdef __G1
-    Gothic_I_Classic::ApplyOptions();
-#endif
-#ifdef __G2A
-    Gothic_II_Addon::ApplyOptions();
-#endif
+	switch (GetGameVersion())
+    {
+    case Engine_G1:
+        Gothic_I_Classic::ApplyOptions();
+        break;
+    case Engine_G2A:
+        Gothic_II_Addon::ApplyOptions();
+        break;
+    }
 }
 
 __declspec(dllexport) void Game_DefineExternals() {
-#ifdef __G1
-    Gothic_I_Classic::DefineExternals();
-#endif
-#ifdef __G2A
-    Gothic_II_Addon::DefineExternals();
-#endif
+    switch (GetGameVersion())
+    {
+    case Engine_G1:
+        Gothic_I_Classic::DefineExternals();
+        break;
+    case Engine_G2A:
+        Gothic_II_Addon::DefineExternals();
+        break;
+    }
 }
 EXTERN_C_END

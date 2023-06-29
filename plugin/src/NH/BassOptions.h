@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Union/String.h>
+
 namespace NH
 {
 	namespace Bass
@@ -10,6 +12,8 @@ namespace NH
 			bool ForceDisableReverb = false;
 			bool ForceFadeTransition = false;
 			bool CreateMainParserCMusicTheme = true;
+			Union::StringUTF8 LoggerLevelUnion = "INFO";
+			Union::StringUTF8 LoggerLevelZSpy = "DEBUG";
 		};
 
 		extern BassOptions Options;

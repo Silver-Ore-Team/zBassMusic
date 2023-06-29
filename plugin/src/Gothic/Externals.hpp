@@ -74,11 +74,6 @@ namespace GOTHIC_NAMESPACE
 
 	void DefineExternals()
 	{
-		if (GetGameVersion() != ENGINE)
-		{
-			return;
-		}
-
 		parser->DefineExternalVar("BassMusic_ActiveThemeFilename", &Globals->BassMusic_ActiveThemeFilename, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_ActiveThemeID", &Globals->BassMusic_ActiveThemeID, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_EventThemeFilename", &Globals->BassMusic_EventThemeFilename, zPAR_TYPE_STRING, 1);
@@ -97,35 +92,6 @@ namespace GOTHIC_NAMESPACE
 		{
 			zCMusicTheme theme;
 			parser->AddClassOffset(Globals->CMusicThemeClass, reinterpret_cast<int>(&theme.dScriptEnd) - reinterpret_cast<int>(&theme.fileName));
-		}
-	}
-
-	void InitInstances()
-	{
-		if (GetGameVersion() != ENGINE)
-		{
-			return;
-		}
-
-		if (NH::Bass::Options.CreateMainParserCMusicTheme)
-		{
-			//const int classIndex = parser->GetIndex(Globals->CMusicThemeClass);
-			//if (classIndex < 0)
-			//{
-			//	return;
-			//}
-			//int position = 0;
-			//while (position >= 0)
-			//{
-			//	position = parser->GetInstance(classIndex, position + 1);
-			//	if(position > 0) {
-			//		const zCPar_Symbol* sym = parser->GetSymbol(position);
-			//		if (sym->type == zPAR_TYPE_INSTANCE) {
-			//			zCMusicTheme* musicTheme = zNEW(zCMusicTheme);
-			//			parser->CreateInstance(position, musicTheme);
-			//		}
-			//	}
-			//}
 		}
 	}
 }

@@ -18,8 +18,8 @@ Download `zBassMusic.vdf` and place it inside `<GOTHIC_ROOT>/Data` with Union in
 ```cpp
 instance SYS_MENU(C_MUSICTHEME_DEF)
 {
-    // wav file will load and play instead of .sgt
-    file = "modern_audio_file.wav";
+	// wav file will load and play instead of .sgt
+	file = "modern_audio_file.wav";
 	// file = "gamestart.sgt";
 	transtype = TRANSITION_TYPE_NONE;
 	transsubtype = TRANSITION_SUB_TYPE_BEAT;

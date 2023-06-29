@@ -10,6 +10,7 @@ Features:
 
 ## Project Status
 
+zBassMusic is in experimental/development phase. Releases may not be stable, but we try our best to not introduce regression.
 
 ## Usage
 

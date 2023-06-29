@@ -1,0 +1,8 @@
+[BEGINVDF]
+Comment=zBassMusic Plugin
+BaseDir=vdf
+VDFName=zBassMusic.vdf
+[FILES]
+System\Autorun\*.dll
+System\*.dll
+[ENDVDF]

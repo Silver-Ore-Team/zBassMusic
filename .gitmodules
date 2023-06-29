@@ -1,0 +1,3 @@
+[submodule "dependencies/union-api"]
+	path = dependencies/union-api
+	url = git@gitlab.com:union-framework/union-api.git

@@ -23,6 +23,15 @@ HOOKSPACE(Gothic_II_Addon, GetGameVersion() == ENGINE);
 HOOKSPACE(Global, true);
 
 EXTERN_C_START
+__declspec(dllexport) void Game_Init() {
+#ifdef __G1
+    Gothic_I_Classic::InitInstances();
+#endif
+#ifdef __G2A
+    Gothic_II_Addon::InitInstances();
+#endif
+}
+
 __declspec(dllexport) void Game_ApplyOptions() {
 #ifdef __G1
     Gothic_I_Classic::ApplyOptions();
@@ -33,8 +42,11 @@ __declspec(dllexport) void Game_ApplyOptions() {
 }
 
 __declspec(dllexport) void Game_DefineExternals() {
-    NH::Log::Debug("Define externals message");
-    NH::Log::Warn("Define externals message");
-    NH::Log::Error("Define externals message");
+#ifdef __G1
+    Gothic_I_Classic::DefineExternals();
+#endif
+#ifdef __G2A
+    Gothic_II_Addon::DefineExternals();
+#endif
 }
 EXTERN_C_END

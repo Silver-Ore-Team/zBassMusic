@@ -1,0 +1,8 @@
+[BEGINVDF]
+Comment=zBassMusic v${CMAKE_PROJECT_VERSION}%%Nhttps://github.com/Silver-Ore-Team/zBassMusic%%NCopyright (c) 2023 Piotr Macha, Silver Ore Team
+BaseDir=vdf
+VDFName=zBassMusic.vdf
+[FILES]
+System\Autorun\*.dll
+System\*.dll
+[ENDVDF]

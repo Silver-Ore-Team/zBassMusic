@@ -25,13 +25,13 @@ namespace NH
 		{
 		}
 
-		void EventManager::DispatchEvent(const EventType type, const MusicDef* musicDef)
+		void EventManager::DispatchEvent(const EventType type, const MusicDef* musicDef, const int data)
 		{
 			for (const auto s : m_Subscribers)
 			{
 				if (s.Type == type)
 				{
-					s.Function(musicDef, s.UserData);
+					s.Function(musicDef, data, s.UserData);
 				}
 			}
 		}

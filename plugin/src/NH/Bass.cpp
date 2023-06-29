@@ -267,7 +267,7 @@ namespace NH
 			const auto self = static_cast<Engine*>(_this);
 			if (self->m_FrontChannel.Stream == channel)
 			{
-				self->GetEM().DispatchEvent(EventType::MUSIC_TRANSITION, &self->m_FrontChannel.Music);
+				self->GetEM().DispatchEvent(EventType::MUSIC_TRANSITION, &self->m_FrontChannel.Music, self->m_FrontChannel.Music.EndTransition.Duration);
 			}
 		}
 

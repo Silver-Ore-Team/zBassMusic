@@ -1,4 +1,8 @@
 # Scriptable interface (externals)
+## Reference
+
+If you use Visual Studio Code with Daedalus extension from Kirides, you can copy `_externals` directory to your project root to register them for autocomplete.
+
 ```cpp
 
 // ---------------------------------------------------------------
@@ -72,4 +76,64 @@ func void BassMuisc_Opt_ForceDisableReverb(var int enabled) {};
 // @param var int enabled: Boolean value
 // ---------------------------------------------------------------
 func void BassMuisc_Opt_ForceFadeTransition(var int enabled) {};
+```
+
+## Full Script Control
+
+It's possible to disable automatic scheduling of music by the engine by setting:
+```cpp
+BassMusic_SetFullScriptControl(true);
+```
+
+After that the changes of music zones or time will not interfere with controlling the playback from scripts. To create custom scheduling logic, you can use event subscribers:
+```cpp
+func void MyMusicEndSubscriber()
+{
+	if (STR_Compare(MEM_BassMusic_EventThemeID, "START_THEME") == 0)
+	{
+		BassMusic_Play("NEXT_THEME_1");
+	};
+	
+	if (STR_Compare(MEM_BassMusic_EventThemeID, "NEXT_THEME_1") == 0)
+	{
+		BassMusic_Play("NEXT_THEME_2");
+	};
+	
+	if (STR_Compare(MEM_BassMusic_EventThemeID, "NEXT_THEME_2") == 0)
+	{
+		BassMusic_Play("START_THEME");
+	};
+};
+
+BassMusic_OnEndEvent(MyMusicEndSubscriber);
+BassMusic_Play("START_THEME");
+```
+
+Each music theme needs to be defined as `C_MUSICTHEME` instance like:
+```cpp
+prototype Base_Theme(C_MUSICTHEME)
+{
+	file = "";
+	transtype = 7;		// TRANSITION_TYPE_ENDANDINTRO
+	transsubtype = 7;	// TRANSITION_TYPE_ENDANDINTRO
+	reverbmix = -8;
+	reverbtime = 9000;
+	vol = 1;
+	loop = 1;
+};
+
+instance START_THEME(Base_Theme)
+{
+	file = "Start_Theme.wav";
+};
+
+instance NEXT_THEME_1(Base_Theme)
+{
+	file = "Next_Theme_1.wav";
+};
+
+instance NEXT_THEME_2(Base_Theme)
+{
+	file = "Next_Theme_2.wav";
+};
 ```

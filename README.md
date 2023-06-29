@@ -48,7 +48,7 @@ Run `cmake --install out/build/x86-release --prefix out/install/x86-release` to 
 
 ## Support
 
-If you have found a bug in zBassMusic, please [create an issue](https://github.com/Silver-Ore-Team/zBassMusic/issues/new) and state your problem in detail. Include zBassMusic version, plugin version and your environment (other plugins, stack traces etc.).
+If you have found a bug in zBassMusic, please [create an issue](https://github.com/Silver-Ore-Team/zBassMusic/issues/new) and state your problem in detail. Include zBassMusic version, Union version and your environment (other plugins, stack traces etc.).
 
 ## License
 

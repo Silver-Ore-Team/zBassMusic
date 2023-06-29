@@ -5,8 +5,6 @@ namespace NH
 {
 	namespace Log
 	{
-		bool zSpyReady = false;
-
 		void Message(Level level, Union::StringUTF8 channel, Union::StringUTF8 message)
 		{
 			Union::StringUTF8 output = "";
@@ -27,23 +25,20 @@ namespace NH
 			}
 			output.StdPrintLine();
 
-//			if (zSpyReady)
-//			{
-//#if __G1
-//				if (Gothic_I_Classic::zerr)
-//				{
-//					auto msg = Gothic_I_Classic::zSTRING("B:\tBASSMUSIC: ") + Gothic_I_Classic::zSTRING(channel.ToChar()) + Gothic_I_Classic::zSTRING(": ") + Gothic_I_Classic::zSTRING(message.ToChar());
-//					Gothic_I_Classic::zerr->Message(msg);
-//				}
-//#endif
-//#if __G2A
-//				if (Gothic_II_Addon::zerr)
-//				{
-//					auto msg = Gothic_II_Addon::zSTRING("B:\tzBASSMUSIC: ") + Gothic_II_Addon::zSTRING(channel.ToChar()) + Gothic_II_Addon::zSTRING(": ") + Gothic_II_Addon::zSTRING(message.ToChar());
-//					Gothic_II_Addon::zerr->Message(msg);
-//				}
-//#endif
-//			}
+#ifdef __G1
+			if (GetGameVersion() == Engine_G1)
+			{
+				auto msg = Gothic_I_Classic::zSTRING("B:\tBASSMUSIC: ") + Gothic_I_Classic::zSTRING(channel.ToChar()) + Gothic_I_Classic::zSTRING(": ") + Gothic_I_Classic::zSTRING(message.ToChar());
+				Gothic_I_Classic::zerr->Message(msg);
+			}
+#endif
+#ifdef __G2A
+			if (GetGameVersion() == Engine_G2A)
+			{
+				auto msg = Gothic_II_Addon::zSTRING("B:\tBASSMUSIC: ") + Gothic_II_Addon::zSTRING(channel.ToChar()) + Gothic_II_Addon::zSTRING(": ") + Gothic_II_Addon::zSTRING(message.ToChar());
+				Gothic_II_Addon::zerr->Message(msg);
+			}
+#endif
 		}
 	}
 }

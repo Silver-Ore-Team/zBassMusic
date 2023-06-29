@@ -5,6 +5,8 @@ namespace GOTHIC_NAMESPACE
 		zSTRING CMusicThemeClass = "C_MUSICTHEME";
 		zSTRING BassMusic_ActiveThemeFilename = "";
 		zSTRING BassMusic_ActiveThemeID = "";
+		zSTRING BassMusic_EventThemeFilename = "";
+		zSTRING BassMusic_EventThemeID = "";
 		zCArray<int> Event_OnEnd_Functions{};
 		zCArray<int> Event_OnTransition_Functions{};
 		zCArray<int> Event_OnChange_Functions{};

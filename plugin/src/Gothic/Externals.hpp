@@ -74,8 +74,15 @@ namespace GOTHIC_NAMESPACE
 
 	void DefineExternals()
 	{
+		if (GetGameVersion() != ENGINE)
+		{
+			return;
+		}
+
 		parser->DefineExternalVar("BassMusic_ActiveThemeFilename", &Globals->BassMusic_ActiveThemeFilename, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_ActiveThemeID", &Globals->BassMusic_ActiveThemeID, zPAR_TYPE_STRING, 1);
+		parser->DefineExternalVar("BassMusic_EventThemeFilename", &Globals->BassMusic_EventThemeFilename, zPAR_TYPE_STRING, 1);
+		parser->DefineExternalVar("BassMusic_EventThemeID", &Globals->BassMusic_EventThemeID, zPAR_TYPE_STRING, 1);
 
 		parser->DefineExternal("BassMusic_Play", BassMusic_Play, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
 		parser->DefineExternal("BassMusic_OnEndEvent", BassMusic_OnEndEvent, zPAR_TYPE_VOID, zPAR_TYPE_FUNC, zPAR_TYPE_VOID);
@@ -88,31 +95,37 @@ namespace GOTHIC_NAMESPACE
 
 		if (NH::Bass::Options.CreateMainParserCMusicTheme)
 		{
-			parser->AddClassOffset(Globals->CMusicThemeClass, 28);
+			zCMusicTheme theme;
+			parser->AddClassOffset(Globals->CMusicThemeClass, reinterpret_cast<int>(&theme.dScriptEnd) - reinterpret_cast<int>(&theme.fileName));
 		}
 	}
 
 	void InitInstances()
 	{
+		if (GetGameVersion() != ENGINE)
+		{
+			return;
+		}
+
 		if (NH::Bass::Options.CreateMainParserCMusicTheme)
 		{
-			const int classIndex = parser->GetIndex(Globals->CMusicThemeClass);
-			if (classIndex < 0)
-			{
-				return;
-			}
-			int position = 0;
-			while (position >= 0)
-			{
-				position = parser->GetInstance(classIndex, position + 1);
-				if(position > 0) {
-					const zCPar_Symbol* sym = parser->GetSymbol(position);
-					if (sym->type == zPAR_TYPE_INSTANCE) {
-						zCMusicTheme* musicTheme = zNEW(zCMusicTheme);
-						parser->CreateInstance(position, musicTheme);
-					}
-				}
-			}
+			//const int classIndex = parser->GetIndex(Globals->CMusicThemeClass);
+			//if (classIndex < 0)
+			//{
+			//	return;
+			//}
+			//int position = 0;
+			//while (position >= 0)
+			//{
+			//	position = parser->GetInstance(classIndex, position + 1);
+			//	if(position > 0) {
+			//		const zCPar_Symbol* sym = parser->GetSymbol(position);
+			//		if (sym->type == zPAR_TYPE_INSTANCE) {
+			//			zCMusicTheme* musicTheme = zNEW(zCMusicTheme);
+			//			parser->CreateInstance(position, musicTheme);
+			//		}
+			//	}
+			//}
 		}
 	}
 }

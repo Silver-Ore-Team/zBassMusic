@@ -12,6 +12,18 @@ var string BassMusic_ActiveThemeFilename;
 var string BassMusic_ActiveThemeID;
 
 // ---------------------------------------------------------------
+// var string BassMusic_EventThemeFilename
+//	Holds the filename of theme in current event
+// ---------------------------------------------------------------
+var string BassMusic_EventThemeFilename;
+
+// ---------------------------------------------------------------
+// var string BassMusic_EventhemeID
+//	Holds the instance name/id of theme in current eventr
+// ---------------------------------------------------------------
+var string BassMusic_EventThemeID;
+
+// ---------------------------------------------------------------
 // BassMusic_Play: Play a CMusicTheme by script name.
 // @param var string id: Name of CMusicTheme instance.
 // ---------------------------------------------------------------
@@ -19,19 +31,19 @@ func void BassMusic_Play(var string id) {};
 
 // ---------------------------------------------------------------
 // BassMusic_OnEndEvent: Add event listener for the end/loop of music theme.
-// @param var func callback: Function with signature func void CB(var string filename, var string id)
+// @param var func callback: Function with signature func void CB()
 // ---------------------------------------------------------------
 func void BassMusic_OnEndEvent(var func callback) {};
 
 // ---------------------------------------------------------------
 // BassMusic_OnTransitionEvent: Add event listener for the moment when track is finishing and transition should start.
-// @param var func callback: Function with signature func void CB(var string filename, var string id, var int time_left_ms)
+// @param var func callback: Function with signature func void CB(var int time_left_ms)
 // ---------------------------------------------------------------
 func void BassMusic_OnTransitionEvent(var func callback) {};
 
 // ---------------------------------------------------------------
 // BassMusic_OnChangeEvent: Add event listener for the change of a theme.
-// @param var func callback: Function with signature func void CB(var string filename, var string id)
+// @param var func callback: Function with signature func void CB()
 // ---------------------------------------------------------------
 func void BassMusic_OnChangeEvent(var func callback) {};
 

@@ -12,7 +12,7 @@ namespace GOTHIC_NAMESPACE
 			auto* bassEngine = NH::Bass::Engine::Initialize();
 			auto* directMusic = dynamic_cast<zCMusicSys_DirectMusic*>(zmusic);
 			zmusic = new CMusicSys_Bass(bassEngine, directMusic);
-			NH::Log::Info("Set music system to CMusicSys_Bass");
+			NH::Log::Info("Engine_Init", "Set music system to CMusicSys_Bass");
 		}
 		return result;
 	}

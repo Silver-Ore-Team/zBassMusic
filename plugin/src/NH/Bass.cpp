@@ -147,7 +147,7 @@ namespace NH
 			BASS_ChannelSetSync(m_FrontChannel.Stream, BASS_SYNC_END, 0, SyncEnd, this);
 			Log::Debug("BassEngine", Union::StringUTF8("SyncEnd set: ") + musicDef.Filename);
 
-			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, &m_FrontChannel.Music);
+			//m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, &m_FrontChannel.Music);
 		}
 
 		void Engine::Update(const unsigned long time)
@@ -161,7 +161,7 @@ namespace NH
 
 			if (m_FrontChannel.Stream > 0 && m_FrontChannel.Playing)
 			{
-				m_EventManager.DispatchEvent(EventType::MUSIC_ACTIVE, &m_FrontChannel.Music);
+				//m_EventManager.DispatchEvent(EventType::MUSIC_ACTIVE, &m_FrontChannel.Music);
 			}
 		}
 

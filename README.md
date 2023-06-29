@@ -8,6 +8,9 @@ Features:
 * Loading music files from VDFS volumes (excluding .sgt)
 * Backwards compatibility with DirectMusic .sgt files
 
+## Project Status
+
+
 ## Usage
 
 Download `zBassMusic.vdf` and place it inside `<GOTHIC_ROOT>/Data` with Union installed to automatically load the system at the start of the game. With default settings you can use modern audio formats directly in `MusicInst.d` like:

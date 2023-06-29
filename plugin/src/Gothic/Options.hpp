@@ -4,6 +4,11 @@ namespace GOTHIC_NAMESPACE
 {
 	void ApplyOptions()
 	{
+		if (GetGameVersion() != ENGINE)
+		{
+			return;
+		}
+
 		NH::Bass::Options.TransitionTime = zoptions->ReadReal("BASSMUSIC", "TransitionTime", 2000.0f);
 		NH::Bass::Options.ForceDisableReverb = zoptions->ReadBool("BASSMUSIC", "ForceDisableReverb", false);
 		NH::Bass::Options.ForceFadeTransition = zoptions->ReadBool("BASSMUSIC", "ForceFadeTransition", false);

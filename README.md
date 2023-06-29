@@ -10,15 +10,45 @@ Features:
 
 ## Usage
 
-...
+Download `zBassMusic.vdf` and place it inside `<GOTHIC_ROOT>/Data` with Union installed to automatically load the system at the start of the game. With default settings you can use modern audio formats directly in `MusicInst.d` like:
+```cpp
+instance SYS_MENU(C_MUSICTHEME_DEF)
+{
+    // wav file will load and play instead of .sgt
+    file = "modern_audio_file.wav";
+	// file = "gamestart.sgt";
+	transtype = TRANSITION_TYPE_NONE;
+	transsubtype = TRANSITION_SUB_TYPE_BEAT;
+	reverbmix = -12;
+	reverbtime = 8500;
+};
+```
+
+For more advanced usage, check our docs:
+- [Options reference (.ini)](docs/options.md)
+- [Transitions and effects](docs/transitions-effects.md)
+- [Scriptable interface (externals)](docs/scriptable-interface.md)
 
 ## Build
 
-...
+To build the project you need Visual Studio 2022 with v143 toolset (eg. 14.36.32532). Then you can clone the repository and update submodules:
+```
+git clone git@github.com:Silver-Ore-Team/zBassMusic.git
+cd zBassMusic
+git submodule update --remote --recursive
+```
+
+The project is based on CMake, so you can open it in Visual Studio, CLion or any other IDE supporting CMake, and build `plugin` target to compile `zBassMusic.dll`. 
+
+Run `cmake --install out/build/x86-release --prefix out/install/x86-release` to generate release directory with all required DLLs and VDF file to include in Gothic.
+
+## Support
+
+If you have found a bug in zBassMusic, please [create an issue](https://github.com/Silver-Ore-Team/zBassMusic/issues/new) and state your problem in detail. Include zBassMusic version, plugin version and your environment (other plugins, stack traces etc.).
 
 ## License
 
-zBassMusic is licensed under [MIT license](LICENSE).
+zBassMusic is licensed under [MIT license](LICENSE) excluding some dependencies.
 
 [union-api](https://gitlab.com/union-framework/union-api) and [gothic-api](https://gitlab.com/union-framework/gothic-api) are licensed under [GNU GENERAL PUBLIC LICENSE V3](https://gitlab.com/union-framework/union-api-/blob/main/LICENSE).
 

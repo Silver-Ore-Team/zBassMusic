@@ -99,6 +99,13 @@ namespace NH
 
 			Log::Debug("BassEngine", Union::StringUTF8("Channel started: ") + musicDef.Filename);
 
+			if (Options.ForceFadeTransition)
+			{
+				Log::Info("BassEngine", Union::StringUTF8("BASSENGINE.ForceFadeTransition is set, forcing TransitionType::FADE"));
+				m_FrontChannel.Music.StartTransition.Type = TransitionType::FADE;
+				m_FrontChannel.Music.EndTransition.Type = TransitionType::FADE;
+			}
+
 			if (m_FrontChannel.Music.StartTransition.Type == TransitionType::FADE)
 			{
 				BASS_ChannelSetAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, 0.0f);
@@ -116,7 +123,7 @@ namespace NH
 				Log::Debug("BassEngine", Union::StringUTF8("Loop set: ") + musicDef.Filename);
 			}
 
-			if (m_FrontChannel.Music.Effects.Reverb)
+			if (!Options.ForceDisableReverb && m_FrontChannel.Music.Effects.Reverb)
 			{
 				HFX fx = BASS_ChannelSetFX(m_FrontChannel.Stream, BASS_FX_DX8_REVERB, 1);
 				BASS_DX8_REVERB params{0, m_FrontChannel.Music.Effects.ReverbMix, m_FrontChannel.Music.Effects.ReverbTime, 0.001f};
@@ -204,7 +211,6 @@ namespace NH
 				{
 					BASS_ChannelSlideAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, 0.0f, m_FrontChannel.Music.StartTransition.Duration);
 					BASS_ChannelSetSync(m_BackChannel.Stream, BASS_SYNC_SLIDE, 0, SyncSlide, this);
-
 				}
 				else
 				{

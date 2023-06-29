@@ -23,9 +23,13 @@ HOOKSPACE(Gothic_II_Addon, GetGameVersion() == ENGINE);
 HOOKSPACE(Global, true);
 
 EXTERN_C_START
-__declspec(dllexport) void Game_Init() {
-    NH::Log::zSpyReady = true;
-    NH::Log::Info("Info message");
+__declspec(dllexport) void Game_ApplyOptions() {
+#ifdef __G1
+    Gothic_I_Classic::ApplyOptions();
+#endif
+#ifdef __G2A
+    Gothic_II_Addon::ApplyOptions();
+#endif
 }
 
 __declspec(dllexport) void Game_DefineExternals() {

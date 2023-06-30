@@ -18,6 +18,9 @@
 #include "Plugin.hpp"
 #endif
 
+#undef GOTHIC_NAMESPACE
+#undef ENGNE
+
 NH::Bass::BassOptions* NH::Bass::Options = new NH::Bass::BassOptions{};
 
 EXTERN_C_START

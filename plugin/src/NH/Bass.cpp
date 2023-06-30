@@ -1,3 +1,4 @@
+#include "NH/BassOptions.h"
 #include "NH/Bass.h"
 #include "NH/Union.h"
 
@@ -99,7 +100,7 @@ namespace NH
 
 			Log::Debug("BassEngine", Union::StringUTF8("Channel started: ") + musicDef.Filename);
 
-			if (Options.ForceFadeTransition)
+			if (Options->ForceFadeTransition)
 			{
 				Log::Info("BassEngine", Union::StringUTF8("BASSENGINE.ForceFadeTransition is set, forcing TransitionType::FADE"));
 				m_FrontChannel.Music.StartTransition.Type = TransitionType::FADE;
@@ -123,7 +124,7 @@ namespace NH
 				Log::Debug("BassEngine", Union::StringUTF8("Loop set: ") + musicDef.Filename);
 			}
 
-			if (!Options.ForceDisableReverb && m_FrontChannel.Music.Effects.Reverb)
+			if (!Options->ForceDisableReverb && m_FrontChannel.Music.Effects.Reverb)
 			{
 				HFX fx = BASS_ChannelSetFX(m_FrontChannel.Stream, BASS_FX_DX8_REVERB, 1);
 				BASS_DX8_REVERB params{0, m_FrontChannel.Music.Effects.ReverbMix, m_FrontChannel.Music.Effects.ReverbTime, 0.001f};

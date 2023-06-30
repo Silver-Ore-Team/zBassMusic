@@ -50,7 +50,7 @@ namespace GOTHIC_NAMESPACE
 		float time;
 		parser->GetParameter(time);
 		zoptions->WriteReal("BASSMUSIC", "TransitionTime", time, true);
-		NH::Bass::Options.TransitionTime = time;
+		NH::Bass::Options->TransitionTime = time;
 		return 0;
 	}
 
@@ -59,7 +59,7 @@ namespace GOTHIC_NAMESPACE
 		int enabled;
 		parser->GetParameter(enabled);
 		zoptions->WriteBool("BASSMUSIC", "ForceDisableReverb", enabled, true);
-		NH::Bass::Options.ForceDisableReverb = enabled;
+		NH::Bass::Options->ForceDisableReverb = enabled;
 		return 0;
 	}
 
@@ -68,12 +68,17 @@ namespace GOTHIC_NAMESPACE
 		int enabled;
 		parser->GetParameter(enabled);
 		zoptions->WriteBool("BASSMUSIC", "ForceFadeTransition", enabled, true);
-		NH::Bass::Options.ForceDisableReverb = enabled;
+		NH::Bass::Options->ForceDisableReverb = enabled;
 		return 0;
 	}
 
 	void DefineExternals()
 	{
+		if (GetGameVersion() != ENGINE)
+		{
+			return;
+		}
+
 		parser->DefineExternalVar("BassMusic_ActiveThemeFilename", &Globals->BassMusic_ActiveThemeFilename, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_ActiveThemeID", &Globals->BassMusic_ActiveThemeID, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_EventThemeFilename", &Globals->BassMusic_EventThemeFilename, zPAR_TYPE_STRING, 1);
@@ -88,7 +93,7 @@ namespace GOTHIC_NAMESPACE
 		parser->DefineExternal("BassMusic_Opt_ForceDisableReverb", BassMusic_Opt_ForceDisableReverb, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
 		parser->DefineExternal("BassMusic_Opt_ForceFadeTransition", BassMusic_Opt_ForceFadeTransition, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
 
-		if (NH::Bass::Options.CreateMainParserCMusicTheme)
+		if (NH::Bass::Options->CreateMainParserCMusicTheme)
 		{
 			zCMusicTheme theme;
 			parser->AddClassOffset(Globals->CMusicThemeClass, reinterpret_cast<int>(&theme.dScriptEnd) - reinterpret_cast<int>(&theme.fileName));

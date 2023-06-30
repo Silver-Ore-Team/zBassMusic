@@ -1,5 +1,3 @@
-#include <vector>
-
 namespace GOTHIC_NAMESPACE
 {
 	namespace BassEvent
@@ -89,7 +87,7 @@ namespace GOTHIC_NAMESPACE
 			}
 
 			zCMusicTheme* theme = zNEW(zCMusicTheme);
-			if (NH::Bass::Options.CreateMainParserCMusicTheme && parser->GetSymbol(identifier) != nullptr)
+			if (NH::Bass::Options->CreateMainParserCMusicTheme && parser->GetSymbol(identifier) != nullptr)
 			{
 				parser->CreateInstance(identifier, (void*)(&(theme->fileName)));
 			}
@@ -278,7 +276,7 @@ namespace GOTHIC_NAMESPACE
 
 		int IsAvailable(zSTRING const& id) override
 		{
-			return (NH::Bass::Options.CreateMainParserCMusicTheme && parser->GetSymbol(id) != nullptr) || parserMusic->GetSymbol(id) != nullptr;
+			return (NH::Bass::Options->CreateMainParserCMusicTheme && parser->GetSymbol(id) != nullptr) || parserMusic->GetSymbol(id) != nullptr;
 		}
 	};
 }

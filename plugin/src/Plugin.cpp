@@ -1,6 +1,15 @@
 // Disable macro redefinition warning 
 #pragma warning(disable: 4005)
 
+#include <NH/BassOptions.h>
+namespace NH
+{
+	namespace Bass
+	{
+		BassOptions* Options = new BassOptions();
+	}
+}
+
 #include <NH/Union.h>
 #include <NH/Bass.h>
 #include <Union/Hook.h>
@@ -23,27 +32,8 @@ HOOKSPACE(Gothic_II_Addon, GetGameVersion() == ENGINE);
 HOOKSPACE(Global, true);
 
 EXTERN_C_START
-__declspec(dllexport) void Game_ApplyOptions() {
-	switch (GetGameVersion())
-    {
-    case Engine_G1:
-        Gothic_I_Classic::ApplyOptions();
-        break;
-    case Engine_G2A:
-        Gothic_II_Addon::ApplyOptions();
-        break;
-    }
-}
-
 __declspec(dllexport) void Game_DefineExternals() {
-    switch (GetGameVersion())
-    {
-    case Engine_G1:
-        Gothic_I_Classic::DefineExternals();
-        break;
-    case Engine_G2A:
-        Gothic_II_Addon::DefineExternals();
-        break;
-    }
+	Gothic_I_Classic::DefineExternals();
+	Gothic_II_Addon::DefineExternals();
 }
 EXTERN_C_END

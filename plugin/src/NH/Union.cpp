@@ -1,13 +1,18 @@
 #include "Union.h"
-#include <ZenGin/zGothicAPI.h>
 #include <NH/BassOptions.h>
+#include <ZenGin/zGothicAPI.h>
 
 namespace NH
 {
 	namespace Log
 	{
+
 		inline bool ShouldLog(Level level, Union::StringUTF8 config)
 		{
+			if (!config)
+			{
+				return true;
+			}
 			if (level == Level::DEBUG) return config == "DEBUG";
 			if (level == Level::INFO) return config == "DEBUG" || config == "INFO";
 			if (level == Level::WARN) return config == "DEBUG" || config == "INFO" || config == "WARN";
@@ -17,7 +22,7 @@ namespace NH
 
 		void Message(Level level, Union::StringUTF8 channel, Union::StringUTF8 message)
 		{
-			if (ShouldLog(level, NH::Bass::Options.LoggerLevelUnion)) {
+			if (ShouldLog(level, NH::Bass::Options->LoggerLevelUnion)) {
 				Union::StringUTF8 output = "";
 				switch (level)
 				{
@@ -37,7 +42,7 @@ namespace NH
 				output.StdPrintLine();
 			}
 
-			if (ShouldLog(level, NH::Bass::Options.LoggerLevelZSpy)) {
+			if (ShouldLog(level, NH::Bass::Options->LoggerLevelZSpy)) {
 				if (GetGameVersion() == Engine_G1)
 				{
 					auto msg = Gothic_I_Classic::zSTRING("B:\tBASSMUSIC: ") + Gothic_I_Classic::zSTRING(channel.ToChar()) + Gothic_I_Classic::zSTRING(": ") + Gothic_I_Classic::zSTRING(message.ToChar());

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <bass.h>
-#include <NH/BassOptions.h>
 #include <Union/String.h>
 
 namespace NH

@@ -1,13 +1,11 @@
 namespace GOTHIC_NAMESPACE
 {
-	// G1:  0x00544340 public: static int __cdecl zCEngine::Init(struct HWND__ * *)
-	// G2A: 0x00558BE0 public: static int __cdecl zCEngine::Init(struct HWND__ * *)
-	int Engine_Init(HWND__**);
-	auto Ivk_zCEngine_Init = Union::CreateHook(reinterpret_cast<void*>(zSwitch(0x00544340, 0x00558BE0)), &Engine_Init);
-
-	int Engine_Init(HWND__** hwnd)
+	// G1:	0x004240C0 public: void __thiscall CGameManager::Init(struct HWND__ * &)
+	// G2A:	0x00424C70 public: void __thiscall CGameManager::Init(struct HWND__ * &)
+	auto Ivk_CGameManager_Init = Union::CreateHook(reinterpret_cast<void*>(zSwitch(0x004240C0, 0x00424C70)), &CGameManager::Init_Hook, Union::HookType::Hook_CallPatch);
+	inline void CGameManager::Init_Hook(HWND__*& hwnd)
 	{
-		int result = Ivk_zCEngine_Init(hwnd);
+		(this->*Ivk_CGameManager_Init)(hwnd);
 		ApplyOptions();
 		if (!zoptions->Parm("ZNOMUSIC")) {
 			auto* bassEngine = NH::Bass::Engine::Initialize();
@@ -15,7 +13,5 @@ namespace GOTHIC_NAMESPACE
 			zmusic = new CMusicSys_Bass(bassEngine, directMusic);
 			NH::Log::Info("Engine_Init", "Set music system to CMusicSys_Bass");
 		}
-		return result;
 	}
-
 }

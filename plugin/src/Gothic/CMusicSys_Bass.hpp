@@ -220,13 +220,13 @@ namespace GOTHIC_NAMESPACE
 			if (theme->trType == zMUS_TR_INTRO || theme->trType == zMUS_TR_ENDANDINTRO)
 			{
 				musicDef.StartTransition.Type = NH::Bass::TransitionType::FADE;
-				musicDef.StartTransition.Duration = 2000.0f; // @todo: move to config
+				musicDef.StartTransition.Duration = NH::Bass::Options->TransitionTime;
 			}
 
 			if (theme->trType == zMUS_TR_END || theme->trType == zMUS_TR_ENDANDINTRO)
 			{
 				musicDef.EndTransition.Type = NH::Bass::TransitionType::FADE;
-				musicDef.EndTransition.Duration = 2000.0f; // @todo: move to config
+				musicDef.EndTransition.Duration = NH::Bass::Options->TransitionTime;
 			}
 
 			if (m_DirectMusic->prefs.globalReverbEnabled)

@@ -33,7 +33,13 @@ HOOKSPACE(Global, true);
 
 EXTERN_C_START
 __declspec(dllexport) void Game_DefineExternals() {
-	Gothic_I_Classic::DefineExternals();
-	Gothic_II_Addon::DefineExternals();
+	if (GetGameVersion() == Engine_G1)
+	{
+		Gothic_I_Classic::DefineExternals();
+	}
+	if (GetGameVersion() == Engine_G2A)
+	{
+		Gothic_II_Addon::DefineExternals();
+	}
 }
 EXTERN_C_END

@@ -54,99 +54,21 @@ namespace NH
 				return;
 			}
 
-			Log::Info("BassEngine", Union::StringUTF8("Starting playback: ") + musicDef.Filename);
-
-			if (m_FrontChannel.Stream > 0)
+			Channel* channel = FindAvailableChannel();
+			if (channel == nullptr)
 			{
-				Log::Debug("BassEngine", Union::StringUTF8("Stopping front channel: ") + m_FrontChannel.Music.Filename);
-
-				if (m_BackChannel.Stream > 0)
-				{
-					BASS_ChannelFree(m_BackChannel.Stream);
-				}
-
-				m_BackChannel = m_FrontChannel;
-				m_FrontChannel = {};
-				if (m_BackChannel.Playing) {
-					if (m_BackChannel.Music.EndTransition.Type == TransitionType::FADE)
-					{
-						BASS_ChannelSlideAttribute(m_BackChannel.Stream, BASS_ATTRIB_VOL, 0.0f, m_BackChannel.Music.EndTransition.Duration);
-						BASS_ChannelSetSync(m_BackChannel.Stream, BASS_SYNC_SLIDE, 0, SyncSlide, this);
-					}
-					else
-					{
-						BASS_ChannelFree(m_BackChannel.Stream);
-					}
-					m_BackChannel.Playing = false;
-				}
-				else
-				{
-					BASS_ChannelFree(m_BackChannel.Stream);
-				}
-			}
-
-			HSTREAM stream = BASS_StreamCreateFile(true, file->Buffer.data(), 0, file->Buffer.size(), 0);
-			if (!stream)
-			{
-				Log::Error("BassEngine", Union::StringUTF8("Could not create stream: ") + musicDef.Filename);
-				Log::Error("BassEngine", Union::StringUTF8("Could not create stream: ") + ErrorCodeToString(BASS_ErrorGetCode()));
+				Log::Error("BassEngine", Union::StringUTF8("Can not play. No channel is available."));
 				return;
 			}
 
-			Log::Debug("BassEngine", Union::StringUTF8("Stream created: ") + musicDef.Filename);
-
-			m_FrontChannel = {stream, true, musicDef};
-			BASS_ChannelStart(m_FrontChannel.Stream);
-
-			Log::Debug("BassEngine", Union::StringUTF8("Channel started: ") + musicDef.Filename);
-
-			if (Options->ForceFadeTransition)
+			Log::Info("BassEngine", Union::StringUTF8("Starting playback: ") + musicDef.Filename);
+			if (m_ActiveChannel)
 			{
-				Log::Info("BassEngine", Union::StringUTF8("BASSENGINE.ForceFadeTransition is set, forcing TransitionType::FADE"));
-				m_FrontChannel.Music.StartTransition.Type = TransitionType::FADE;
-				m_FrontChannel.Music.EndTransition.Type = TransitionType::FADE;
+				m_ActiveChannel->Stop();
 			}
 
-			if (m_FrontChannel.Music.StartTransition.Type == TransitionType::FADE)
-			{
-				BASS_ChannelSetAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, 0.0f);
-				BASS_ChannelSlideAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, m_FrontChannel.Music.Volume,
-					m_FrontChannel.Music.StartTransition.Duration);
-			}
-			else
-			{
-				BASS_ChannelSetAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, m_FrontChannel.Music.Volume);
-			}
-
-			if (m_FrontChannel.Music.Loop)
-			{
-				BASS_ChannelFlags(m_FrontChannel.Stream, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
-				Log::Debug("BassEngine", Union::StringUTF8("Loop set: ") + musicDef.Filename);
-			}
-
-			if (!Options->ForceDisableReverb && m_FrontChannel.Music.Effects.Reverb)
-			{
-				HFX fx = BASS_ChannelSetFX(m_FrontChannel.Stream, BASS_FX_DX8_REVERB, 1);
-				BASS_DX8_REVERB params{0, m_FrontChannel.Music.Effects.ReverbMix, m_FrontChannel.Music.Effects.ReverbTime, 0.001f};
-				if (!BASS_FXSetParameters(fx, (void*)&params))
-				{
-					Log::Error("BassEngine", Union::StringUTF8("Could not set reverb FX: ") + musicDef.Filename);
-					Log::Error("BassEngine", Union::StringUTF8("Could not set reverb FX: ") + ErrorCodeToString(BASS_ErrorGetCode()));
-				}
-				Log::Debug("BassEngine", Union::StringUTF8("Reverb set: ") + musicDef.Filename);
-			}
-
-			if (m_FrontChannel.Music.EndTransition.Type != TransitionType::NONE)
-			{
-				const QWORD length = BASS_ChannelGetLength(m_FrontChannel.Stream, BASS_POS_BYTE);
-				const QWORD transitionBytes = BASS_ChannelSeconds2Bytes(m_FrontChannel.Stream, m_FrontChannel.Music.EndTransition.Duration / 1000.0f);
-				const QWORD offset = length - transitionBytes;
-				BASS_ChannelSetSync(m_FrontChannel.Stream, BASS_SYNC_POS, offset, SyncTransitionPos, this);
-				Log::Debug("BassEngine", Union::StringUTF8("SyncTransitionPos set: ") + musicDef.Filename);
-			}
-
-			BASS_ChannelSetSync(m_FrontChannel.Stream, BASS_SYNC_END, 0, SyncEnd, this);
-			Log::Debug("BassEngine", Union::StringUTF8("SyncEnd set: ") + musicDef.Filename);
+			m_ActiveChannel = channel;
+			m_ActiveChannel->Play(musicDef, file);
 
 			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, m_FrontChannel.Music);
 		}
@@ -159,11 +81,6 @@ namespace NH
 			}
 
 			BASS_Update(time);
-
-			if (m_FrontChannel.Stream > 0 && m_FrontChannel.Playing)
-			{
-				m_EventManager.DispatchEvent(EventType::MUSIC_ACTIVE,m_FrontChannel.Music);
-			}
 		}
 
 		void Engine::SetVolume(float volume)
@@ -183,6 +100,7 @@ namespace NH
 				Log::Warn("BassEngine", Union::StringUTF8("SetVolume ") + Union::StringUTF8(volume) + " clamped to 0.0f");
 				volume = 0.0f;
 			}
+
 			m_MasterVolume = volume;
 			BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
 		}
@@ -204,36 +122,12 @@ namespace NH
 				return;
 			}
 
-			if (m_FrontChannel.Stream > 0 && m_FrontChannel.Playing)
+			for (auto& channel : m_Channels)
 			{
-				Log::Debug("BassEngine", Union::StringUTF8("Stopping front channel: ") + m_FrontChannel.Music.Filename);
-
-				if (m_FrontChannel.Music.StartTransition.Type == TransitionType::FADE)
-				{
-					BASS_ChannelSlideAttribute(m_FrontChannel.Stream, BASS_ATTRIB_VOL, 0.0f, m_FrontChannel.Music.StartTransition.Duration);
-					BASS_ChannelSetSync(m_BackChannel.Stream, BASS_SYNC_SLIDE, 0, SyncSlide, this);
-				}
-				else
-				{
-					BASS_ChannelFree(m_FrontChannel.Stream);
-				}
+				channel.Stop();
 			}
 
-			if (m_BackChannel.Stream > 0 && m_BackChannel.Playing)
-			{
-				Log::Debug("BassEngine", Union::StringUTF8("Stopping back channel: ") + m_BackChannel.Music.Filename);
-
-				if (m_BackChannel.Music.StartTransition.Type == TransitionType::FADE)
-				{
-					BASS_ChannelSlideAttribute(m_BackChannel.Stream, BASS_ATTRIB_VOL, 0.0f, m_BackChannel.Music.StartTransition.Duration);
-					BASS_ChannelSetSync(m_BackChannel.Stream, BASS_SYNC_SLIDE, 0, SyncSlide, this);
-
-				}
-				else
-				{
-					BASS_ChannelFree(m_BackChannel.Stream);
-				}
-			}
+			m_ActiveChannel = nullptr;
 		}
 
 		Engine::Engine()
@@ -249,6 +143,15 @@ namespace NH
 			Log::Info("BassEngine", Union::StringUTF8("BASS Device: ") + device.name);
 			Log::Info("BassEngine", Union::StringUTF8("BASS Driver: ") + device.driver);
 			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: 44100 Hz"));
+
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
+			m_Channels.emplace_back(Channel(m_EventManager));
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)
@@ -263,53 +166,16 @@ namespace NH
 			return nullptr;
 		}
 
-		void Engine::SyncTransitionPos(HSYNC, DWORD channel, DWORD data, void* _this)
+		Channel* Engine::FindAvailableChannel()
 		{
-			const auto self = static_cast<Engine*>(_this);
-			if (self->m_FrontChannel.Stream == channel)
+			for (int i = 0; i < m_Channels.size(); i++)
 			{
-				self->GetEM().DispatchEvent(EventType::MUSIC_TRANSITION, self->m_FrontChannel.Music, self->m_FrontChannel.Music.EndTransition.Duration);
-			}
-		}
-
-		void Engine::SyncEnd(HSYNC, DWORD channel, DWORD data, void* _this)
-		{
-			const auto self = static_cast<Engine*>(_this);
-			if (self->m_FrontChannel.Stream == channel)
-			{
-				if (!self->m_FrontChannel.Music.Loop)
+				if (m_Channels[i].IsAvailable())
 				{
-					self->m_FrontChannel.Playing = false;
-				}
-				self->GetEM().DispatchEvent(EventType::MUSIC_END, self->m_FrontChannel.Music);
-			}
-		}
-
-		void Engine::SyncSlide(HSYNC, DWORD channel, DWORD data, void* _this)
-		{
-			const auto self = static_cast<Engine*>(_this);
-			if (data == BASS_ATTRIB_VOL)
-			{
-				float volume;
-				BASS_ChannelGetAttribute(channel, BASS_ATTRIB_VOL, &volume);
-				if (volume < 0.0001f)
-				{
-					if (self->m_FrontChannel.Stream == channel && !self->m_FrontChannel.Playing)
-					{
-						BASS_ChannelFree(self->m_FrontChannel.Stream);
-						self->m_FrontChannel.Stream = 0;
-					}
-					else if (self->m_BackChannel.Stream == channel && !self->m_BackChannel.Playing)
-					{
-						BASS_ChannelFree(self->m_BackChannel.Stream);
-						self->m_BackChannel.Stream = 0;
-					}
-					else
-					{
-						BASS_ChannelFree(channel);
-					}
+					return &m_Channels[i];
 				}
 			}
+			return nullptr;
 		}
 
 		Union::StringUTF8 Engine::ErrorCodeToString(const int code)

@@ -1,3 +1,5 @@
+#include <deque>
+
 namespace GOTHIC_NAMESPACE
 {
 	struct GlobalsDef

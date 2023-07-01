@@ -2,6 +2,8 @@
 
 #include <NH/BassTypes.h>
 #include <NH/BassEventManager.h>
+#include <NH/BassChannel.h>
+#include <vector>
 
 namespace NH
 {
@@ -15,7 +17,10 @@ namespace NH
 			Union::Array<MusicFile> m_MusicFiles{};
 			MusicChannel m_FrontChannel{};
 			MusicChannel m_BackChannel{};
+			std::vector<Channel> m_Channels;
+			Channel* m_ActiveChannel = nullptr;
 			EventManager m_EventManager{};
+
 
 		public:
 			static Engine* Initialize();
@@ -39,12 +44,9 @@ namespace NH
 
 			MusicFile* GetMusicFile(const Union::StringUTF8& filename);
 
-			static void CALLBACK SyncTransitionPos(HSYNC, DWORD channel, DWORD data, void* _this);
+			Channel* FindAvailableChannel();
 
-			static void CALLBACK SyncEnd(HSYNC, DWORD channel, DWORD data, void* _this);
-
-			static void CALLBACK SyncSlide(HSYNC, DWORD channel, DWORD data, void* _this);
-
+		public:
 			static Union::StringUTF8 ErrorCodeToString(int code);
 		};
 	}

@@ -54,19 +54,19 @@ func void BassMusic_OnChangeEvent(var func callback) {};
 func void BassMusic_SetFullScriptControl(var int active) {};
 
 // ---------------------------------------------------------------
-// BassMuisc_Opt_TransitionTime: Set TransitionTime option value.
+// BassMusic_Opt_TransitionTime: Set TransitionTime option value.
 // @param var float time: Transition time in miliseconds
 // ---------------------------------------------------------------
-func void BassMuisc_Opt_TransitionTime(var float time) {};
+func void BassMusic_Opt_TransitionTime(var float time) {};
 
 // ---------------------------------------------------------------
-// BassMuisc_Opt_ForceDisableReverb: Set ForceDisableReverb option value.
+// BassMusic_Opt_ForceDisableReverb: Set ForceDisableReverb option value.
 // @param var int enabled: Boolean value
 // ---------------------------------------------------------------
-func void BassMuisc_Opt_ForceDisableReverb(var int enabled) {};
+func void BassMusic_Opt_ForceDisableReverb(var int enabled) {};
 
 // ---------------------------------------------------------------
-// BassMuisc_Opt_ForceFadeTransition: Set ForceFadeTransition option value.
+// BassMusic_Opt_ForceFadeTransition: Set ForceFadeTransition option value.
 // @param var int enabled: Boolean value
 // ---------------------------------------------------------------
-func void BassMuisc_Opt_ForceFadeTransition(var int enabled) {};
+func void BassMusic_Opt_ForceFadeTransition(var int enabled) {};

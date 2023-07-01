@@ -1,4 +1,5 @@
 #include "BassEventManager.h"
+#include <NH/Union.h>
 
 namespace NH
 {
@@ -21,17 +22,24 @@ namespace NH
 			}
 		}
 
-		EventManager::EventManager()
+		void EventManager::DispatchEvent(const EventType type, const MusicDef musicDef, const int data)
 		{
+			m_EventQueue.emplace_front(Event{type, musicDef, data});
 		}
 
-		void EventManager::DispatchEvent(const EventType type, const MusicDef* musicDef, const int data)
+		void EventManager::Update()
 		{
-			for (const auto s : m_Subscribers)
+			while (!m_EventQueue.empty())
 			{
-				if (s.Type == type)
+				NH::Log::Debug("EM", Union::StringUTF8("Processing events, left: ") + Union::StringUTF8(m_EventQueue.size()));
+				Event event = m_EventQueue.back();
+				m_EventQueue.pop_back();
+				for (const auto s : m_Subscribers)
 				{
-					s.Function(musicDef, data, s.UserData);
+					if (s.Type == event.type)
+					{
+						s.Function(event.music, event.data, s.UserData);
+					}
 				}
 			}
 		}

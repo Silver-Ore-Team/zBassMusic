@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.25)
-set(PROJECT_VERSION "0.0.8")
+set(PROJECT_VERSION "0.0.9")
 if(DEFINED ENV{PROJECT_VERSION})
 	set(PROJECT_VERSION "$ENV{PROJECT_VERSION}")
 endif()

@@ -2,12 +2,13 @@
 
 #include <NH/BassTypes.h>
 #include <Union/Array.h>
+#include <deque>
 
 namespace NH
 {
 	namespace Bass
 	{
-		using EventSubscriberFunction = void(*)(const MusicDef*, int data, void*);
+		using EventSubscriberFunction = void(*)(const MusicDef, int data, void*);
 
 		enum class EventType
 		{
@@ -33,19 +34,29 @@ namespace NH
 
 		class EventManager
 		{
+			struct Event
+			{
+				EventType type;
+				MusicDef music;
+				int data;
+			};
+
 			friend Engine;
 
 			Union::Array<EventSubscriber> m_Subscribers{};
+			std::deque<Event> m_EventQueue;
 
 		public:
 			EventSubscriber* AddSubscriber(EventType type, EventSubscriberFunction function, void* userData = nullptr);
 
 			void RemoveSubscriber(const EventSubscriber* subscriber);
 
-		private:
-			EventManager();
+			void DispatchEvent(EventType type, const MusicDef musicDef, int data = 0);
 
-			void DispatchEvent(EventType type, const MusicDef* musicDef, int data = 0);
+			void Update();
+
+		private:
+			EventManager() {};
 		};
 	}
 }

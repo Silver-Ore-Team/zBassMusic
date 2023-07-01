@@ -148,7 +148,7 @@ namespace NH
 			BASS_ChannelSetSync(m_FrontChannel.Stream, BASS_SYNC_END, 0, SyncEnd, this);
 			Log::Debug("BassEngine", Union::StringUTF8("SyncEnd set: ") + musicDef.Filename);
 
-			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, &m_FrontChannel.Music);
+			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, m_FrontChannel.Music);
 		}
 
 		void Engine::Update(const unsigned long time)
@@ -162,7 +162,7 @@ namespace NH
 
 			if (m_FrontChannel.Stream > 0 && m_FrontChannel.Playing)
 			{
-				m_EventManager.DispatchEvent(EventType::MUSIC_ACTIVE, &m_FrontChannel.Music);
+				m_EventManager.DispatchEvent(EventType::MUSIC_ACTIVE,m_FrontChannel.Music);
 			}
 		}
 
@@ -268,7 +268,7 @@ namespace NH
 			const auto self = static_cast<Engine*>(_this);
 			if (self->m_FrontChannel.Stream == channel)
 			{
-				self->GetEM().DispatchEvent(EventType::MUSIC_TRANSITION, &self->m_FrontChannel.Music, self->m_FrontChannel.Music.EndTransition.Duration);
+				self->GetEM().DispatchEvent(EventType::MUSIC_TRANSITION, self->m_FrontChannel.Music, self->m_FrontChannel.Music.EndTransition.Duration);
 			}
 		}
 
@@ -281,7 +281,7 @@ namespace NH
 				{
 					self->m_FrontChannel.Playing = false;
 				}
-				self->GetEM().DispatchEvent(EventType::MUSIC_END, &self->m_FrontChannel.Music);
+				self->GetEM().DispatchEvent(EventType::MUSIC_END, self->m_FrontChannel.Music);
 			}
 		}
 

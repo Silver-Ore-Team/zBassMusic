@@ -24,7 +24,14 @@
 NH::Bass::BassOptions* NH::Bass::Options = new NH::Bass::BassOptions{};
 
 EXTERN_C_START
-__declspec(dllexport) void Game_DefineExternals() {
+__declspec(dllexport) void Game_Loop() 
+{
+	auto* engine = NH::Bass::Engine::Initialize();
+	engine->GetEM().Update();
+}
+
+__declspec(dllexport) void Game_DefineExternals() 
+{
 	NH::Bass::Options->LoggerLevelUnion = "DEBUG";
 	NH::Bass::Options->LoggerLevelZSpy = "DEBUG";
 

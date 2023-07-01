@@ -15,8 +15,6 @@ namespace NH
 			bool m_Initialized;
 			float m_MasterVolume = 1.0f;
 			Union::Array<MusicFile> m_MusicFiles{};
-			MusicChannel m_FrontChannel{};
-			MusicChannel m_BackChannel{};
 			std::vector<Channel> m_Channels;
 			Channel* m_ActiveChannel = nullptr;
 			EventManager m_EventManager{};

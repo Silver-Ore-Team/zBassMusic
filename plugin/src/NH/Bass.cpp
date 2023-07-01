@@ -70,7 +70,7 @@ namespace NH
 			m_ActiveChannel = channel;
 			m_ActiveChannel->Play(musicDef, file);
 
-			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, m_FrontChannel.Music);
+			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, musicDef);
 		}
 
 		void Engine::Update(const unsigned long time)

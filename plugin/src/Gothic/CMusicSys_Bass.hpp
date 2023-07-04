@@ -260,6 +260,7 @@ namespace GOTHIC_NAMESPACE
 
 		void Stop() override
 		{
+			m_BassEngine->StopMusic();
 			m_DirectMusic->Stop();
 		}
 

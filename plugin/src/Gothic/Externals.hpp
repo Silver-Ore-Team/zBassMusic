@@ -6,7 +6,6 @@ namespace GOTHIC_NAMESPACE
 	{
 		zSTRING id;
 		parser->GetParameter(id);
-		NH::Log::Info("Externals", Union::StringUTF8("Loading ") + Union::StringUTF8(id.ToChar()) + Union::StringUTF8(" to playback queue"));
 		zCMusicTheme* theme = zmusic->LoadThemeByScript(id);
 		zmusic->PlayTheme(theme, zMUS_THEME_VOL_DEFAULT, zMUS_TR_DEFAULT, zMUS_TRSUB_DEFAULT);
 		return 0;

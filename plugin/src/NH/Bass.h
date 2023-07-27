@@ -4,6 +4,8 @@
 #include <NH/BassEventManager.h>
 #include <NH/BassChannel.h>
 #include <vector>
+#include <mutex>
+#include <chrono>
 
 namespace NH
 {
@@ -19,15 +21,17 @@ namespace NH
 			Channel* m_ActiveChannel = nullptr;
 			EventManager m_EventManager{};
 
+			std::mutex m_PlayMusicMutex;
+			std::vector<MusicDefRetry> m_PlayMusicRetryList;
 
 		public:
-			static Engine* Initialize();
+			static Engine* GetInstance();
 
-			void LoadMusicFile(const Union::StringUTF8& filename, const std::vector<char>& buffer);
+			MusicFile& CreateMusicBuffer(const Union::StringUTF8& filename);
 
 			void PlayMusic(const MusicDef& musicDef);
 
-			void Update(unsigned long time);
+			void Update();
 
 			void SetVolume(float volume);
 

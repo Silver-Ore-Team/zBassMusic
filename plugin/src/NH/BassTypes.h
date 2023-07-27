@@ -23,6 +23,8 @@ namespace NH
 		{
 			Union::StringUTF8 Filename;
 			std::vector<char> Buffer;
+			bool Ready = false;
+			bool Loading = false;
 		};
 
 		struct MusicDef
@@ -39,6 +41,12 @@ namespace NH
 				float ReverbMix = 0.0f;
 				float ReverbTime = 1000.0f;
 			} Effects{};
+		};
+
+		struct MusicDefRetry
+		{
+			MusicDef musicDef;
+			int32_t delayMs;
 		};
 
 		struct MusicChannel

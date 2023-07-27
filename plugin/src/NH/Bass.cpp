@@ -1,6 +1,7 @@
 #include "NH/BassOptions.h"
 #include "NH/Bass.h"
 #include "NH/Union.h"
+#include <algorithm>
 
 namespace NH
 {
@@ -8,7 +9,7 @@ namespace NH
 	{
 		Engine* Engine::s_Instance = nullptr;
 
-		Engine* Engine::Initialize()
+		Engine* Engine::GetInstance()
 		{
 			if (!s_Instance)
 			{
@@ -17,40 +18,51 @@ namespace NH
 			return s_Instance;
 		}
 
-		void Engine::LoadMusicFile(const Union::StringUTF8& filename, const std::vector<char>& buffer)
+		MusicFile& Engine::CreateMusicBuffer(const Union::StringUTF8& filename)
 		{
-			for (auto m : m_MusicFiles)
+			for (size_t i = 0; i < m_MusicFiles.GetCount(); i++)
 			{
+				MusicFile& m = m_MusicFiles[i];
 				if (m.Filename == filename) {
-					Log::Info("BassEngine", Union::StringUTF8("LoadMusicFile: Buffer already exists for ") + filename);
-					return;
+					Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: Buffer already exists for ") + filename);
+					return m;
 				}
 			}
-			Log::Info("BassEngine", Union::StringUTF8("LoadMusicFile: New buffer for ") + filename);
-			Log::Info("BassEngine", Union::StringUTF8("LoadMusicFile: New buffer length: ") + Union::StringUTF8(buffer.size()));
 
-			m_MusicFiles.Insert({filename, buffer});
-
-			size_t memoryUsage = 0;
-			for (auto m : m_MusicFiles)
-			{
-				memoryUsage = m.Buffer.size();
-			}
-			Log::Debug("BassEngine", Union::StringUTF8("m_MusicFiles loaded files: ") + Union::StringUTF8(m_MusicFiles.GetCount()));
-			Log::Debug("BassEngine", Union::StringUTF8("m_MusicFiles memory usage: ") + Union::StringUTF8(static_cast<float>(memoryUsage) / 1024 / 1024) + Union::StringUTF8(" MB"));
+			Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: New buffer for ") + filename);
+		
+			uint32_t index = m_MusicFiles.Insert({ filename, std::vector<char>() });
+			return m_MusicFiles[index];
 		}
 
 		void Engine::PlayMusic(const MusicDef& musicDef)
 		{
+			std::lock_guard<std::mutex> guard(m_PlayMusicMutex);
+
 			if (!m_Initialized)
 			{
 				return;
 			}
 
 			const MusicFile* file = GetMusicFile(musicDef.Filename);
+
 			if (!file)
 			{
 				Log::Error("BassEngine", Union::StringUTF8("Can not play ") + musicDef.Filename + ". Music file is not loaded.");
+				return;
+			}
+
+			if (!file->Ready && file->Loading)
+			{
+				Log::Info("BassEngine", musicDef.Filename + " is loading, will PlayMusic retry in 500ms");
+				MusicDefRetry retry{ MusicDef(musicDef), 500 };
+				m_PlayMusicRetryList.emplace_back(retry);
+				return;
+			}
+
+			if (!file->Ready)
+			{
+				Log::Error("BassEngine", Union::StringUTF8("Invalid sate: ") + musicDef.Filename + ". Music not ready and not loading.");
 				return;
 			}
 
@@ -69,18 +81,35 @@ namespace NH
 
 			m_ActiveChannel = channel;
 			m_ActiveChannel->Play(musicDef, file);
-
-			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, musicDef);
 		}
 
-		void Engine::Update(const unsigned long time)
+		void Engine::Update()
 		{
 			if (!m_Initialized)
 			{
 				return;
 			}
 
-			BASS_Update(time);
+			static auto lastTimestamp = std::chrono::system_clock::now();
+			auto now = std::chrono::system_clock::now();
+			uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
+			lastTimestamp = now;
+
+			for (size_t i = 0; i < m_PlayMusicRetryList.size(); i++)
+			{
+				MusicDefRetry& retry = m_PlayMusicRetryList[i];
+				retry.delayMs -= delta;
+				if (retry.delayMs < 0)
+				{
+					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + Union::StringUTF8(retry.musicDef.Filename));
+					PlayMusic(retry.musicDef);
+				}
+			}
+			std::erase_if(m_PlayMusicRetryList, [](MusicDefRetry retry) { return retry.delayMs < 0; });
+
+			BASS_Update(delta);
+
+			GetEM().Update();
 		}
 
 		void Engine::SetVolume(float volume)
@@ -132,17 +161,38 @@ namespace NH
 
 		Engine::Engine()
 		{
-			m_Initialized = BASS_Init(-1, 44100, 0, nullptr, nullptr);
+			size_t deviceIndex = 0;
+			BASS_DEVICEINFO deviceInfo;
+			for (size_t i = 1; BASS_GetDeviceInfo(i, &deviceInfo); i++)
+			{
+				bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
+				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
+
+				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name 
+					+ Union::StringUTF8(", driver: ") + deviceInfo.driver
+					+ Union::StringUTF8(", enabled: ") + Union::StringUTF8(enabled ? "true" : "faqlse")
+					+ Union::StringUTF8(", default: ") + Union::StringUTF8(isDefault ? "true" : "faqlse"));
+
+				if (enabled && isDefault)
+				{
+					deviceIndex = i;
+					break;
+				}
+			}
+
+			BASS_GetDeviceInfo(deviceIndex, &deviceInfo);
+			Log::Info("BassEngine", Union::StringUTF8("Selected device: ") + deviceInfo.name);
+
+			m_Initialized = BASS_Init(deviceIndex, 44100, 0, nullptr, nullptr);
 			if (!m_Initialized)
 			{
 				Log::Error("BassEngine", Union::StringUTF8("Could not initialize BASS: ") + ErrorCodeToString(BASS_ErrorGetCode()));
 				return;
 			}
-			BASS_DEVICEINFO device{};
-			BASS_GetDeviceInfo(BASS_GetDevice(), &device);
-			Log::Info("BassEngine", Union::StringUTF8("BASS Device: ") + device.name);
-			Log::Info("BassEngine", Union::StringUTF8("BASS Driver: ") + device.driver);
-			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: 44100 Hz"));
+
+			BASS_INFO info;
+			BASS_GetInfo(&info);
+			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: ") + Union::StringUTF8(info.freq) + Union::StringUTF8(" Hz"));
 
 			m_Channels.emplace_back(Channel(m_EventManager));
 			m_Channels.emplace_back(Channel(m_EventManager));

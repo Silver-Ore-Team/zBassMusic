@@ -108,15 +108,32 @@ namespace GOTHIC_NAMESPACE
 				zFILE* file = zfactory->CreateZFile(theme->fileName);
 				if (file->Exists())
 				{
-					NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("Music file: ") + file->GetFullPath().ToChar());
-					file->Open(false);
-					size_t size = file->Size();
-					std::vector<char> buffer(size);
-					size_t read = file->Read(buffer.data(), size);
-					NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("Music size: ") + Union::StringUTF8(size));
-					NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("Music read: ") + Union::StringUTF8(read));
-					file->Close();
-					m_BassEngine->LoadMusicFile(theme->fileName.ToChar(), buffer);
+					NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
+					if (!musicFileRef.Ready && !musicFileRef.Loading)
+					{
+						NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("Loading music: ") + file->GetFullPath().ToChar());
+
+						file->Open(false);
+						musicFileRef.Loading = true;
+						auto loadingStart = std::chrono::system_clock::now();
+
+						std::thread loadingThread([file, &musicFileRef, loadingStart]() {
+							size_t size = file->Size();
+							musicFileRef.Buffer.resize(size);
+							size_t read = file->Read(musicFileRef.Buffer.data(), size);
+							file->Close();
+
+							musicFileRef.Ready = true;
+							musicFileRef.Loading = false;
+
+							uint64_t loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
+								
+							NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", file->GetFullPath()) + Union::StringUTF8(read));
+							NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", file->GetFullPath(), loadingTime));
+						});
+
+						loadingThread.detach();
+					}
 				}
 				else
 				{
@@ -236,9 +253,13 @@ namespace GOTHIC_NAMESPACE
 				musicDef.Effects.ReverbTime = theme->reverbTime;
 			}
 
-			m_BassEngine->PlayMusic(musicDef);
-
 			m_ActiveTheme = theme;
+
+			// Engine::PlayMusic() uses a mutex, so let's submit it in a deteached thread to avoid blocking
+			std::thread submitThread([this, musicDef]() {
+				m_BassEngine->PlayMusic(musicDef);
+			});
+			submitThread.detach();
 		}
 
 		zCMusicTheme* GetActiveTheme() override
@@ -248,7 +269,6 @@ namespace GOTHIC_NAMESPACE
 
 		void DoMusicUpdate() override
 		{
-			m_BassEngine->Update(ztimer->lastTimer);
 			m_DirectMusic->DoMusicUpdate();
 		}
 

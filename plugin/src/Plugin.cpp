@@ -36,8 +36,14 @@ __declspec(dllexport) void Game_Entry()
 
 __declspec(dllexport) void Game_Loop() 
 {
-	auto* engine = NH::Bass::Engine::Initialize();
-	engine->GetEM().Update();
+	auto* engine = NH::Bass::Engine::GetInstance();
+	engine->Update();
+}
+
+__declspec(dllexport) void Game_MenuLoop()
+{
+	auto* engine = NH::Bass::Engine::GetInstance();
+	engine->Update();
 }
 
 __declspec(dllexport) void Game_DefineExternals() 

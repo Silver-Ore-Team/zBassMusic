@@ -274,12 +274,15 @@ namespace GOTHIC_NAMESPACE
 
 		void Mute() override
 		{
+			NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8("Mute"));
 			m_BassEngine->SetVolume(0.0f);
 			m_DirectMusic->Mute();
 		}
 
 		void Stop() override
 		{
+			NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8("Stop"));
+			m_ActiveTheme = nullptr;
 			m_BassEngine->StopMusic();
 			m_DirectMusic->Stop();
 		}

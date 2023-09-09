@@ -34,7 +34,7 @@ namespace NH
 				NH::Log::Debug("EM", Union::StringUTF8("Processing events, left: ") + Union::StringUTF8(m_EventQueue.size()));
 				Event event = m_EventQueue.back();
 				m_EventQueue.pop_back();
-				for (const auto s : m_Subscribers)
+				for (const auto& s : m_Subscribers)
 				{
 					if (s.Type == event.type)
 					{

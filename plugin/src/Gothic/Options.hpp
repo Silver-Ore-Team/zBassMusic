@@ -11,13 +11,13 @@ namespace GOTHIC_NAMESPACE
 
 
 		{
-			char* value = zoptions->ReadString("BASSMUSIC", "LoggerLevelUnion", "INFO").ToChar();
-			NH::Bass::Options->LoggerLevelUnion = Union::StringUTF8(value);
+			zSTRING value = zoptions->ReadString("BASSMUSIC", "LoggerLevelUnion", "INFO");
+			NH::Bass::Options->LoggerLevelUnion = Union::StringUTF8(value.ToChar());
 			NH::Log::Info("ApplyOptions", Union::StringUTF8("LoggerLevelUnion = ") + NH::Bass::Options->LoggerLevelUnion);
 		}
 		{
-			char* value = zoptions->ReadString("BASSMUSIC", "LoggerLevelZSpy", "DEBUG").ToChar();
-			NH::Bass::Options->LoggerLevelZSpy = Union::StringUTF8(value);
+			zSTRING value = zoptions->ReadString("BASSMUSIC", "LoggerLevelZSpy", "DEBUG");
+			NH::Bass::Options->LoggerLevelZSpy = Union::StringUTF8(value.ToChar());
 			NH::Log::Info("ApplyOptions", Union::StringUTF8("LoggerLevelZSpy = ") + NH::Bass::Options->LoggerLevelZSpy);
 		}
 

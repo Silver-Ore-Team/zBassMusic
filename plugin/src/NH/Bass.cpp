@@ -168,10 +168,10 @@ namespace NH
 				bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
 				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
 
-				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name 
+				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name
 					+ Union::StringUTF8(", driver: ") + deviceInfo.driver
-					+ Union::StringUTF8(", enabled: ") + Union::StringUTF8(enabled ? "true" : "faqlse")
-					+ Union::StringUTF8(", default: ") + Union::StringUTF8(isDefault ? "true" : "faqlse"));
+					+ Union::StringUTF8(", enabled: ") + Union::StringUTF8(enabled ? "true" : "false")
+					+ Union::StringUTF8(", default: ") + Union::StringUTF8(isDefault ? "true" : "false"));
 
 				if (enabled && isDefault)
 				{
@@ -194,14 +194,8 @@ namespace NH
 			BASS_GetInfo(&info);
 			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: ") + Union::StringUTF8(info.freq) + Union::StringUTF8(" Hz"));
 
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
+			constexpr size_t Channels_Max = 8;
+			m_Channels.resize(8, Channel{m_EventManager});
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)

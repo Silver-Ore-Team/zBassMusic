@@ -7,9 +7,9 @@ namespace NH
 	namespace Log
 	{
 
-		inline bool ShouldLog(Level level, Union::StringUTF8 config)
+		inline bool ShouldLog(Level level, const Union::StringUTF8& config)
 		{
-			if (!config)
+			if (config.IsEmpty())
 			{
 				return true;
 			}
@@ -20,9 +20,9 @@ namespace NH
 			return false;
 		}
 
-		void Message(Level level, Union::StringUTF8 channel, Union::StringUTF8 message)
+		void Message(Level level, const Union::StringUTF8& channel, const Union::StringUTF8& message)
 		{
-			if (ShouldLog(level, NH::Bass::Options->LoggerLevelUnion)) {
+			if (ShouldLog(level, NH::Bass::Options->LoggerLevelUnion)) {		
 				Union::StringUTF8 output = "";
 				switch (level)
 				{
@@ -45,13 +45,13 @@ namespace NH
 			if (ShouldLog(level, NH::Bass::Options->LoggerLevelZSpy)) {
 				if (GetGameVersion() == Engine_G1)
 				{
-					auto msg = Gothic_I_Classic::zSTRING("B:\tBASSMUSIC: ") + Gothic_I_Classic::zSTRING(channel.ToChar()) + Gothic_I_Classic::zSTRING(": ") + Gothic_I_Classic::zSTRING(message.ToChar());
+					auto msg = Gothic_I_Classic::zSTRING("B:\tBASSMUSIC: ") + channel.ToChar() + ": " + message.ToChar();
 					Gothic_I_Classic::zerr->Message(msg);
 				}
 
 				if (GetGameVersion() == Engine_G2A)
 				{
-					auto msg = Gothic_II_Addon::zSTRING("B:\tBASSMUSIC: ") + Gothic_II_Addon::zSTRING(channel.ToChar()) + Gothic_II_Addon::zSTRING(": ") + Gothic_II_Addon::zSTRING(message.ToChar());
+					auto msg = Gothic_II_Addon::zSTRING("B:\tBASSMUSIC: ") + channel.ToChar() + ": " + message.ToChar();
 					Gothic_II_Addon::zerr->Message(msg);
 				}
 			}

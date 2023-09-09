@@ -22,7 +22,7 @@ namespace NH
 			}
 		}
 
-		void EventManager::DispatchEvent(const EventType type, const MusicDef musicDef, const int data)
+		void EventManager::DispatchEvent(const EventType type, const MusicDef& musicDef, const int data)
 		{
 			m_EventQueue.emplace_front(Event{type, musicDef, data});
 		}

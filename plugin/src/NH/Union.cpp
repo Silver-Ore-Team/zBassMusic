@@ -39,7 +39,16 @@ namespace NH
 					output = Union::StringUTF8::Format("\x1B[1m\x1B[97m\x1B[41mzBassMusic ERROR \x1B[0m\x1B[91m %s: %s", channel, message);
 					break;
 				}
-				output.StdPrintLine();
+				
+				const auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
+				CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+				GetConsoleScreenBufferInfo(handle, &consoleInfo);
+				const auto color = consoleInfo.wAttributes;
+
+				DWORD dw;
+				WriteConsoleA(handle, output.ToChar(), output.GetLength(), &dw, nullptr);
+
+				SetConsoleTextAttribute(handle, color);
 			}
 
 			if (ShouldLog(level, NH::Bass::Options->LoggerLevelZSpy)) {

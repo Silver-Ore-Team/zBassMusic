@@ -13,11 +13,11 @@ namespace NH
 
 		void EventManager::RemoveSubscriber(const EventSubscriber* subscriber)
 		{
-			for (auto s : m_Subscribers)
+			for (const auto i : std::views::iota(0u, m_Subscribers.GetCount()) | std::views::reverse)
 			{
-				if (&s == subscriber)
+				if (&m_Subscribers[i] == subscriber)
 				{
-					m_Subscribers.Remove(s);
+					m_Subscribers.RemoveAt(i);
 				}
 			}
 		}

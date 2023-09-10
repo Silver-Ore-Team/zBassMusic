@@ -8,7 +8,7 @@ namespace NH
 {
 	namespace Bass
 	{
-		using EventSubscriberFunction = void(*)(const MusicDef, int data, void*);
+		using EventSubscriberFunction = void(*)(const MusicDef&, int data, void*);
 
 		enum class EventType
 		{
@@ -51,7 +51,7 @@ namespace NH
 
 			void RemoveSubscriber(const EventSubscriber* subscriber);
 
-			void DispatchEvent(EventType type, const MusicDef musicDef, int data = 0);
+			void DispatchEvent(EventType type, const MusicDef& musicDef, int data = 0);
 
 			void Update();
 

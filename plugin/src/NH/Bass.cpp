@@ -20,9 +20,8 @@ namespace NH
 
 		MusicFile& Engine::CreateMusicBuffer(const Union::StringUTF8& filename)
 		{
-			for (size_t i = 0; i < m_MusicFiles.GetCount(); i++)
+			for (auto& m : m_MusicFiles)
 			{
-				MusicFile& m = m_MusicFiles[i];
 				if (m.Filename == filename) {
 					Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: Buffer already exists for ") + filename);
 					return m;
@@ -95,17 +94,16 @@ namespace NH
 			uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
 			lastTimestamp = now;
 
-			for (size_t i = 0; i < m_PlayMusicRetryList.size(); i++)
+			for(auto& retry : m_PlayMusicRetryList)
 			{
-				MusicDefRetry& retry = m_PlayMusicRetryList[i];
 				retry.delayMs -= delta;
 				if (retry.delayMs < 0)
 				{
-					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + Union::StringUTF8(retry.musicDef.Filename));
+					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + retry.musicDef.Filename);
 					PlayMusic(retry.musicDef);
 				}
 			}
-			std::erase_if(m_PlayMusicRetryList, [](MusicDefRetry retry) { return retry.delayMs < 0; });
+			std::erase_if(m_PlayMusicRetryList, [](const MusicDefRetry& retry) { return retry.delayMs < 0; });
 
 			BASS_Update(delta);
 
@@ -168,10 +166,10 @@ namespace NH
 				bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
 				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
 
-				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name 
-					+ Union::StringUTF8(", driver: ") + deviceInfo.driver
-					+ Union::StringUTF8(", enabled: ") + Union::StringUTF8(enabled ? "true" : "faqlse")
-					+ Union::StringUTF8(", default: ") + Union::StringUTF8(isDefault ? "true" : "faqlse"));
+				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name
+					+ ", driver: "   + deviceInfo.driver
+					+ ", enabled: "  + (enabled ? "true" : "false")
+					+ ", default: "  + (isDefault ? "true" : "false"));
 
 				if (enabled && isDefault)
 				{
@@ -194,37 +192,33 @@ namespace NH
 			BASS_GetInfo(&info);
 			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: ") + Union::StringUTF8(info.freq) + Union::StringUTF8(" Hz"));
 
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
-			m_Channels.emplace_back(Channel(m_EventManager));
+			static constexpr size_t Channels_Max = 8;
+			m_Channels.resize(Channels_Max, Channel{m_EventManager});
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)
 		{
-			for (int i = 0; i < m_MusicFiles.GetCount(); i++)
+			for(auto& m : m_MusicFiles)
 			{
-				if (m_MusicFiles[i].Filename == filename)
+				if (m.Filename == filename)
 				{
-					return &m_MusicFiles[i];
+					return &m;
 				}
 			}
+
 			return nullptr;
 		}
 
 		Channel* Engine::FindAvailableChannel()
 		{
-			for (int i = 0; i < m_Channels.size(); i++)
+			for (auto& channel : m_Channels)
 			{
-				if (m_Channels[i].IsAvailable())
+				if (channel.IsAvailable())
 				{
-					return &m_Channels[i];
+					return &channel;
 				}
 			}
+
 			return nullptr;
 		}
 

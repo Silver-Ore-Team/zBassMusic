@@ -17,7 +17,7 @@ namespace NH
 			ERROR = 3
 		};
 
-		void Message(Level level, Union::StringUTF8 channel, Union::StringUTF8 message);
+		void Message(Level level, const Union::StringUTF8& channel, const Union::StringUTF8& message);
 
 		inline void Debug(const Union::StringUTF8& channel, const Union::StringUTF8& message) { Message(Level::DEBUG, channel, message); }
 		inline void Debug(const Union::StringUTF8& message) { Debug("DEFAULT", message); }

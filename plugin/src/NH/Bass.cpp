@@ -104,7 +104,7 @@ namespace NH
 					PlayMusic(retry.musicDef);
 				}
 			}
-			std::erase_if(m_PlayMusicRetryList, [](MusicDefRetry retry) { return retry.delayMs < 0; });
+			std::erase_if(m_PlayMusicRetryList, [](const MusicDefRetry& retry) { return retry.delayMs < 0; });
 
 			BASS_Update(delta);
 

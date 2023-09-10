@@ -168,9 +168,9 @@ namespace NH
 				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
 
 				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name
-					+ Union::StringUTF8(", driver: ") + deviceInfo.driver
-					+ Union::StringUTF8(", enabled: ") + Union::StringUTF8(enabled ? "true" : "false")
-					+ Union::StringUTF8(", default: ") + Union::StringUTF8(isDefault ? "true" : "false"));
+					+ ", driver: "   + deviceInfo.driver
+					+ ", enabled: "  + (enabled ? "true" : "false")
+					+ ", default: "  + (isDefault ? "true" : "false"));
 
 				if (enabled && isDefault)
 				{

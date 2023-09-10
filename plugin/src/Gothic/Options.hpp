@@ -24,10 +24,10 @@ namespace GOTHIC_NAMESPACE
 		NH::Bass::Options->TransitionTime = zoptions->ReadReal("BASSMUSIC", "TransitionTime", 2000.0f);
 		NH::Log::Info("ApplyOptions", Union::StringUTF8("TransitionTime = ") + Union::StringUTF8(NH::Bass::Options->TransitionTime));
 		NH::Bass::Options->ForceDisableReverb = zoptions->ReadBool("BASSMUSIC", "ForceDisableReverb", false);
-		NH::Log::Info("ApplyOptions", Union::StringUTF8("ForceDisableReverb = ") + Union::StringUTF8(NH::Bass::Options->ForceDisableReverb ? "TRUE" : "FALSE"));
+		NH::Log::Info("ApplyOptions", Union::StringUTF8("ForceDisableReverb = ") + (NH::Bass::Options->ForceDisableReverb ? "TRUE" : "FALSE"));
 		NH::Bass::Options->ForceFadeTransition = zoptions->ReadBool("BASSMUSIC", "ForceFadeTransition", false);
-		NH::Log::Info("ApplyOptions", Union::StringUTF8("ForceFadeTransition = ") + Union::StringUTF8(NH::Bass::Options->ForceFadeTransition ? "TRUE" : "FALSE"));
+		NH::Log::Info("ApplyOptions", Union::StringUTF8("ForceFadeTransition = ") + (NH::Bass::Options->ForceFadeTransition ? "TRUE" : "FALSE"));
 		NH::Bass::Options->CreateMainParserCMusicTheme = zoptions->ReadBool("BASSMUSIC", "CreateMainParserCMusicTheme", true);
-		NH::Log::Info("ApplyOptions", Union::StringUTF8("CreateMainParserCMusicTheme = ") + Union::StringUTF8(NH::Bass::Options->CreateMainParserCMusicTheme ? "TRUE" : "FALSE"));
+		NH::Log::Info("ApplyOptions", Union::StringUTF8("CreateMainParserCMusicTheme = ") + (NH::Bass::Options->CreateMainParserCMusicTheme ? "TRUE" : "FALSE"));
 	}
 }

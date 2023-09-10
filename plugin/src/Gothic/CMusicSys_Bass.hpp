@@ -4,7 +4,7 @@ namespace GOTHIC_NAMESPACE
 	{
 		void Event_OnEnd(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
-			NH::Log::Debug("Event", Union::StringUTF8("Event_OnEnd: ") + Union::StringUTF8(musicDef.Filename.ToChar()));
+			NH::Log::Debug("Event", Union::StringUTF8("Event_OnEnd: ") + musicDef.Filename);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -20,7 +20,7 @@ namespace GOTHIC_NAMESPACE
 
 		void Event_OnTransition(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
-			NH::Log::Debug("Event", Union::StringUTF8("Event_OnTransition: ") + Union::StringUTF8(musicDef.Filename.ToChar())
+			NH::Log::Debug("Event", Union::StringUTF8("Event_OnTransition: ") + musicDef.Filename
 				+ Union::StringUTF8::Format(", %i ms", data));
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
@@ -102,7 +102,7 @@ namespace GOTHIC_NAMESPACE
 				return nullptr;
 			}
 
-			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("LoadThemeByScript: ") + id.ToChar());
+			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("LoadThemeByScript: ") + id.ToChar());
 
 			zSTRING identifier = id;
 			if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
@@ -135,7 +135,7 @@ namespace GOTHIC_NAMESPACE
 					NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
 					if (!musicFileRef.Ready && !musicFileRef.Loading)
 					{
-						NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("Loading music: ") + file->GetFullPath().ToChar());
+						NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("Loading music: ") + file->GetFullPath().ToChar());
 
 						file->Open(false);
 						musicFileRef.Loading = true;
@@ -161,7 +161,7 @@ namespace GOTHIC_NAMESPACE
 				}
 				else
 				{
-					NH::Log::Error("CMusicSys_Bass", Union::StringUTF8::Format("Could not find file: ") + theme->fileName.ToChar());
+					NH::Log::Error("CMusicSys_Bass", Union::StringUTF8("Could not find file: ") + theme->fileName.ToChar());
 				}
 			}
 
@@ -175,11 +175,11 @@ namespace GOTHIC_NAMESPACE
 				return;
 			}
 
-			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("PlayThemeByScript: ") + id.ToChar());
+			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("PlayThemeByScript: ") + id.ToChar());
 
 			if (Globals->FullScriptControl)
 			{
-				NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("PlayThemeByScript skipped because FullScriptControl is enabled."));
+				NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("PlayThemeByScript skipped because FullScriptControl is enabled."));
 				return;
 			}
 

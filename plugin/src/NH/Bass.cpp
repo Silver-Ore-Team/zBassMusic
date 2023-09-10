@@ -95,13 +95,12 @@ namespace NH
 			uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
 			lastTimestamp = now;
 
-			for (size_t i = 0; i < m_PlayMusicRetryList.size(); i++)
+			for(auto& retry : m_PlayMusicRetryList)
 			{
-				MusicDefRetry& retry = m_PlayMusicRetryList[i];
 				retry.delayMs -= delta;
 				if (retry.delayMs < 0)
 				{
-					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + Union::StringUTF8(retry.musicDef.Filename));
+					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + retry.musicDef.Filename);
 					PlayMusic(retry.musicDef);
 				}
 			}

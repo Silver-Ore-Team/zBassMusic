@@ -97,7 +97,7 @@ namespace GOTHIC_NAMESPACE
 
 		zCMusicTheme* LoadThemeByScript(zSTRING const& id) override
 		{
-			if (s_musicSystemDisabled || !id || id.IsEmpty())
+			if (s_musicSystemDisabled || id.IsEmpty())
 			{
 				return nullptr;
 			}
@@ -170,7 +170,7 @@ namespace GOTHIC_NAMESPACE
 
 		void PlayThemeByScript(zSTRING const& id, int manipulate, int* done) override
 		{
-			if (s_musicSystemDisabled || !id || id.IsEmpty())
+			if (s_musicSystemDisabled || id.IsEmpty())
 			{
 				return;
 			}

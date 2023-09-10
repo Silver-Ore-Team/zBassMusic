@@ -194,8 +194,8 @@ namespace NH
 			BASS_GetInfo(&info);
 			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: ") + Union::StringUTF8(info.freq) + Union::StringUTF8(" Hz"));
 
-			constexpr size_t Channels_Max = 8;
-			m_Channels.resize(8, Channel{m_EventManager});
+			static constexpr size_t Channels_Max = 8;
+			m_Channels.resize(Channels_Max, Channel{m_EventManager});
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)

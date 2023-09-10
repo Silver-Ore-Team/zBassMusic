@@ -20,9 +20,8 @@ namespace NH
 
 		MusicFile& Engine::CreateMusicBuffer(const Union::StringUTF8& filename)
 		{
-			for (size_t i = 0; i < m_MusicFiles.GetCount(); i++)
+			for (auto& m : m_MusicFiles)
 			{
-				MusicFile& m = m_MusicFiles[i];
 				if (m.Filename == filename) {
 					Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: Buffer already exists for ") + filename);
 					return m;
@@ -199,25 +198,27 @@ namespace NH
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)
 		{
-			for (int i = 0; i < m_MusicFiles.GetCount(); i++)
+			for(auto& m : m_MusicFiles)
 			{
-				if (m_MusicFiles[i].Filename == filename)
+				if (m.Filename == filename)
 				{
-					return &m_MusicFiles[i];
+					return &m;
 				}
 			}
+
 			return nullptr;
 		}
 
 		Channel* Engine::FindAvailableChannel()
 		{
-			for (int i = 0; i < m_Channels.size(); i++)
+			for (auto& channel : m_Channels)
 			{
-				if (m_Channels[i].IsAvailable())
+				if (channel.IsAvailable())
 				{
-					return &m_Channels[i];
+					return &channel;
 				}
 			}
+
 			return nullptr;
 		}
 

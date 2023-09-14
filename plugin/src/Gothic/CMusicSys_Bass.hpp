@@ -142,28 +142,30 @@ namespace GOTHIC_NAMESPACE
 						{
 							musicFileRef.Loading = true;
 
-							std::thread([loadingStart = std::chrono::system_clock::now(), myFile = std::move(file), &musicFileRef]() {
+							std::thread([](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
 								
+								auto loadingStart = std::chrono::system_clock::now();
+
 								zSTRING path = myFile->GetFullPath();
 								const long size = myFile->Size();
 								
-								musicFileRef.Buffer.resize(static_cast<size_t>(size));
-								const long read = myFile->Read(musicFileRef.Buffer.data(), size);
+								myMusicPtr->Buffer.resize(static_cast<size_t>(size));
+								const long read = myFile->Read(myMusicPtr->Buffer.data(), size);
 
 								if (read == size)
 								{
-									musicFileRef.Ready = true;
+									myMusicPtr->Ready = true;
 
 									NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", path) + Union::StringUTF8(read));
 								}
-
-								musicFileRef.Loading = false;
+		
+								myMusicPtr->Loading = false;
 								myFile->Close();
 											
 								auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
 
 								NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", path, loadingTime));
-							}).detach();
+								}, std::move(file), &musicFileRef).detach();
 						}
 						else
 						{

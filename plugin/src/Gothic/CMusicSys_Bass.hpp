@@ -142,9 +142,7 @@ namespace GOTHIC_NAMESPACE
 						{
 							musicFileRef.Loading = true;
 
-							std::thread([](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
-								
-								auto loadingStart = std::chrono::system_clock::now();
+							std::thread([loadingStart = std::chrono::system_clock::now()](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
 
 								zSTRING path = myFile->GetFullPath();
 								const long size = myFile->Size();

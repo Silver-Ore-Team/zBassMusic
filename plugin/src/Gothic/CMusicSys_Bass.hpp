@@ -110,26 +110,25 @@ namespace GOTHIC_NAMESPACE
 				return m_ActiveTheme;
 			}
 
-			zCMusicTheme* theme = zNEW(zCMusicTheme);
-			if (NH::Bass::Options->CreateMainParserCMusicTheme && parser->GetSymbol(identifier) != nullptr)
+			zCMusicTheme* theme = new zCMusicTheme;
+			
+			if (!(NH::Bass::Options->CreateMainParserCMusicTheme && parser->CreateInstance(identifier, &theme->fileName)))
 			{
-				parser->CreateInstance(identifier, (void*)(&(theme->fileName)));
+				parserMusic->CreateInstance(identifier, &theme->fileName);
 			}
-			else
-			{
-				parserMusic->CreateInstance(identifier, (void*)(&(theme->fileName)));
-			}
-			theme->name = identifier;
 
 			if (IsDirectMusicFormat(theme->fileName))
 			{
-				zDELETE(theme);
+				delete theme;
 				theme = m_DirectMusic->LoadThemeByScript(id);
 			}
 			else
 			{
+				theme->name = identifier;
+
 				zoptions->ChangeDir(DIR_MUSIC);
-				zFILE* file = zfactory->CreateZFile(theme->fileName);
+				std::unique_ptr<zFILE> file{ zfactory->CreateZFile(theme->fileName) };
+
 				if (file->Exists())
 				{
 					NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
@@ -137,26 +136,39 @@ namespace GOTHIC_NAMESPACE
 					{
 						NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("Loading music: ") + file->GetFullPath().ToChar());
 
-						file->Open(false);
-						musicFileRef.Loading = true;
-						auto loadingStart = std::chrono::system_clock::now();
+						const auto error = file->Open(false);
 
-						std::thread loadingThread([file, &musicFileRef, loadingStart]() {
-							size_t size = file->Size();
-							musicFileRef.Buffer.resize(size);
-							size_t read = file->Read(musicFileRef.Buffer.data(), size);
-							file->Close();
+						if (error == 0)
+						{
+							musicFileRef.Loading = true;
 
-							musicFileRef.Ready = true;
-							musicFileRef.Loading = false;
+							std::thread([loadingStart = std::chrono::system_clock::now()](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
 
-							uint64_t loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
+								zSTRING path = myFile->GetFullPath();
+								const long size = myFile->Size();
 								
-							NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", file->GetFullPath()) + Union::StringUTF8(read));
-							NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", file->GetFullPath(), loadingTime));
-						});
+								myMusicPtr->Buffer.resize(static_cast<size_t>(size));
+								const long read = myFile->Read(myMusicPtr->Buffer.data(), size);
 
-						loadingThread.detach();
+								if (read == size)
+								{
+									myMusicPtr->Ready = true;
+
+									NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", path) + Union::StringUTF8(read));
+								}
+		
+								myMusicPtr->Loading = false;
+								myFile->Close();
+											
+								auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
+
+								NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", path, loadingTime));
+								}, std::move(file), &musicFileRef).detach();
+						}
+						else
+						{
+							NH::Log::Error("CMusicSys_Bass", Union::StringUTF8("Could not open file: ") + theme->fileName.ToChar());
+						}
 					}
 				}
 				else

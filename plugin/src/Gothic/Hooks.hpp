@@ -17,10 +17,15 @@ namespace GOTHIC_NAMESPACE
 		if (!zoptions->Parm("ZNOMUSIC")) {
 			auto* bassEngine = NH::Bass::Engine::GetInstance();
 			auto* directMusic = dynamic_cast<zCMusicSys_DirectMusic*>(zmusic);
-			zmusic = new CMusicSys_Bass(bassEngine, directMusic);
-			float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
-			zmusic->SetVolume(volume);
-			NH::Log::Info("CGameManager::Init_Hook", "Set music system to CMusicSys_Bass");
+			if (directMusic) {
+				zmusic = new CMusicSys_Bass(bassEngine, directMusic);
+				float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
+				zmusic->SetVolume(volume);
+				NH::Log::Info("CGameManager::Init_Hook", "Set music system to CMusicSys_Bass");
+			}
+			else {
+				NH::Log::Error("CGameManager::Init_Hook", "Failed to initialize");
+			}
 		}
 	}
 }

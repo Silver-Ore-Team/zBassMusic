@@ -15,6 +15,9 @@ target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G2A)
 target_include_directories(plugin PRIVATE "src/")
 target_link_libraries(plugin PRIVATE union-api gothic-api bass)
 
+add_custom_command(TARGET plugin PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${GOTHIC_USERAPI_DIR} "${GOTHIC_API_WORKING_DIR}/ZenGin/Gothic_UserAPI")
+
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
 install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
 install(SCRIPT "${VDF_DIR}/vdf.cmake")

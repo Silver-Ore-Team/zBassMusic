@@ -16,7 +16,7 @@ namespace GOTHIC_NAMESPACE
 
 		if (!zoptions->Parm("ZNOMUSIC")) {
 			auto* bassEngine = NH::Bass::Engine::GetInstance();
-			auto* directMusic = (zCMusicSys_DirectMusic*)zmusic;
+			auto* directMusic = dynamic_cast<zCMusicSys_DirectMusic*>(zmusic);
 			zmusic = new CMusicSys_Bass(bassEngine, directMusic);
 			float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
 			zmusic->SetVolume(volume);

@@ -1,9 +1,7 @@
 ﻿name: CMake Build
 on:
     push:
-        branches: ["main"]
-        tags: 
-        - 'v*'
+        branches: ["main", "dev"]
 permissions: write-all
 jobs:
     build:
@@ -36,50 +34,3 @@ jobs:
           with:
             name: vdf-release
             path: out/install/x86-release/*.vdf
-    release:
-        name: Release tag
-        runs-on: windows-2022
-        needs:
-        - build
-        if: github.ref_type == 'tag'
-        steps:
-        - name: Download DLL
-          uses: actions/download-artifact@v3
-          with:
-            name: dll-release
-            path: out/install/x86-release/bin/
-        - name: Download VDF
-          uses: actions/download-artifact@master
-          with:
-            name: vdf-release
-            path: out/install/x86-release/
-        - name: Zip dll-release
-          run: Compress-Archive out/install/x86-release/bin/* dll-release.zip
-        - name: Create Release
-          id: create_release
-          uses: actions/create-release@latest
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-          with:
-            tag_name: ${{ github.ref_name }}
-            release_name: ${{ github.ref_name }}
-            draft: false
-            prerelease: false
-        - name: Upload Release ZIP 
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: dll-release.zip
-            asset_name: zBassMusic.zip
-            asset_content_type: application/zip
-        - name: Upload Release VDF
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: out/install/x86-release/zBassMusic.vdf
-            asset_name: zBassMusic.vdf
-            asset_content_type: application/octet-stream

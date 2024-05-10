@@ -55,7 +55,7 @@ namespace NH
 
 			if (!file->Ready && file->Loading)
 			{
-                static int32_t delay = 500;
+                static int32_t delay = 10;
                 log->Debug("{0} is loading, will retry after {1} ms", musicDef.Filename, delay);
 				MusicDefRetry retry{ MusicDef(musicDef), delay };
 				m_PlayMusicRetryList.emplace_back(retry);

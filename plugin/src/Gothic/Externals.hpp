@@ -1,4 +1,6 @@
 #include <thread>
+#include <string>
+#include <sstream>
 
 namespace GOTHIC_NAMESPACE
 {
@@ -74,6 +76,54 @@ namespace GOTHIC_NAMESPACE
 		return 0;
 	}
 
+    // func void BassMusic_TransitionRule_OnBeat(var string name, var string interval, var string timePoints)
+    int BassMusic_TransitionRule_OnBeat()
+    {
+        NH::Logger* log = NH::CreateLogger("zBassMusic::BassMusic_TransitionRule_OnBeat");
+
+        zSTRING name;
+        zSTRING inInterval;
+        zSTRING inTimePoints;
+
+        parser->GetParameter(inTimePoints);
+        parser->GetParameter(inInterval);
+        parser->GetParameter(name);
+
+        log->Trace("name = {0}", name.ToChar());
+        log->Trace("interval = {0}", inInterval.ToChar());
+        log->Trace("timePoints = {0}", inTimePoints.ToChar());
+
+        try
+        {
+            // Parse interval
+            double interval = std::stod(inInterval.ToChar());
+            log->Trace("parsed interval = {0}", interval);
+
+            // Parse time points
+            std::vector<double> timePoints;
+            std::stringstream timePointsStream(inTimePoints.ToChar());
+            std::string timePoint;
+            while (std::getline(timePointsStream, timePoint, ';'))
+            {
+                double point = std::stod(timePoint);
+                log->Trace("parsed point = {0}", point);
+                timePoints.push_back(point);
+            }
+
+            NH::Bass::Engine::GetInstance()->GetTransitionScheduler().AddRuleOnBeat(name.ToChar(), interval, timePoints);
+        }
+        catch (const std::invalid_argument& e)
+        {
+            log->Fatal("invalid_argument: {0}\n  at {1}:{2}", e.what(), __FILE__, __LINE__);
+        }
+        catch (const std::out_of_range& e)
+        {
+            log->Fatal("out_of_range: {0}\n  at {1}:{2}", e.what(), __FILE__, __LINE__);
+        }
+
+        return 0;
+    }
+
 	void DefineExternals()
 	{
 		if (GetGameVersion() != ENGINE)
@@ -94,6 +144,8 @@ namespace GOTHIC_NAMESPACE
 		parser->DefineExternal("BassMusic_Opt_TransitionTime", BassMuisc_Opt_TransitionTime, zPAR_TYPE_VOID, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
 		parser->DefineExternal("BassMusic_Opt_ForceDisableReverb", BassMusic_Opt_ForceDisableReverb, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
 		parser->DefineExternal("BassMusic_Opt_ForceFadeTransition", BassMusic_Opt_ForceFadeTransition, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
+
+		parser->DefineExternal("BassMusic_TransitionRule_OnBeat", BassMusic_TransitionRule_OnBeat, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
 
 		if (NH::Bass::Options->CreateMainParserCMusicTheme)
 		{

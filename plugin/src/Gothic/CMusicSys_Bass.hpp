@@ -5,7 +5,7 @@ namespace GOTHIC_NAMESPACE
 		void Event_OnEnd(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
-            log->Debug("{0}", musicDef.Filename);
+            log->Trace("{0}", musicDef.Filename);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -22,7 +22,7 @@ namespace GOTHIC_NAMESPACE
 		void Event_OnTransition(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
-            log->Debug("{0}, {1} ms", musicDef.Filename, data);
+            log->Trace("{0}, {1} ms", musicDef.Filename, data);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -39,7 +39,7 @@ namespace GOTHIC_NAMESPACE
 		void Event_OnChange(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
-            log->Debug("{0}", musicDef.Filename);
+            log->Trace("{0}", musicDef.Filename);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -105,7 +105,7 @@ namespace GOTHIC_NAMESPACE
 				return nullptr;
 			}
 
-            log->Debug("LoadThemeByScript: {0}", id.ToChar());
+            log->Trace("LoadThemeByScript: {0}", id.ToChar());
 
 			zSTRING identifier = id;
 			if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
@@ -137,7 +137,7 @@ namespace GOTHIC_NAMESPACE
 					NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
 					if (!musicFileRef.Ready && !musicFileRef.Loading)
 					{
-                        log->Debug("Loading music: {0}", file->GetFullPath().ToChar());
+                        log->Trace("Loading music: {0}", file->GetFullPath().ToChar());
 
 						const auto error = file->Open(false);
 
@@ -156,7 +156,7 @@ namespace GOTHIC_NAMESPACE
 								if (read == size)
 								{
 									myMusicPtr->Ready = true;
-                                    log->Debug("Music ready: {0}, size = {1}", path.ToChar(), read);
+                                    log->Trace("Music ready: {0}, size = {1}", path.ToChar(), read);
 								}
 
 								myMusicPtr->Loading = false;
@@ -164,7 +164,7 @@ namespace GOTHIC_NAMESPACE
 											
 								auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
 
-                                log->Debug("Loading done: {0}, time = {1}", path.ToChar(), loadingTime);
+                                log->Trace("Loading done: {0}, time = {1}", path.ToChar(), loadingTime);
                             }, std::move(file), &musicFileRef).detach();
 						}
 						else
@@ -189,11 +189,11 @@ namespace GOTHIC_NAMESPACE
 				return;
 			}
 
-            log->Debug("PlayThemeByScript: {0}", id.ToChar());
+            log->Trace("PlayThemeByScript: {0}", id.ToChar());
 
 			if (Globals->FullScriptControl)
 			{
-                log->Debug("PlayThemeByScript skipped because FullScriptControl is enabled.");
+                log->Trace("PlayThemeByScript skipped because FullScriptControl is enabled.");
 				return;
 			}
 
@@ -244,7 +244,7 @@ namespace GOTHIC_NAMESPACE
 			zTMus_TransType const& transition = zMUS_TR_DEFAULT, 
 			zTMus_TransSubType const& subTransition = zMUS_TRSUB_DEFAULT) override
 		{
-            log->Debug("PlayTheme: {0}", theme->fileName.ToChar());
+            log->Trace("PlayTheme: {0}", theme->fileName.ToChar());
 
 			if (IsDirectMusicFormat(theme->fileName))
 			{
@@ -312,14 +312,14 @@ namespace GOTHIC_NAMESPACE
 
 		void Mute() override
 		{
-            log->Debug("Mute");
+            log->Trace("Mute");
 			m_BassEngine->SetVolume(0.0f);
 			m_DirectMusic->Mute();
 		}
 
 		void Stop() override
 		{
-            log->Debug("Stop");
+            log->Trace("Stop");
 			m_ActiveTheme = nullptr;
 			m_DirectMusic->Stop();
 		}

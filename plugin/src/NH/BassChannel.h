@@ -4,6 +4,8 @@
 #include <NH/BassEventManager.h>
 #include <NH/Logger.h>
 
+#include <functional>
+
 namespace NH
 {
 	namespace Bass
@@ -35,11 +37,19 @@ namespace NH
 
 			bool IsAvailable() { return m_Status == ChannelStatus::AVAILABLE; };
 
+            double CurrentPosition() const;
+
+            double CurrentLength() const;
+
+            const MusicDef& CurrentMusic() const;
+
 			static void CALLBACK OnTransitionSync(HSYNC, DWORD channel, DWORD data, void* userData);
 
 			static void CALLBACK OnEndSync(HSYNC, DWORD channel, DWORD data, void* userData);
 
 			static void CALLBACK OnVolumeSlideSync(HSYNC, DWORD channel, DWORD data, void* userData);
+
+        private:
 		};
 	}
 }

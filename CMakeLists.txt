@@ -1,9 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.25)
-set(PROJECT_VERSION "0.0.20")
-if(DEFINED ENV{PROJECT_VERSION})
-	set(PROJECT_VERSION "$ENV{PROJECT_VERSION}")
-endif()
-project(zBassMusic VERSION ${PROJECT_VERSION})
+project(zBassMusic VERSION "0.0.20")
 
 option(BUILD_VDF "Build .VDF file with plugin" ON)
 

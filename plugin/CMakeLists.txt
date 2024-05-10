@@ -11,12 +11,9 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/NH.ico" DESTINATION "${CMAKE_CURRENT_BINA
 file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
-target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G2A)
+target_compile_definitions(plugin PRIVATE _UNION_API_LIB __G1 __G2A)
 target_include_directories(plugin PRIVATE "src/")
 target_link_libraries(plugin PRIVATE union-api gothic-api bass)
-
-add_custom_command(TARGET plugin PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${GOTHIC_USERAPI_DIR} "${GOTHIC_API_WORKING_DIR}/ZenGin/Gothic_UserAPI")
 
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
 install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")

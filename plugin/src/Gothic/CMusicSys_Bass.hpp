@@ -154,15 +154,15 @@ namespace GOTHIC_NAMESPACE
 								{
 									myMusicPtr->Ready = true;
 
-									NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", path) + Union::StringUTF8(read));
+									NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", path.ToChar()) + Union::StringUTF8(read));
 								}
-		
+
 								myMusicPtr->Loading = false;
 								myFile->Close();
 											
 								auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
 
-								NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", path, loadingTime));
+								NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", path.ToChar(), loadingTime));
 								}, std::move(file), &musicFileRef).detach();
 						}
 						else

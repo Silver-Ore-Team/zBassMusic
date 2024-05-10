@@ -3,6 +3,7 @@
 #include <NH/BassTypes.h>
 #include <NH/BassEventManager.h>
 #include <NH/BassChannel.h>
+#include <NH/Logger.h>
 #include <vector>
 #include <mutex>
 #include <chrono>
@@ -13,6 +14,7 @@ namespace NH
 	{
 		class Engine
 		{
+            static NH::Logger* log;
 			static Engine* s_Instance;
 			bool m_Initialized;
 			float m_MasterVolume = 1.0f;

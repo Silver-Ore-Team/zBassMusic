@@ -1,12 +1,13 @@
 #include "NH/BassOptions.h"
 #include "NH/Bass.h"
-#include "NH/Union.h"
 #include <algorithm>
 
 namespace NH
 {
 	namespace Bass
 	{
+        NH::Logger* Engine::log = NH::CreateLogger("zBassMusic::Engine");
+
 		Engine* Engine::s_Instance = nullptr;
 
 		Engine* Engine::GetInstance()
@@ -23,12 +24,12 @@ namespace NH
 			for (auto& m : m_MusicFiles)
 			{
 				if (m.Filename == filename) {
-					Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: Buffer already exists for ") + filename);
+                    log->Debug("Buffer already exists for {0}", filename);
 					return m;
 				}
 			}
 
-			Log::Info("BassEngine", Union::StringUTF8("CreateMusicBuffer: New buffer for ") + filename);
+            log->Debug("New buffer for {0}", filename);
 		
 			uint32_t index = m_MusicFiles.Insert({ filename, std::vector<char>() });
 			return m_MusicFiles[index];
@@ -47,32 +48,36 @@ namespace NH
 
 			if (!file)
 			{
-				Log::Error("BassEngine", Union::StringUTF8("Can not play ") + musicDef.Filename + ". Music file is not loaded.");
+                log->Error("Could not play {0}. Music file is not loaded.\n  at {1}:{2}",
+                           musicDef.Filename, __FILE__, __LINE__);
 				return;
 			}
 
 			if (!file->Ready && file->Loading)
 			{
-				Log::Info("BassEngine", musicDef.Filename + " is loading, will PlayMusic retry in 500ms");
-				MusicDefRetry retry{ MusicDef(musicDef), 500 };
+                static int32_t delay = 500;
+                log->Debug("{0} is loading, will retry after {1} ms", musicDef.Filename, delay);
+				MusicDefRetry retry{ MusicDef(musicDef), delay };
 				m_PlayMusicRetryList.emplace_back(retry);
 				return;
 			}
 
 			if (!file->Ready)
 			{
-				Log::Error("BassEngine", Union::StringUTF8("Invalid sate: ") + musicDef.Filename + ". Music not ready and not loading.");
+                log->Error("Invalid state. MusicDef is not ready but not loading {0}\n  at {1}:{2}",
+                           musicDef.Filename, __FILE__, __LINE__);
 				return;
 			}
 
 			Channel* channel = FindAvailableChannel();
 			if (channel == nullptr)
 			{
-				Log::Error("BassEngine", Union::StringUTF8("Can not play. No channel is available."));
+                log->Error("Could not play {0}. No channel is available.\n  at {1}:{2}",
+                           musicDef.Filename, __FILE__, __LINE__);
 				return;
 			}
 
-			Log::Info("BassEngine", Union::StringUTF8("Starting playback: ") + musicDef.Filename);
+            log->Info("Starting playback: {0}", musicDef.Filename);
 			if (m_ActiveChannel)
 			{
 				m_ActiveChannel->Stop();
@@ -99,7 +104,7 @@ namespace NH
 				retry.delayMs -= delta;
 				if (retry.delayMs < 0)
 				{
-					Log::Debug("BassEngine", Union::StringUTF8("PlayMusic retry: ") + retry.musicDef.Filename);
+                    log->Trace("PlayMusic({0})", retry.musicDef.Filename);
 					PlayMusic(retry.musicDef);
 				}
 			}
@@ -119,12 +124,12 @@ namespace NH
 
 			if (volume > 1.0f)
 			{
-				Log::Warn("BassEngine", Union::StringUTF8("SetVolume ") + Union::StringUTF8(volume) + " clamped to 1.0f");
-				volume = 1.0f;
+                log->Warning("SetVolume({0}f) clamped to 1.0f", volume);
+                volume = 1.0f;
 			}
 			if (volume < 0.0f)
 			{
-				Log::Warn("BassEngine", Union::StringUTF8("SetVolume ") + Union::StringUTF8(volume) + " clamped to 0.0f");
+                log->Warning("SetVolume({0}f) clamped to 0.0f", volume);
 				volume = 0.0f;
 			}
 
@@ -166,10 +171,8 @@ namespace NH
 				bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
 				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
 
-				Log::Info("BassEngine", Union::StringUTF8("Available device: ") + deviceInfo.name
-					+ ", driver: "   + deviceInfo.driver
-					+ ", enabled: "  + (enabled ? "true" : "false")
-					+ ", default: "  + (isDefault ? "true" : "false"));
+                log->Trace("Detected audio device\n\tname: {0}\n\tdriver: {1}\n\tenabled: {2}\n\tdefault: {3}",
+                             deviceInfo.name, deviceInfo.driver, enabled, isDefault);
 
 				if (enabled && isDefault)
 				{
@@ -179,21 +182,27 @@ namespace NH
 			}
 
 			BASS_GetDeviceInfo(deviceIndex, &deviceInfo);
-			Log::Info("BassEngine", Union::StringUTF8("Selected device: ") + deviceInfo.name);
+            log->Trace("Selected device: {}", deviceInfo.name);
 
 			m_Initialized = BASS_Init(deviceIndex, 44100, 0, nullptr, nullptr);
 			if (!m_Initialized)
 			{
-				Log::Error("BassEngine", Union::StringUTF8("Could not initialize BASS: ") + ErrorCodeToString(BASS_ErrorGetCode()));
+                log->Error("Could not initialize BASS using BASS_Init\n  {0}\n  at {1}:{2}",
+                           ErrorCodeToString(BASS_ErrorGetCode()), __FILE__, __LINE__);
 				return;
 			}
 
 			BASS_INFO info;
 			BASS_GetInfo(&info);
-			Log::Info("BassEngine", Union::StringUTF8("BASS Sample Rate: ") + Union::StringUTF8(info.freq) + Union::StringUTF8(" Hz"));
+            log->Trace("Sample Rate: {0} Hz", info.freq);
 
 			static constexpr size_t Channels_Max = 8;
-			m_Channels.resize(Channels_Max, Channel{m_EventManager});
+            m_Channels.clear();
+            for (size_t i = 0; i < Channels_Max; i++) {
+                m_Channels.emplace_back(i, m_EventManager);
+            }
+
+            log->Info("Initialized with device: {0}", deviceInfo.name);
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)

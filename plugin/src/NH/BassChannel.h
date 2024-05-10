@@ -2,6 +2,7 @@
 
 #include <NH/BassTypes.h>
 #include <NH/BassEventManager.h>
+#include <NH/Logger.h>
 
 namespace NH
 {
@@ -16,13 +17,17 @@ namespace NH
 
 		class Channel
 		{
+            NH::Logger* log;
+            size_t m_Index;
 			EventManager& m_EventManager;
 			ChannelStatus m_Status = ChannelStatus::AVAILABLE;
 			HSTREAM m_Stream = 0;
 			MusicDef m_Music{};
 
 		public:
-			explicit Channel(EventManager& em) : m_EventManager(em) {};
+			explicit Channel(size_t index, EventManager& em) : m_Index(index), m_EventManager(em) {
+                log = NH::CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
+            };
 
 			void Play(const MusicDef& music, const MusicFile* file);
 

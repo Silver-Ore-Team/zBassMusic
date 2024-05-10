@@ -1,6 +1,7 @@
 #pragma once
 
 #include <NH/BassTypes.h>
+#include <NH/Logger.h>
 #include <Union/Array.h>
 #include <deque>
 
@@ -34,6 +35,8 @@ namespace NH
 
 		class EventManager
 		{
+            static NH::Logger* log;
+
 			struct Event
 			{
 				EventType type;

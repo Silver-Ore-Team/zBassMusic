@@ -1,5 +1,4 @@
 #include "BassChannel.h"
-#include <NH/Union.h>
 #include <NH/Bass.h>
 #include <NH/BassOptions.h>
 
@@ -18,18 +17,19 @@ namespace NH
 			m_Stream = BASS_StreamCreateFile(true, file->Buffer.data(), 0, file->Buffer.size(), 0);
 			if (!m_Stream)
 			{
-				NH::Log::Error("BassChannel", Union::StringUTF8("Could not create stream: ") + m_Music.Filename);
-				NH::Log::Error("BassChannel", Union::StringUTF8("Could not create stream: ") + Engine::ErrorCodeToString(BASS_ErrorGetCode()));
+                log->Error("Could not create stream: {0}\n  error: {1}\n  at {2}:{3}",
+                           m_Music.Filename, Engine::ErrorCodeToString(BASS_ErrorGetCode()),
+                           __FILE__, __LINE__);
 				return;
 			}
 
 			BASS_ChannelStart(m_Stream);
 
-			Log::Debug("BassChannel", Union::StringUTF8("Channel started: ") + m_Music.Filename);
+            log->Debug("Channel started: {0}", m_Music.Filename);
 
 			if (Options->ForceFadeTransition)
 			{
-				Log::Info("BassChannel", Union::StringUTF8("BASSENGINE.ForceFadeTransition is set, forcing TransitionType::FADE"));
+                log->Debug("BASSENGINE.ForceFadeTransition is set, forcing TransitionType::FADE");
 				m_Music.StartTransition.Type = TransitionType::FADE;
 				m_Music.EndTransition.Type = TransitionType::FADE;
 			}
@@ -47,7 +47,7 @@ namespace NH
 			if (m_Music.Loop)
 			{
 				BASS_ChannelFlags(m_Stream, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
-				Log::Debug("BassChannel", Union::StringUTF8("Loop set: ") + music.Filename);
+                log->Debug("Loop set {0}", music.Filename);
 			}
 
 			if (!Options->ForceDisableReverb && m_Music.Effects.Reverb)
@@ -56,10 +56,11 @@ namespace NH
 				BASS_DX8_REVERB params{ 0, m_Music.Effects.ReverbMix, m_Music.Effects.ReverbTime, 0.001f };
 				if (!BASS_FXSetParameters(fx, (void*)&params))
 				{
-					Log::Error("BassChannel", Union::StringUTF8("Could not set reverb FX: ") + m_Music.Filename);
-					Log::Error("BassChannel", Union::StringUTF8("Could not set reverb FX: ") + Engine::ErrorCodeToString(BASS_ErrorGetCode()));
+                    log->Error("Could not set reverb FX: {0}\n  error: {1}\n  at {2}:{3}",
+                               m_Music.Filename, Engine::ErrorCodeToString(BASS_ErrorGetCode()),
+                               __FILE__, __LINE__);
 				}
-				Log::Debug("BassChannel", Union::StringUTF8("Reverb set: ") + m_Music.Filename);
+                log->Debug("Reverb set: {0}", m_Music.Filename);
 			}
 
 			if (m_Music.EndTransition.Type != TransitionType::NONE)
@@ -68,11 +69,11 @@ namespace NH
 				const QWORD transitionBytes = BASS_ChannelSeconds2Bytes(m_Stream, m_Music.EndTransition.Duration / 1000.0f);
 				const QWORD offset = length - transitionBytes;
 				BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, offset, OnTransitionSync, this);
-				Log::Debug("BassChannel", Union::StringUTF8("SyncTransitionPos set: ") + m_Music.Filename);
+                log->Debug("SyncTransitionPos set: {0}", m_Music.Filename);
 			}
 
 			BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnEndSync, this);
-			Log::Debug("BassChannel", Union::StringUTF8("SyncEnd set: ") + m_Music.Filename);
+            log->Debug("SyncEnd set: {0}", m_Music.Filename);
 
 			m_Status = ChannelStatus::PLAYING;
 			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, m_Music);

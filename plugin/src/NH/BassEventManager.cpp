@@ -1,10 +1,11 @@
 #include "BassEventManager.h"
-#include <NH/Union.h>
 
 namespace NH
 {
 	namespace Bass
 	{
+        NH::Logger* EventManager::log = NH::CreateLogger("zBassMusic::EventManager");
+
 		EventSubscriber* EventManager::AddSubscriber(const EventType type, const EventSubscriberFunction function, void* userData)
 		{
 			const int index = m_Subscribers.Insert({type, function, userData});
@@ -31,7 +32,7 @@ namespace NH
 		{
 			while (!m_EventQueue.empty())
 			{
-				NH::Log::Debug("EM", Union::StringUTF8("Processing events, left: ") + Union::StringUTF8(m_EventQueue.size()));
+                log->Debug("Processing {0} events", m_EventQueue.size());
 				Event event = m_EventQueue.back();
 				m_EventQueue.pop_back();
 				for (const auto& s : m_Subscribers)

@@ -4,7 +4,8 @@ namespace GOTHIC_NAMESPACE
 	{
 		void Event_OnEnd(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
-			NH::Log::Debug("Event", Union::StringUTF8("Event_OnEnd: ") + musicDef.Filename);
+            static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
+            log->Debug("{0}", musicDef.Filename);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -20,8 +21,8 @@ namespace GOTHIC_NAMESPACE
 
 		void Event_OnTransition(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
-			NH::Log::Debug("Event", Union::StringUTF8("Event_OnTransition: ") + musicDef.Filename
-				+ Union::StringUTF8::Format(", %i ms", data));
+            static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
+            log->Debug("{0}, {1} ms", musicDef.Filename, data);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -37,7 +38,8 @@ namespace GOTHIC_NAMESPACE
 
 		void Event_OnChange(const NH::Bass::MusicDef& musicDef, int data, void* userData)
 		{
-			NH::Log::Debug("Event", Union::StringUTF8("Event_OnChange: ") + Union::StringUTF8(musicDef.Filename.ToChar()));
+            static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
+            log->Debug("{0}", musicDef.Filename);
 
 			zSTRING filename{ musicDef.Filename.ToChar() };
 			zSTRING name{ musicDef.Name.ToChar() };
@@ -58,6 +60,7 @@ namespace GOTHIC_NAMESPACE
 	class CMusicSys_Bass : public zCMusicSystem
 	{
 	private:
+        NH::Logger* log = NH::CreateLogger("zBassMusic::CMusicSys_Bass");
 		NH::Bass::Engine* m_BassEngine;
 		zCMusicSys_DirectMusic* m_DirectMusic;
 		zCMusicTheme* m_ActiveTheme = nullptr;
@@ -102,7 +105,7 @@ namespace GOTHIC_NAMESPACE
 				return nullptr;
 			}
 
-			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("LoadThemeByScript: ") + id.ToChar());
+            log->Debug("LoadThemeByScript: {0}", id.ToChar());
 
 			zSTRING identifier = id;
 			if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
@@ -134,7 +137,7 @@ namespace GOTHIC_NAMESPACE
 					NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
 					if (!musicFileRef.Ready && !musicFileRef.Loading)
 					{
-						NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("Loading music: ") + file->GetFullPath().ToChar());
+                        log->Debug("Loading music: {0}", file->GetFullPath().ToChar());
 
 						const auto error = file->Open(false);
 
@@ -142,7 +145,7 @@ namespace GOTHIC_NAMESPACE
 						{
 							musicFileRef.Loading = true;
 
-							std::thread([loadingStart = std::chrono::system_clock::now()](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
+							std::thread([loadingStart = std::chrono::system_clock::now(), this](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr) {
 
 								zSTRING path = myFile->GetFullPath();
 								const long size = myFile->Size();
@@ -153,8 +156,7 @@ namespace GOTHIC_NAMESPACE
 								if (read == size)
 								{
 									myMusicPtr->Ready = true;
-
-									NH::Log::Info("CMusicSys_Bass", Union::StringUTF8::Format("%z ready, size ", path.ToChar()) + Union::StringUTF8(read));
+                                    log->Debug("Music ready: {0}, size = {1}", path.ToChar(), read);
 								}
 
 								myMusicPtr->Loading = false;
@@ -162,18 +164,18 @@ namespace GOTHIC_NAMESPACE
 											
 								auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
 
-								NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8::Format("%z loading took %I ms", path.ToChar(), loadingTime));
-								}, std::move(file), &musicFileRef).detach();
+                                log->Debug("Loading done: {0}, time = {1}", path.ToChar(), loadingTime);
+                            }, std::move(file), &musicFileRef).detach();
 						}
 						else
 						{
-							NH::Log::Error("CMusicSys_Bass", Union::StringUTF8("Could not open file: ") + theme->fileName.ToChar());
+                            log->Error("Could not open file {0}\n  at {1}{2}", theme->fileName.ToChar(), __FILE__, __LINE__);
 						}
 					}
 				}
 				else
 				{
-					NH::Log::Error("CMusicSys_Bass", Union::StringUTF8("Could not find file: ") + theme->fileName.ToChar());
+                    log->Error("Could not find file {0}\n  at {1}{2}", theme->fileName.ToChar(), __FILE__, __LINE__);
 				}
 			}
 
@@ -187,11 +189,11 @@ namespace GOTHIC_NAMESPACE
 				return;
 			}
 
-			NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("PlayThemeByScript: ") + id.ToChar());
+            log->Debug("PlayThemeByScript: {0}", id.ToChar());
 
 			if (Globals->FullScriptControl)
 			{
-				NH::Log::Info("CMusicSys_Bass", Union::StringUTF8("PlayThemeByScript skipped because FullScriptControl is enabled."));
+                log->Debug("PlayThemeByScript skipped because FullScriptControl is enabled.");
 				return;
 			}
 
@@ -242,7 +244,7 @@ namespace GOTHIC_NAMESPACE
 			zTMus_TransType const& transition = zMUS_TR_DEFAULT, 
 			zTMus_TransSubType const& subTransition = zMUS_TRSUB_DEFAULT) override
 		{
-			NH::Log::Debug(Union::StringUTF8("PlayTheme: ") + theme->fileName.ToChar());
+            log->Debug("PlayTheme: {0}", theme->fileName.ToChar());
 
 			if (IsDirectMusicFormat(theme->fileName))
 			{
@@ -310,14 +312,14 @@ namespace GOTHIC_NAMESPACE
 
 		void Mute() override
 		{
-			NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8("Mute"));
+            log->Debug("Mute");
 			m_BassEngine->SetVolume(0.0f);
 			m_DirectMusic->Mute();
 		}
 
 		void Stop() override
 		{
-			NH::Log::Debug("CMusicSys_Bass", Union::StringUTF8("Stop"));
+            log->Debug("Stop");
 			m_ActiveTheme = nullptr;
 			m_BassEngine->StopMusic();
 			m_DirectMusic->Stop();

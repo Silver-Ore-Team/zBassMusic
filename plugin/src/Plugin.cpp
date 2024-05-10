@@ -2,7 +2,6 @@
 #pragma warning(disable: 4005)
 
 #include <NH/BassOptions.h>
-#include <NH/Union.h>
 #include <NH/Bass.h>
 #include <Union/Hook.h>
 #include <ZenGin/zGothicAPI.h>
@@ -30,8 +29,8 @@ NH::Bass::BassOptions* NH::Bass::Options = new NH::Bass::BassOptions{};
 EXTERN_C_START
 __declspec(dllexport) void Game_Entry()
 {
-	NH::Bass::Options->LoggerLevelUnion = "DEBUG";
-	NH::Bass::Options->LoggerLevelZSpy = "DEBUG";
+	NH::Bass::Options->LoggerLevelUnion = "TRACE";
+	NH::Bass::Options->LoggerLevelZSpy = "TRACE";
 }
 
 __declspec(dllexport) void Game_Loop() 

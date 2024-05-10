@@ -5,6 +5,8 @@ namespace GOTHIC_NAMESPACE
 	auto Ivk_CGameManager_Init = Union::CreateHook(reinterpret_cast<void*>(zSwitch(0x004240C0, 0x00424C70)), &CGameManager::Init_Hook, Union::HookType::Hook_CallPatch);
 	inline void CGameManager::Init_Hook(HWND__*& hwnd)
 	{
+        static NH::Logger* log = NH::CreateLogger("zBassMusic::CGameManager::Init_Hook");
+
 		if (GetGameVersion() != ENGINE)
 		{
 			return;
@@ -21,10 +23,11 @@ namespace GOTHIC_NAMESPACE
 				zmusic = new CMusicSys_Bass(bassEngine, directMusic);
 				float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
 				zmusic->SetVolume(volume);
-				NH::Log::Info("CGameManager::Init_Hook", "Set music system to CMusicSys_Bass");
+                log->Info("Set music system to CMusicSys_Bass");
 			}
 			else {
-				NH::Log::Error("CGameManager::Init_Hook", "Failed to initialize");
+                log->Fatal("Failed to initialize, dynamic_cast<zCMusicSys_DirectMusic*>(zmusic) is null\n  at {0}{1}",
+                           __FILE__, __LINE__);
 			}
 		}
 	}

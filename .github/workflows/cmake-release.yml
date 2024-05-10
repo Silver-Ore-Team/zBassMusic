@@ -26,12 +26,12 @@ jobs:
         - name: CMake Install
           run: cmake --install out/build/x86-release --prefix out/install/x86-release
         - name: Archive DLL
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: dll-release
             path: out/install/x86-release/bin/*.dll
         - name: Archive VDF
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: vdf-release
             path: out/install/x86-release/*.vdf

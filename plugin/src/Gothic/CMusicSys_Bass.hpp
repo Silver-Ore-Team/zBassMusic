@@ -321,7 +321,6 @@ namespace GOTHIC_NAMESPACE
 		{
             log->Debug("Stop");
 			m_ActiveTheme = nullptr;
-			m_BassEngine->StopMusic();
 			m_DirectMusic->Stop();
 		}
 

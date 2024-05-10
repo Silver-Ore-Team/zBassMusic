@@ -1,5 +1,4 @@
 #include "Logger.h"
-#include "Gothic/Options.hpp"
 
 #include <ZenGin/zGothicAPI.h>
 
@@ -91,7 +90,6 @@ namespace NH {
     LoggerFactory *LoggerFactory::s_Instance = null;
 
     Logger *LoggerFactory::Create(const String &name) {
-//		Bass::Options->
         auto *logger = new NH::Logger(name, {
                 new NH::UnionConsoleLoggerAdapter(NH::LoggerLevel::Trace),
                 new NH::ZSpyLoggerAdapter(NH::LoggerLevel::Trace, "B")

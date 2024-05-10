@@ -70,8 +70,8 @@ namespace NH::Bass
             if (timePointCandidate <= 0 && intervalCandidate <= 0)
             {
                 log->Trace("Not found any candidates, rollback to INSTANT");
-                m_Monitors.emplace_back(ScheduleMonitor{ &activeChannel, 0, [&music](const std::function<void(const MusicDef&)>& onReady) {
-                    onReady(music);
+                m_Monitors.emplace_back(ScheduleMonitor{ &activeChannel, 0, [&nextMusic](const std::function<void(const MusicDef&)>& onReady) {
+                    onReady(nextMusic);
                 }});
                 return;
             }

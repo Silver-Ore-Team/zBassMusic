@@ -16,7 +16,7 @@ jobs:
         - uses: TheMrMilchmann/setup-msvc-dev@v2
           with:
             arch: x86
-            toolset: 14.37
+            toolset: 14.39
             export-path-to-vcvarsall: VCVARSALL
         - name: CMake Setup
           uses: lukka/get-cmake@latest

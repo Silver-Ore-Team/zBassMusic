@@ -69,23 +69,32 @@ namespace NH
 				return;
 			}
 
-			Channel* channel = FindAvailableChannel();
-			if (channel == nullptr)
-			{
+            if (!m_ActiveChannel)
+            {
+                FinalizeScheduledMusic(musicDef);
+                return;
+            }
+
+            m_TransitionScheduler.Schedule(*m_ActiveChannel, musicDef);
+		}
+
+        void Engine::FinalizeScheduledMusic(const NH::Bass::MusicDef &musicDef)
+        {
+            Channel *channel = FindAvailableChannel();
+            if (channel == nullptr) {
                 log->Error("Could not play {0}. No channel is available.\n  at {1}:{2}",
                            musicDef.Filename, __FILE__, __LINE__);
-				return;
-			}
+                return;
+            }
 
             log->Info("Starting playback: {0}", musicDef.Filename);
-			if (m_ActiveChannel)
-			{
-				m_ActiveChannel->Stop();
-			}
+            if (m_ActiveChannel) {
+                m_ActiveChannel->Stop();
+            }
 
-			m_ActiveChannel = channel;
-			m_ActiveChannel->Play(musicDef, file);
-		}
+            m_ActiveChannel = channel;
+            m_ActiveChannel->Play(musicDef, GetMusicFile(musicDef.Filename));
+        }
 
 		void Engine::Update()
 		{
@@ -109,6 +118,11 @@ namespace NH
 				}
 			}
 			std::erase_if(m_PlayMusicRetryList, [](const MusicDefRetry& retry) { return retry.delayMs < 0; });
+
+            m_TransitionScheduler.Update([this](const MusicDef& musicDef) {
+                log->Trace("onReady from scheduler {0}", musicDef.Filename);
+                FinalizeScheduledMusic(musicDef);
+            });
 
 			BASS_Update(delta);
 
@@ -147,6 +161,11 @@ namespace NH
 			return m_EventManager;
 		}
 
+        TransitionScheduler& Engine::GetTransitionScheduler()
+        {
+            return m_TransitionScheduler;
+        }
+
 		void Engine::StopMusic()
 		{
 			if (!m_Initialized)
@@ -164,7 +183,7 @@ namespace NH
 
 		Engine::Engine()
 		{
-			size_t deviceIndex = 0;
+            size_t deviceIndex = 0;
 			BASS_DEVICEINFO deviceInfo;
 			for (size_t i = 1; BASS_GetDeviceInfo(i, &deviceInfo); i++)
 			{

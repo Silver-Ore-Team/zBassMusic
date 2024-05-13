@@ -3,6 +3,7 @@
 #include <NH/BassTypes.h>
 #include <NH/BassEventManager.h>
 #include <NH/BassChannel.h>
+#include <NH/BassTransitionScheduler.h>
 #include <NH/Logger.h>
 #include <vector>
 #include <mutex>
@@ -22,6 +23,7 @@ namespace NH
 			std::vector<Channel> m_Channels;
 			Channel* m_ActiveChannel = nullptr;
 			EventManager m_EventManager{};
+            TransitionScheduler m_TransitionScheduler{};
 
 			std::mutex m_PlayMusicMutex;
 			std::vector<MusicDefRetry> m_PlayMusicRetryList;
@@ -41,6 +43,8 @@ namespace NH
 
 			EventManager& GetEM();
 
+            TransitionScheduler& GetTransitionScheduler();
+
 			void StopMusic();
 
 		private:
@@ -49,6 +53,8 @@ namespace NH
 			MusicFile* GetMusicFile(const Union::StringUTF8& filename);
 
 			Channel* FindAvailableChannel();
+
+            void FinalizeScheduledMusic(const MusicDef& musicDef);
 
 		public:
 			static Union::StringUTF8 ErrorCodeToString(int code);

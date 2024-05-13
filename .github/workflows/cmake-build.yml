@@ -2,6 +2,9 @@
 on:
     push:
         branches: ["main", "dev"]
+        paths-ignore:
+          - 'README.md'
+          - 'docs/**'
 permissions: write-all
 jobs:
     build:

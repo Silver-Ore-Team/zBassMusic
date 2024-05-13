@@ -25,7 +25,7 @@ namespace NH
 
 			BASS_ChannelStart(m_Stream);
 
-            log->Debug("Channel started: {0}", m_Music.Filename);
+            log->Info("Channel started: {0}", m_Music.Filename);
 
 			if (Options->ForceFadeTransition)
 			{
@@ -47,7 +47,7 @@ namespace NH
 			if (m_Music.Loop)
 			{
 				BASS_ChannelFlags(m_Stream, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
-                log->Debug("Loop set {0}", music.Filename);
+                log->Trace("Loop set {0}", music.Filename);
 			}
 
 			if (!Options->ForceDisableReverb && m_Music.Effects.Reverb)
@@ -60,7 +60,7 @@ namespace NH
                                m_Music.Filename, Engine::ErrorCodeToString(BASS_ErrorGetCode()),
                                __FILE__, __LINE__);
 				}
-                log->Debug("Reverb set: {0}", m_Music.Filename);
+                log->Trace("Reverb set: {0}", m_Music.Filename);
 			}
 
 			if (m_Music.EndTransition.Type != TransitionType::NONE)
@@ -69,15 +69,38 @@ namespace NH
 				const QWORD transitionBytes = BASS_ChannelSeconds2Bytes(m_Stream, m_Music.EndTransition.Duration / 1000.0f);
 				const QWORD offset = length - transitionBytes;
 				BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, offset, OnTransitionSync, this);
-                log->Debug("SyncTransitionPos set: {0}", m_Music.Filename);
+                log->Trace("SyncTransitionPos set: {0}", m_Music.Filename);
 			}
 
 			BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnEndSync, this);
-            log->Debug("SyncEnd set: {0}", m_Music.Filename);
+            log->Trace("SyncEnd set: {0}", m_Music.Filename);
 
 			m_Status = ChannelStatus::PLAYING;
 			m_EventManager.DispatchEvent(EventType::MUSIC_CHANGE, m_Music);
 		}
+
+        double Channel::CurrentPosition() const
+        {
+            if (m_Stream > 0)
+            {
+                return BASS_ChannelBytes2Seconds(m_Stream, BASS_ChannelGetPosition(m_Stream, BASS_POS_BYTE));
+            }
+            return -1;
+        }
+
+        double Channel::CurrentLength() const
+        {
+            if (m_Stream > 0)
+            {
+                return BASS_ChannelBytes2Seconds(m_Stream, BASS_ChannelGetLength(m_Stream, BASS_POS_BYTE));
+            }
+            return -1;
+        }
+
+        const MusicDef& Channel::CurrentMusic() const
+        {
+            return m_Music;
+        }
 
 		void Channel::Stop()
 		{
@@ -135,6 +158,5 @@ namespace NH
 				}
 			}
 		}
-
 	}
 }

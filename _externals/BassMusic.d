@@ -70,3 +70,13 @@ func void BassMusic_Opt_ForceDisableReverb(var int enabled) {};
 // @param var int enabled: Boolean value
 // ---------------------------------------------------------------
 func void BassMusic_Opt_ForceFadeTransition(var int enabled) {};
+
+// ---------------------------------------------------------------
+// BassMusic_TransitionRule_OnBeat: Creates an OnBeat transition rule for the given music file name.
+// @param var string name: Name of the music file including extensions (eg. OLD_CAMP.mp3)
+// @param var string interval: Duration of single beat repeated throughout the playback to schedule transition
+//                                (in seconds, eq. "7.43")
+// @param var string timeCodes: Semicolon-separated time codes at which music can transition
+//                                (in seconds, eq. "1.2;4.8;7.3;9.443")
+// ---------------------------------------------------------------
+func void BassMusic_TransitionRule_OnBeat(var string name, var string interval, var string timeCodes) {};

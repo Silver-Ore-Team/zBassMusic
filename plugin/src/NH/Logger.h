@@ -48,6 +48,8 @@ namespace NH
         Union::Array<ILoggerAdapter*> m_Adapters;
 
     public:
+        friend class LoggerFactory;
+
         explicit Logger(const String& name) : m_LoggerName(name) {};
 
         explicit Logger(const String& name, Union::Array<ILoggerAdapter*> adapters) : m_LoggerName(name), m_Adapters(adapters) {};

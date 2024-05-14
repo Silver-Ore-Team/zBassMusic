@@ -90,6 +90,15 @@ namespace NH {
     LoggerFactory *LoggerFactory::s_Instance = null;
 
     Logger *LoggerFactory::Create(const String &name) {
+        
+        for (auto* logger : m_Loggers)
+        {
+            if (logger->m_LoggerName == name)
+            {
+                return logger;
+            }
+        }
+        
         auto *logger = new NH::Logger(name, {
                 new NH::UnionConsoleLoggerAdapter(NH::LoggerLevel::Trace),
                 new NH::ZSpyLoggerAdapter(NH::LoggerLevel::Trace, "B")

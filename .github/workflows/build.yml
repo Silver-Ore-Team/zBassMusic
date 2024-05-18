@@ -30,6 +30,10 @@ on:
         required: false
         type: boolean
         default: false
+      push-version-branch:
+        required: false
+        type: string
+        default: main
 
 jobs:
   build:
@@ -55,6 +59,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         if: ${{ inputs.push-version-commit == true }}
         with:
+          branch: ${{ inputs.push-version-branch }}
           commit_options: --no-verify --signoff
           file_pattern: CMakeLists.txt
           commit_user_name: Nekobocik

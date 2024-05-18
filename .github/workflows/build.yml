@@ -1,0 +1,73 @@
+name: Build CMake Project
+
+on:
+  workflow_call:
+    inputs:
+      cmake-preset:
+        required: true
+        type: string
+      upload-artifact-dll:
+        required: false
+        type: string
+        default: false
+      upload-artifact-dll-pdb:
+        required: false
+        type: string
+        default: false
+      upload-artifact-vdf:
+        required: false
+        type: string
+        default: false
+      msvc-toolkit:
+        required: false
+        type: string
+        default: 14.39
+      project-version:
+        required: false
+        type: string
+        default: false
+
+jobs:
+  build:
+    name: MSVC / Windows 2022
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x86
+          toolset: ${{ inputs.msvc-toolkit }}
+          export-path-to-vcvarsall: VCVARSALL
+      - name: CMake Setup
+        uses: lukka/get-cmake@latest
+      - name: Set project version
+        if: ${{ inputs.project-version != 'false' }}
+        run: powershell ./set-version.ps1 ${{ inputs.project-version }}
+      - name: CMake Configure
+        run: cmake --preset ${{ inputs.cmake-preset }}
+      - name: Ninja Build
+        run: ninja -C out/build/${{ inputs.cmake-preset }} -j 20
+      - name: CMake Install
+        run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}
+      - name: Archive DLL
+        if: ${{ inputs.upload-artifact-dll != 'false' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload-artifact-dll }}
+          path: out/install/${{ inputs.cmake-preset }}/bin/*.dll
+      - name: Archive DLL PDB
+        uses: actions/upload-artifact@v4
+        if: ${{ inputs.upload-artifact-dll-pdb != 'false' }}
+        with:
+          name:  ${{ inputs.upload-artifact-dll-pdb }}
+          path: |
+            out/build/${{ inputs.cmake-preset }}/*.dll
+            out/build/${{ inputs.cmake-preset }}/*.pdb
+      - name: Archive VDF
+        uses: actions/upload-artifact@v4
+        if: ${{ inputs.upload-artifact-vdf != 'false' }}
+        with:
+          name: ${{ inputs.upload-artifact-vdf }}
+          path: out/install/${{ inputs.cmake-preset }}/*.vdf

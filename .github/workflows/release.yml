@@ -1,0 +1,78 @@
+﻿name: Release
+permissions: write-all
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    name: Build Release
+    uses: ./.github/workflows/build.yml
+    with:
+      cmake-preset: x86-release
+      upload-artifact-dll: release-dll
+      upload-artifact-vdf: release-vdf
+      project-version: ${{ github.ref_name }}
+
+  build-release-pdb:
+    name: Build Release (Debug Symbols)
+    uses: ./.github/workflows/build.yml
+    with:
+      cmake-preset: x86-release-pdb
+      upload-artifact-dll-pdb: release-dll-pdb
+      upload-artifact-vdf: release-vdf-pdb
+      project-version: ${{ github.ref_name }}
+
+  publish:
+    name: Publish Release
+    runs-on: windows-2022
+    needs:
+      - build-release
+      - build-release-pdb
+    steps:
+      - name: Download Release DLL
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dll
+          path: out/install/x86-release/bin/
+      - name: Download Release VDF
+        uses: actions/download-artifact@v4
+        with:
+          name: release-vdf
+          path: out/install/x86-release/
+      - name: Download Release DLL PDB
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dll-pdb
+          path: out/build/x86-release-pdb/
+      - name: Download Release DLL VDF
+        uses: actions/download-artifact@v4
+        with:
+          name: release-vdf-pdb
+          path: out/install/x86-release-pdb/
+      - name: Prepare Release Files
+        id: prepare-release
+        shell: powershell
+        env:
+          GITHUB_REF: ${{ github.ref_name }}
+        run: |
+          $tag = $env:GITHUB_REF -replace '^refs/tags/', ''
+          Compress-Archive out/install/x86-release/bin/* zBassMusic-${tag}.zip
+          Compress-Archive out/build/x86-release-pdb/* zBassMusic-${tag}-pdb.zip
+          Copy-Item out/install/x86-release/zBassMusic.vdf zBassMusic-${tag}.vdf
+          Copy-Item out/install/x86-release-pdb/zBassMusic.vdf zBassMusic-${tag}-pdb.vdf
+          $draft = if (-not ($tag -match '^v?(\d+\.\d+\.\d+)$')) { 'true' } else { 'false' }
+          echo "draft=${draft}" >> $env:GITHUB_OUTPUT
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ github.token }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          draft: ${{ steps.prepare-release.outputs.draft }}
+          prerelease: ${{ steps.prepare-release.outputs.draft }}
+          files: |
+            zBassMusic-*.zip
+            zBassMusic-*.vdf

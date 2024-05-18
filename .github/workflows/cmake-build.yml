@@ -32,6 +32,13 @@ jobs:
           with:
             name: dll-release
             path: out/install/x86-release/bin/*.dll
+        - name: Archive DLL PDB
+          uses: actions/upload-artifact@v4
+          with:
+            name: dll-pdb-release
+            path: |
+                out/install/x86-release/bin/*.dll
+                out/build/x86-release/bin/*.pdb
         - name: Archive VDF
           uses: actions/upload-artifact@v4
           with:

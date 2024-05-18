@@ -11,6 +11,7 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/NH.ico" DESTINATION "${CMAKE_CURRENT_BINA
 file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
+add_compile_options(plugin PRIVATE /W4 /WX)
 target_compile_definitions(plugin PRIVATE _UNION_API_LIB __G1 __G2A)
 target_include_directories(plugin PRIVATE "src/")
 target_link_libraries(plugin PRIVATE union-api gothic-api bass)

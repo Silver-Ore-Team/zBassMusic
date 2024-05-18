@@ -190,18 +190,12 @@ namespace NH
 				bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
 				bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
 
-                log->Trace("Detected audio device\n\tname: {0}\n\tdriver: {1}\n\tenabled: {2}\n\tdefault: {3}",
-                             deviceInfo.name, deviceInfo.driver, enabled, isDefault);
-
 				if (enabled && isDefault)
 				{
 					deviceIndex = i;
 					break;
 				}
-			}
-
-			BASS_GetDeviceInfo(deviceIndex, &deviceInfo);
-            log->Trace("Selected device: {}", deviceInfo.name);
+			};
 
 			m_Initialized = BASS_Init(deviceIndex, 44100, 0, nullptr, nullptr);
 			if (!m_Initialized)
@@ -221,7 +215,7 @@ namespace NH
                 m_Channels.emplace_back(i, m_EventManager);
             }
 
-            log->Info("Initialized with device: {0}", deviceInfo.name);
+            log->Info("Initialized with device: {0}", deviceIndex);
 		}
 
 		MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)

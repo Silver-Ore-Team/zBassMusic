@@ -30,6 +30,13 @@ jobs:
           with:
             name: dll-release
             path: out/install/x86-release/bin/*.dll
+        - name: Archive DLL PDB
+          uses: actions/upload-artifact@v4
+          with:
+            name: dll-pdb-release
+            path: |
+                out/install/x86-release/bin/*.dll
+                out/build/x86-release/bin/*.pdb
         - name: Archive VDF
           uses: actions/upload-artifact@v4
           with:
@@ -46,6 +53,11 @@ jobs:
           with:
             name: dll-release
             path: out/install/x86-release/bin/
+        - name: Download DLL PDB
+          uses: actions/download-artifact@v4
+          with:
+            name: dll-pdb-release
+            path: out/build/x86-release/bin/
         - name: Download VDF
           uses: actions/download-artifact@v4
           with:
@@ -53,6 +65,10 @@ jobs:
             path: out/install/x86-release/
         - name: Zip dll-release
           run: Compress-Archive out/install/x86-release/bin/* dll-release.zip
+        - name: Copy PDB
+          run: Copy-Item out/build/x86-release/bin/*.pdb out/install/x86-release/bin/
+        - name: Zip dll-pdb-release
+          run: Compress-Archive out/install/x86-release/bin/* dll-pdb-release.zip
         - name: Create Release
           id: create_release
           uses: actions/create-release@latest
@@ -71,6 +87,15 @@ jobs:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
             asset_path: dll-release.zip
             asset_name: zBassMusic.zip
+            asset_content_type: application/zip
+        - name: Upload Release ZIP with PDB
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: dll-pdb-release.zip
+            asset_name: zBassMusic-PDB.zip
             asset_content_type: application/zip
         - name: Upload Release VDF
           uses: actions/upload-release-asset@v1

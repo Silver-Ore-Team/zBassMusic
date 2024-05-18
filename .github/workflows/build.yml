@@ -26,6 +26,10 @@ on:
         required: false
         type: string
         default: false
+      push-version-commit:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -34,7 +38,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}  
           submodules: recursive
+          persist-credentials: true
+          ssh-key: ${{ secrets.NEKOBOCIK_SSH_KEY }}
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x86
@@ -45,6 +52,15 @@ jobs:
       - name: Set project version
         if: ${{ inputs.project-version != 'false' }}
         run: powershell ./set-version.ps1 ${{ inputs.project-version }}
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ inputs.push-version-commit == true }}
+        with:
+          commit_options: --no-verify --signoff
+          file_pattern: CMakeLists.txt
+          commit_user_name: Nekobocik
+          status_options: --untracked-files=no
+          commit_message: '[skip ci] set project version to ${{ inputs.project-version }}'
+          push_options: --force
       - name: CMake Configure
         run: cmake --preset ${{ inputs.cmake-preset }}
       - name: Ninja Build

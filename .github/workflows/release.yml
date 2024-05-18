@@ -15,6 +15,7 @@ jobs:
       upload-artifact-dll: release-dll
       upload-artifact-vdf: release-vdf
       project-version: ${{ github.ref_name }}
+      push-version-commit: true
 
   build-release-pdb:
     name: Build Release (Debug Symbols)
@@ -24,6 +25,7 @@ jobs:
       upload-artifact-dll-pdb: release-dll-pdb
       upload-artifact-vdf: release-vdf-pdb
       project-version: ${{ github.ref_name }}
+      push-version-commit: true
 
   publish:
     name: Publish Release

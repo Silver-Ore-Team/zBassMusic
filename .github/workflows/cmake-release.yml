@@ -36,7 +36,7 @@ jobs:
             name: dll-pdb-release
             path: |
                 out/install/x86-release/bin/*.dll
-                out/build/x86-release/bin/*.pdb
+                out/build/x86-release/*.pdb
         - name: Archive VDF
           uses: actions/upload-artifact@v4
           with:
@@ -57,7 +57,7 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: dll-pdb-release
-            path: out/build/x86-release/bin/
+            path: out/build/x86-release/
         - name: Download VDF
           uses: actions/download-artifact@v4
           with:
@@ -66,7 +66,7 @@ jobs:
         - name: Zip dll-release
           run: Compress-Archive out/install/x86-release/bin/* dll-release.zip
         - name: Copy PDB
-          run: Copy-Item out/build/x86-release/bin/*.pdb out/install/x86-release/bin/
+          run: Copy-Item out/build/x86-release/*.pdb out/install/x86-release/bin/
         - name: Zip dll-pdb-release
           run: Compress-Archive out/install/x86-release/bin/* dll-pdb-release.zip
         - name: Create Release

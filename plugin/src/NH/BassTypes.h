@@ -41,6 +41,17 @@ namespace NH
 				float ReverbMix = 0.0f;
 				float ReverbTime = 1000.0f;
 			} Effects{};
+
+			void CopyFrom(const MusicDef& other)
+			{
+				Filename = other.Filename;
+				Name = other.Name;
+				Volume = other.Volume;
+				Loop = other.Loop;
+				StartTransition = other.StartTransition;
+				EndTransition = other.EndTransition;
+				Effects = other.Effects;
+			}
 		};
 
 		struct MusicDefRetry

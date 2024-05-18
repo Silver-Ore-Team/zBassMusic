@@ -4,6 +4,8 @@ permissions: write-all
 on:
   push:
     branches: [ "main", "dev", "gh_actions" ]
+    pull_request:
+      branches: [ "main", "dev" ]
     paths-ignore:
       - 'README.md'
       - 'docs/**'

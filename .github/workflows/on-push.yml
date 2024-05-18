@@ -1,0 +1,37 @@
+﻿name: On Push
+permissions: write-all
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+  push:
+    branches: [ "main", "dev", "gh_actions" ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+
+jobs:
+  build-debug:
+    name: Build Debug
+    uses: ./.github/workflows/build.yml
+    with:
+      cmake-preset: x86-debug
+      upload-artifact-dll: debug-dll
+      upload-artifact-dll-pdb: debug-dll-pdb
+      upload-artifact-vdf: debug-vdf
+
+  build-release:
+    name: Build Release
+    uses: ./.github/workflows/build.yml
+    with:
+      cmake-preset: x86-release
+      upload-artifact-dll: release-dll
+      upload-artifact-vdf: release-vdf
+
+  build-release-pdb:
+    name: Build Release (Debug Symbols)
+    uses: ./.github/workflows/build.yml
+    with:
+      cmake-preset: x86-release-pdb
+      upload-artifact-dll-pdb: release-dll-pdb
+      upload-artifact-vdf: release-vdf-pdb

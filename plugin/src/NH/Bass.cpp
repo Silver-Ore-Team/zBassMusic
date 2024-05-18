@@ -35,29 +35,42 @@ namespace NH
 			return m_MusicFiles[index];
 		}
 
-		void Engine::PlayMusic(const MusicDef& musicDef)
+		void Engine::PlayMusic(MusicDef inMusicDef)
 		{
 			std::lock_guard<std::mutex> guard(m_PlayMusicMutex);
-
 			if (!m_Initialized)
 			{
 				return;
 			}
+			
+			// We are taking ownership of the MusicDef from here to gurarantee it's lifetime.
+			// MusicDef lives as long as the Engine instance and other classes expect it to stay
+			// at the same place in memory, so if we receive a second MusicDef with the same filename,
+			// we just copy its' data to our instance.
+			HashString musicDefKey = HashString(inMusicDef.Filename);
+			if (m_MusicDefs.find(musicDefKey) == m_MusicDefs.end())
+			{
+				m_MusicDefs[musicDefKey] = std::move(inMusicDef);
+			}
+			else
+			{
+				m_MusicDefs[musicDefKey].CopyFrom(std::move(inMusicDef));
+			}
 
-			const MusicFile* file = GetMusicFile(musicDef.Filename);
+			const MusicFile* file = GetMusicFile(m_MusicDefs[musicDefKey].Filename);
 
 			if (!file)
 			{
                 log->Error("Could not play {0}. Music file is not loaded.\n  at {1}:{2}",
-                           musicDef.Filename, __FILE__, __LINE__);
+					m_MusicDefs[musicDefKey].Filename, __FILE__, __LINE__);
 				return;
 			}
 
 			if (!file->Ready && file->Loading)
 			{
                 static int32_t delay = 10;
-                log->Debug("{0} is loading, will retry after {1} ms", musicDef.Filename, delay);
-				MusicDefRetry retry{ MusicDef(musicDef), delay };
+                log->Debug("{0} is loading, will retry after {1} ms", m_MusicDefs[musicDefKey].Filename, delay);
+				MusicDefRetry retry{ MusicDef(m_MusicDefs[musicDefKey]), delay };
 				m_PlayMusicRetryList.emplace_back(retry);
 				return;
 			}
@@ -65,17 +78,17 @@ namespace NH
 			if (!file->Ready)
 			{
                 log->Error("Invalid state. MusicDef is not ready but not loading {0}\n  at {1}:{2}",
-                           musicDef.Filename, __FILE__, __LINE__);
+					m_MusicDefs[musicDefKey].Filename, __FILE__, __LINE__);
 				return;
 			}
 
             if (!m_ActiveChannel)
             {
-                FinalizeScheduledMusic(musicDef);
+                FinalizeScheduledMusic(m_MusicDefs[musicDefKey]);
                 return;
             }
 
-            m_TransitionScheduler.Schedule(*m_ActiveChannel, musicDef);
+            m_TransitionScheduler.Schedule(*m_ActiveChannel, m_MusicDefs[musicDefKey]);
 		}
 
         void Engine::FinalizeScheduledMusic(const NH::Bass::MusicDef &musicDef)

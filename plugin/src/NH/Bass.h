@@ -5,9 +5,11 @@
 #include <NH/BassChannel.h>
 #include <NH/BassTransitionScheduler.h>
 #include <NH/Logger.h>
+#include <NH/HashString.h>
 #include <vector>
 #include <mutex>
 #include <chrono>
+#include <unordered_map>
 
 namespace NH
 {
@@ -24,6 +26,7 @@ namespace NH
 			Channel* m_ActiveChannel = nullptr;
 			EventManager m_EventManager{};
             TransitionScheduler m_TransitionScheduler{};
+			std::unordered_map<HashString, MusicDef> m_MusicDefs;
 
 			std::mutex m_PlayMusicMutex;
 			std::vector<MusicDefRetry> m_PlayMusicRetryList;
@@ -33,7 +36,7 @@ namespace NH
 
 			MusicFile& CreateMusicBuffer(const Union::StringUTF8& filename);
 
-			void PlayMusic(const MusicDef& musicDef);
+			void PlayMusic(MusicDef musicDef);
 
 			void Update();
 

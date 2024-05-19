@@ -42,8 +42,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
-          ssh-key: ${{ secrets.NEKOBOCIK_SSH_KEY }}
           submodules: recursive
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
@@ -52,19 +50,32 @@ jobs:
           export-path-to-vcvarsall: VCVARSALL
       - name: CMake Setup
         uses: lukka/get-cmake@latest
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
       - name: Set project version
         if: ${{ inputs.project-version != 'false' }}
         run: powershell ./set-version.ps1 ${{ inputs.project-version }}
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Setup token for branch rules bypass
+        uses: webfactory/ssh-agent@v0.5.4
         if: ${{ inputs.push-version-commit == true }}
         with:
-          branch: ${{ inputs.push-version-branch }}
-          commit_options: --no-verify --signoff
-          file_pattern: CMakeLists.txt
-          commit_user_name: Nekobocik
-          status_options: --untracked-files=no
-          commit_message: '[skip ci] set project version to ${{ inputs.project-version }}'
-          push_options: --force
+          ssh-private-key: ${{ secrets.NEKOBOCIK_SSH_KEY }}
+      - name: Commit version change
+        if: ${{ inputs.push-version-commit == true }}
+        shell: bash
+        run: |
+          git config --global user.name "Nekobot"
+          git fetch --all
+          git checkout ${{ inputs.push-version-branch }}
+          if [ -z "$(git status -s)" ]; then
+            echo "No changes to commit"
+          else
+            git add CMakeLists.txt
+            git commit -m "[skip ci] set project version to ${{ inputs.project-version }}"
+            git push -u origin ${{ inputs.push-version-branch }}
+          fi
       - name: CMake Configure
         run: cmake --preset ${{ inputs.cmake-preset }}
       - name: Ninja Build

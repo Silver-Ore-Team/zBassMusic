@@ -71,6 +71,7 @@ jobs:
         shell: bash
         run: |
           git config --global user.name "Nekobot"
+          git config --global user.email "nekobot-service.noreply@silveroreteam.pl"
           git fetch --all
           git checkout ${{ inputs.push-version-branch }}
           if [ -z "$(git status -s)" ]; then

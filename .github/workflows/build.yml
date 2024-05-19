@@ -2,6 +2,10 @@ name: Build CMake Project
 
 on:
   workflow_call:
+    secrets:
+      SSH_KEY:
+        required: false
+        description: SSH private key for pushing version changes
     inputs:
       cmake-preset:
         required: true
@@ -61,7 +65,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.4
         if: ${{ inputs.push-version-commit == true }}
         with:
-          ssh-private-key: ${{ secrets.NEKOBOCIK_SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
       - name: Commit version change
         if: ${{ inputs.push-version-commit == true }}
         shell: bash

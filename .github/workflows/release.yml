@@ -10,7 +10,8 @@ jobs:
   build-release:
     name: Build Release
     uses: ./.github/workflows/build.yml
-    secrets: inherit
+    secrets:
+      SSH_KEY: ${{ secrets.NEKOBOCIK_SSH_KEY }}
     with:
       cmake-preset: x86-release
       upload-artifact-dll: release-dll
@@ -21,7 +22,8 @@ jobs:
   build-release-pdb:
     name: Build Release (Debug Symbols)
     uses: ./.github/workflows/build.yml
-    secrets: inherit
+    secrets:
+      SSH_KEY: ${{ secrets.NEKOBOCIK_SSH_KEY }}
     with:
       cmake-preset: x86-release-pdb
       upload-artifact-dll-pdb: release-dll-pdb

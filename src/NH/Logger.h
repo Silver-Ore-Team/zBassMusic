@@ -110,6 +110,8 @@ namespace NH
     class UnionConsoleLoggerAdapter : public ILoggerAdapter
     {
     public:
+		static LoggerLevel DEFAULT_LEVEL;
+
         struct Color
         {
             String Channel;
@@ -134,7 +136,9 @@ namespace NH
         String m_Prefix;
 
     public:
-        explicit ZSpyLoggerAdapter(LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
+		static LoggerLevel DEFAULT_LEVEL;
+
+		explicit ZSpyLoggerAdapter(LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
 
     protected:
         void Message(LoggerLevel level, const String& channel, const String& message) override;

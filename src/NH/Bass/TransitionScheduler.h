@@ -1,8 +1,8 @@
 #pragma once
 
-#include <NH/BassTypes.h>
-#include <NH/BassChannel.h>
-#include <NH/Logger.h>
+#include "NH/Bass/CommonTypes.h"
+#include "Channel.h"
+#include "NH/Logger.h"
 
 #include <unordered_map>
 #include <utility>

@@ -24,9 +24,10 @@ if (Test-Path ./CMakeLists.txt.bak -PathType Leaf) {
 }
 
 $version = $version -replace '^v', ''
-$version = $version -replace '-[a-z0-9]+$', ''
+$cmakeVersion = $version -replace '-[a-z0-9]+$', ''
 Write-Host "Setting version to $version"
 
 Copy-Item CMakeLists.txt CMakeLists.txt.bak
 $cmake = (Get-Content -Path ./CMakeLists.txt) -replace 'set\(PROJECT_VERSION "[^"]*"\)', "set(PROJECT_VERSION ""$version"")"
+$cmake = (Get-Content -Path ./CMakeLists.txt) -replace 'set\(PROJECT_VERSION_CMAKE "[^"]*"\)', "set(PROJECT_VERSION_CMAKE ""$cmakeVersion"")"
 $cmake | Set-Content -Path ./CMakeLists.txt

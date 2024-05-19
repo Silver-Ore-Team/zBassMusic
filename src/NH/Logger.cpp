@@ -81,11 +81,20 @@ namespace NH {
             case Engine_G1:
                 Gothic_I_Classic::zerr->Message(Gothic_I_Classic::zSTRING(formattedMessage.ToChar()));
                 break;
+			case Engine_G1A:
+				Gothic_I_Addon::zerr->Message(Gothic_I_Addon::zSTRING(formattedMessage.ToChar()));
+				break;
+			case Engine_G2:
+				Gothic_II_Classic::zerr->Message(Gothic_II_Classic::zSTRING(formattedMessage.ToChar()));
+				break;
             case Engine_G2A:
                 Gothic_II_Addon::zerr->Message(Gothic_II_Addon::zSTRING(formattedMessage.ToChar()));
                 break;
         }
     }
+
+	LoggerLevel UnionConsoleLoggerAdapter::DEFAULT_LEVEL = LoggerLevel::Debug;
+	LoggerLevel ZSpyLoggerAdapter::DEFAULT_LEVEL = LoggerLevel::Debug;
 
     LoggerFactory *LoggerFactory::s_Instance = null;
 
@@ -100,8 +109,8 @@ namespace NH {
         }
         
         auto *logger = new NH::Logger(name, {
-                new NH::UnionConsoleLoggerAdapter(NH::LoggerLevel::Trace),
-                new NH::ZSpyLoggerAdapter(NH::LoggerLevel::Trace, "B")
+                new NH::UnionConsoleLoggerAdapter(UnionConsoleLoggerAdapter::DEFAULT_LEVEL),
+                new NH::ZSpyLoggerAdapter(ZSpyLoggerAdapter::DEFAULT_LEVEL, "B")
         });
         m_Loggers.Insert(logger);
         return logger;

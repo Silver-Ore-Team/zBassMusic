@@ -126,11 +126,6 @@ namespace GOTHIC_NAMESPACE
 
 	void DefineExternals()
 	{
-		if (GetGameVersion() != ENGINE)
-		{
-			return;
-		}
-
 		parser->DefineExternalVar("BassMusic_ActiveThemeFilename", &Globals->BassMusic_ActiveThemeFilename, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_ActiveThemeID", &Globals->BassMusic_ActiveThemeID, zPAR_TYPE_STRING, 1);
 		parser->DefineExternalVar("BassMusic_EventThemeFilename", &Globals->BassMusic_EventThemeFilename, zPAR_TYPE_STRING, 1);

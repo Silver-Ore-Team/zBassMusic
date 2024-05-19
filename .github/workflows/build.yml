@@ -42,10 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}  
-          submodules: recursive
-          persist-credentials: true
+          repository: ${{ github.repository }}
           ssh-key: ${{ secrets.NEKOBOCIK_SSH_KEY }}
+          submodules: recursive
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x86

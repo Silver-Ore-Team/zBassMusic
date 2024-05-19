@@ -1,5 +1,5 @@
-﻿cmake_minimum_required(VERSION 3.25)
-set(PROJECT_VERSION "0.1.2")
+cmake_minimum_required(VERSION 3.25)
+set(PROJECT_VERSION "0.1.3")
 project(zBassMusic VERSION ${PROJECT_VERSION})
 
 option(BUILD_VDF "Build .VDF file with plugin" ON)

@@ -40,6 +40,9 @@ jobs:
     name: MSVC / Windows 2022
     runs-on: windows-2022
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x86

@@ -62,7 +62,7 @@ jobs:
         if: ${{ inputs.project-version != 'false' }}
         run: powershell ./set-version.ps1 ${{ inputs.project-version }}
       - name: Setup token for branch rules bypass
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: webfactory/ssh-agent@v0.9.0
         if: ${{ inputs.push-version-commit == true }}
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}

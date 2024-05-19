@@ -22,14 +22,11 @@ jobs:
   build-release-pdb:
     name: Build Release (Debug Symbols)
     uses: ./.github/workflows/build.yml
-    secrets:
-      SSH_KEY: ${{ secrets.NEKOBOCIK_SSH_KEY }}
     with:
       cmake-preset: x86-release-pdb
       upload-artifact-dll-pdb: release-dll-pdb
       upload-artifact-vdf: release-vdf-pdb
       project-version: ${{ github.ref_name }}
-      push-version-commit: true
 
   publish:
     name: Publish Release

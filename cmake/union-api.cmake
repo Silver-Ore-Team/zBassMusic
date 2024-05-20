@@ -8,7 +8,7 @@ set_target_properties(union-api PROPERTIES
 target_include_directories(union-api PUBLIC "${UNION_API_DIR}/union-api")
 target_link_directories(union-api PUBLIC "${UNION_API_DIR}/union-api")
 
-file(GLOB_RECURSE UNION_SOURCES "${UNION_API_DIR}/union-api/union-api.cpp" "${UNION_API_DIR}/union-api/Memory.cpp")
+file(GLOB_RECURSE UNION_SOURCES "${UNION_API_DIR}/union-api/union-api.cpp" "${UNION_API_DIR}/union-api/Union/Memory.cpp")
 target_sources(union-api PRIVATE ${UNION_SOURCES})
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

@@ -35,7 +35,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in" "${CMAKE_CURRENT_BINA
 configure_file("${CMAKE_SOURCE_DIR}/vdf/script.vdfs.in" "${CMAKE_BINARY_DIR}/script.vdfs")
 configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src/BuildInfo.h" @ONLY)
 
-file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Memory.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Union/Memory.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
 add_compile_options(plugin PRIVATE /W4 /WX)

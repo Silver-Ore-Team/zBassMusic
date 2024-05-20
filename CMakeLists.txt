@@ -35,15 +35,16 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in" "${CMAKE_CURRENT_BINA
 configure_file("${CMAKE_SOURCE_DIR}/vdf/script.vdfs.in" "${CMAKE_BINARY_DIR}/script.vdfs")
 configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src/BuildInfo.h" @ONLY)
 
-file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Memory.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
 add_compile_options(plugin PRIVATE /W4 /WX)
-target_compile_definitions(plugin PRIVATE _UNION_API_LIB __G1 __G1A __G2 __G2A)
+target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G1A __G2 __G2A)
 target_include_directories(plugin PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")
 target_link_libraries(plugin PRIVATE union-api gothic-api bass)
 
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
+install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
 if(${BUILD_VDF})
     install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
     install(SCRIPT "${VDF_DIR}/vdf.cmake")
@@ -64,4 +65,13 @@ if(${BUILD_VDF})
                 DEPENDS plugin_vdf
                 COMMENT "Copy plugin to target directory: $ENV{COPY_VDF_TARGET}")
     endif()
+endif()
+
+if(DEFINED ENV{COPY_DLL_TARGET})
+    add_custom_target(copy_dll ALL
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/zBassMusic.dll" "$ENV{COPY_DLL_TARGET}/Autorun/zBassMusic.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/UnionAPI.dll" "$ENV{COPY_DLL_TARGET}/Autorun/UnionAPI.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bass.dll" "$ENV{COPY_DLL_TARGET}/bass.dll"
+            DEPENDS plugin
+            COMMENT "Copy plugin to target directory: $ENV{COPY_DLL_TARGET}")
 endif()

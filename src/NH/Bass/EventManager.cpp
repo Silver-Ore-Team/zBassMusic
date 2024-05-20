@@ -7,19 +7,14 @@ namespace NH::Bass
 	EventSubscriber*
 	EventManager::AddSubscriber(const EventType type, const EventSubscriberFunction function, void* userData)
 	{
-		const int index = m_Subscribers.Insert({ type, function, userData });
-		return &m_Subscribers[index];
+		return &m_Subscribers.emplace_back(EventSubscriber{ type, function, userData });
 	}
 
 	void EventManager::RemoveSubscriber(const EventSubscriber* subscriber)
 	{
-		for (const auto i: std::views::iota(0u, m_Subscribers.GetCount()) | std::views::reverse)
-		{
-			if (&m_Subscribers[i] == subscriber)
-			{
-				m_Subscribers.RemoveAt(i);
-			}
-		}
+		erase_if(m_Subscribers, [&subscriber](const EventSubscriber& s) {
+			return s == *subscriber;
+		});
 	}
 
 	void EventManager::DispatchEvent(const EventType type, const MusicDef& musicDef, const int data)

@@ -8,7 +8,7 @@ namespace GOTHIC_NAMESPACE {
 
         Union::Array<NH::Logger *> loggers = NH::LoggerFactory::GetInstance()->GetLoggers();
         {
-			static NH::Logger* log = NH::CreateLogger("GothicOptions");
+			static NH::Logger* log = NH::CreateLogger("zBassMusic::GothicOptions");
             zSTRING unionValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelUnion", "INFO");
             zSTRING zSpyValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelZSpy", "DEBUG");
 
@@ -18,16 +18,22 @@ namespace GOTHIC_NAMESPACE {
                 if (unionAdapter)
                 {
 					NH::LoggerLevel level = NH::StringToLoggerLevel(unionValue.ToChar());
-					NH::UnionConsoleLoggerAdapter::DEFAULT_LEVEL = level;
-					log->Message(level, "Logger level for UnionConsoleLoggerAdapter: {0}", unionValue.ToChar());
+					if (level != unionAdapter->DEFAULT_LEVEL)
+					{
+						NH::UnionConsoleLoggerAdapter::DEFAULT_LEVEL = level;
+						log->Info("Logger level for UnionConsoleLoggerAdapter: {0}", unionValue.ToChar());
+					}
                     unionAdapter->SetLoggerLevel(level);
                 }
                 auto* zSpyAdapter = (*it)->GetAdapter<NH::ZSpyLoggerAdapter>();
                 if (zSpyAdapter)
                 {
 					NH::LoggerLevel level = NH::StringToLoggerLevel(zSpyValue.ToChar());
-					NH::ZSpyLoggerAdapter::DEFAULT_LEVEL = level;
-					log->Message(level, "Logger level for ZSpyLoggerAdapter: {0}", zSpyValue.ToChar());
+					if (level != zSpyAdapter->DEFAULT_LEVEL)
+					{
+						NH::ZSpyLoggerAdapter::DEFAULT_LEVEL = level;
+						log->Info("Logger level for ZSpyLoggerAdapter: {0}", unionValue.ToChar());
+					}
                     zSpyAdapter->SetLoggerLevel(level);
                 }
             }

@@ -35,14 +35,15 @@ namespace NH
         uint64_t Id;
 
     public:
-		constexpr HashString(const char* str) noexcept : Id(FNV1a::hash_64_fnv1a_const(str)) {}
-		constexpr operator uint64_t() const noexcept { return Id; }
+		constexpr explicit(false) HashString(const char* str) noexcept : Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
+		constexpr explicit(false) HashString(const String& str) noexcept : Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
+		constexpr explicit(false) operator uint64_t() const noexcept { return Id; } // NOLINT(google-explicit-constructor)
 		constexpr bool operator==(const HashString& other) const noexcept { return Id == other.Id; }
     };
 
 	constexpr HashString operator"" _hs(const char* str, size_t) noexcept
 	{
-		return HashString(str);
+		return { str };
 	}
 }
 

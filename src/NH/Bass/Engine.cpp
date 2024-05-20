@@ -19,19 +19,19 @@ namespace NH::Bass
 
 	MusicFile& Engine::CreateMusicBuffer(const Union::StringUTF8& filename)
 	{
-		for (auto& m: m_MusicFiles)
+		for (auto& [key, m]: m_MusicFiles)
 		{
-			if (m.Filename == filename)
+			if (key == filename)
 			{
 				log->Debug("Buffer already exists for {0}", filename);
 				return m;
 			}
 		}
 
+		m_MusicFiles.emplace(std::make_pair(filename, MusicFile{ filename, std::vector<char>() }));
 		log->Debug("New buffer for {0}", filename);
 
-		uint32_t index = m_MusicFiles.Insert({ filename, std::vector<char>() });
-		return m_MusicFiles[index];
+		return m_MusicFiles.at(filename);
 	}
 
 	void Engine::PlayMusic(MusicDef inMusicDef)
@@ -237,9 +237,9 @@ namespace NH::Bass
 
 	MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)
 	{
-		for (auto& m: m_MusicFiles)
+		for (auto& [key, m]: m_MusicFiles)
 		{
-			if (m.Filename == filename)
+			if (key == filename)
 			{
 				return &m;
 			}

@@ -2,7 +2,7 @@
 
 #include "NH/Bass/CommonTypes.h"
 #include "NH/Logger.h"
-#include "Union/Array.h"
+#include <vector>
 #include <deque>
 
 namespace NH::Bass
@@ -11,17 +11,17 @@ namespace NH::Bass
 
 	enum class EventType
 	{
+		UNKNOWN = 0,
 		MUSIC_END,
 		MUSIC_TRANSITION,
-		MUSIC_CHANGE,
-		MUSIC_ACTIVE
+		MUSIC_CHANGE
 	};
 
 	struct EventSubscriber
 	{
-		EventType Type;
-		EventSubscriberFunction Function;
-		void* UserData;
+		EventType Type = EventType::UNKNOWN;
+		EventSubscriberFunction Function{};
+		void* UserData = nullptr;
 
 		bool operator==(const EventSubscriber& other) const
 		{
@@ -37,14 +37,14 @@ namespace NH::Bass
 
 		struct Event
 		{
-			EventType type;
+			EventType type = EventType::UNKNOWN;
 			MusicDef music;
-			int data;
+			int data{};
 		};
 
 		friend Engine;
 
-		Union::Array<EventSubscriber> m_Subscribers{};
+		std::vector<EventSubscriber> m_Subscribers{};
 		std::deque<Event> m_EventQueue;
 
 	public:
@@ -57,8 +57,6 @@ namespace NH::Bass
 		void Update();
 
 	private:
-		EventManager()
-		{
-		};
+		EventManager() = default;
 	};
 }

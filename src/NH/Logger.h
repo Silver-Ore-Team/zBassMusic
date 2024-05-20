@@ -18,7 +18,15 @@ namespace NH
         Trace = 6
     };
 
-    String LoggerLevelToString(LoggerLevel level);
+	constexpr const char* LoggerLevelToString(LoggerLevel level) {
+		constexpr const char* values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
+		return values[(size_t) level];
+	}
+
+	constexpr const char* LoggerLevelToDisplayString(LoggerLevel level) {
+		constexpr const char* values[] = { " NONE", "FATAL", "ERROR", " WARN", " INFO", "DEBUG", "TRACE"};
+		return values[(size_t) level];
+	}
 
     LoggerLevel StringToLoggerLevel(String level);
 

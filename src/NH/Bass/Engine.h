@@ -17,14 +17,14 @@ namespace NH::Bass
 	{
 		static NH::Logger* log;
 		static Engine* s_Instance;
-		bool m_Initialized;
+		bool m_Initialized = false;
 		float m_MasterVolume = 1.0f;
-		Union::Array<MusicFile> m_MusicFiles{};
 		std::vector<Channel> m_Channels;
 		Channel* m_ActiveChannel = nullptr;
 		EventManager m_EventManager{};
 		TransitionScheduler m_TransitionScheduler{};
 		std::unordered_map<HashString, MusicDef> m_MusicDefs;
+		std::unordered_map<HashString, MusicFile> m_MusicFiles;
 
 		std::mutex m_PlayMusicMutex;
 		std::vector<MusicDefRetry> m_PlayMusicRetryList;

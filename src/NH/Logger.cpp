@@ -5,29 +5,8 @@
 #include <utility>
 
 namespace NH {
-    String LoggerLevelToString(LoggerLevel level) {
-        String values[] = {
-                "NONE",
-                "FATAL",
-                "ERROR",
-                "WARN",
-                "INFO",
-                "DEBUG",
-                "TRACE"
-        };
-        return values[(size_t) level];
-    }
-
     LoggerLevel StringToLoggerLevel(String level) {
-        String values[] = {
-                "NONE",
-                "FATAL",
-                "ERROR",
-                "WARN",
-                "INFO",
-                "DEBUG",
-                "TRACE"
-        };
+		String values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
         size_t count = sizeof(values) / sizeof(String);
         for (size_t i = 0; i < count; i++) {
             if (level.MakeUpper() == values[i]) {
@@ -52,12 +31,12 @@ namespace NH {
     }
 
     UnionConsoleLoggerAdapter::UnionConsoleLoggerAdapter(LoggerLevel level) : ILoggerAdapter(level) {
-        SetLevelColor(LoggerLevel::Fatal, Color{"\x1B[31m", "\x1B[41;1m\x1B[37;1m", "\x1B[41m\x1B[37;1m"});
-        SetLevelColor(LoggerLevel::Error, Color{"\x1B[31m", "\x1B[41;1m\x1B[37;1m", "\x1B[31;1m"});
-        SetLevelColor(LoggerLevel::Warn, Color{"\x1B[33m", "\x1B[43;1m\x1B[37m", "\x1B[0m\x1B[33;1m"});
-        SetLevelColor(LoggerLevel::Info, Color{"\x1b[37m", "\x1B[47;1m\x1B[30m", "\x1B[0m"});
-        SetLevelColor(LoggerLevel::Debug, Color{"\x1B[32m", "\x1B[42;1m\x1B[37;1m", "\x1B[0m\x1B[32;1m"});
-        SetLevelColor(LoggerLevel::Trace, Color{"\x1B[30;1m", "\x1B[47;1m\x1B[30m", "\x1B[37m"});
+		SetLevelColor(LoggerLevel::Fatal, Color{"\x1B[31m", "\x1B[41;1m\x1B[37;1m", "\x1B[41m\x1B[37;1m"});
+		SetLevelColor(LoggerLevel::Error, Color{"\x1B[31m", "\x1B[41;1m\x1B[37;1m", "\x1B[31;1m"});
+		SetLevelColor(LoggerLevel::Warn, Color{"\x1B[33m", "\x1B[43;1m\x1B[37m", "\x1B[0m\x1B[33;1m"});
+		SetLevelColor(LoggerLevel::Info, Color{"\x1B[30;1m", "\x1B[47;2m\x1B[39m", "\x1B[0m"});
+		SetLevelColor(LoggerLevel::Debug, Color{"\x1B[32m", "\x1B[42;1m\x1B[37;1m", "\x1B[0m\x1B[32;1m"});
+		SetLevelColor(LoggerLevel::Trace, Color{"\x1B[35m", "\x1B[35;1m\x1B[30m", "\x1B[35;1m"});
     }
 
     void UnionConsoleLoggerAdapter::SetLevelColor(LoggerLevel level, Color color) {
@@ -68,7 +47,7 @@ namespace NH {
         Color color = m_ColorTable[(size_t) level];
 
         String::Format("\x1B[0m{0} {1} \x1B[0m {2}[{3}]\x1B[0m {4}{5}\x1B[0m",
-                       color.Level, LoggerLevelToString(level),
+                       color.Level, LoggerLevelToDisplayString(level),
                        color.Channel, channel,
                        color.Message, message)
                 .StdPrintLine();

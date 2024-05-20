@@ -28,7 +28,7 @@ namespace GOTHIC_NAMESPACE
 	auto Partial_CGameManager_Run = Union::CreatePartialHook(CGameManager_Run, CGameManager_Run_PartialHook);
 	void __fastcall CGameManager_Run_PartialHook()
 	{
-		static NH::Logger* log = NH::CreateLogger("zBassMusic::oCGame::Init_Hook");
+		static NH::Logger* log = NH::CreateLogger("zBassMusic::CGameManager::Run");
 		log->Info("zBassMusic {0} {1} (build: {2}, branch: {3}, revision: {4})", BUILD_VERSION, BUILD_TYPE, BUILD_TIME, BUILD_BRANCH, BUILD_REVISION);
 		ApplyOptions();
 		if (!zoptions->Parm("ZNOMUSIC"))

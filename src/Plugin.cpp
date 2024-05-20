@@ -7,6 +7,13 @@
 #include <Union/Hook.h>
 #include <ZenGin/zGothicAPI.h>
 
+//BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ) {
+//	if( fdwReason == DLL_PROCESS_ATTACH ) {
+//		NH::CreateLogger("DllMain")->Info("DLL_PROCESS_ATTACH");
+//	}
+//	return TRUE;
+//}
+
 #ifdef __G1
 #define GOTHIC_NAMESPACE Gothic_I_Classic
 #define ENGINE Engine_G1

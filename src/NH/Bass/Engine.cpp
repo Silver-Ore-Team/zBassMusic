@@ -140,7 +140,7 @@ namespace NH::Bass
 			FinalizeScheduledMusic(musicDef);
 		});
 
-		BASS_Update(delta);
+		BASS.BASS_Update(delta);
 
 		GetEM().Update();
 	}
@@ -164,7 +164,7 @@ namespace NH::Bass
 		}
 
 		m_MasterVolume = volume;
-		BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
+		BASS.BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
 	}
 
 	float Engine::GetVolume() const
@@ -201,7 +201,7 @@ namespace NH::Bass
 	{
 		size_t deviceIndex = 0;
 		BASS_DEVICEINFO deviceInfo;
-		for (size_t i = 1; BASS_GetDeviceInfo(i, &deviceInfo); i++)
+		for (size_t i = 1; ::NH::Bass::BASS.BASS_GetDeviceInfo(i, &deviceInfo); i++)
 		{
 			bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
 			bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
@@ -213,16 +213,16 @@ namespace NH::Bass
 			}
 		};
 
-		m_Initialized = BASS_Init(deviceIndex, 44100, 0, nullptr, nullptr);
+		m_Initialized = BASS.BASS_Init(deviceIndex, 44100, 0, nullptr, nullptr);
 		if (!m_Initialized)
 		{
-			log->Error("Could not initialize BASS using BASS_Init\n  {0}\n  at {1}:{2}",
-					ErrorCodeToString(BASS_ErrorGetCode()), __FILE__, __LINE__);
+			log->Error("Could not initialize BASS using BASS.BASS_Init\n  {0}\n  at {1}:{2}",
+					ErrorCodeToString(BASS.BASS_ErrorGetCode()), __FILE__, __LINE__);
 			return;
 		}
 
 		BASS_INFO info;
-		BASS_GetInfo(&info);
+		::NH::Bass::BASS.BASS_GetInfo(&info);
 		log->Trace("Sample Rate: {0} Hz", info.freq);
 
 		static constexpr size_t Channels_Max = 8;
@@ -266,89 +266,89 @@ namespace NH::Bass
 		switch (code)
 		{
 		case 0:
-			return Union::StringUTF8("BASS_OK");
+			return Union::StringUTF8("BASS.BASS_OK");
 		case 1:
-			return Union::StringUTF8("BASS_ERROR_MEM");
+			return Union::StringUTF8("BASS.BASS_ERROR_MEM");
 		case 2:
-			return Union::StringUTF8("BASS_ERROR_FILEOPEN");
+			return Union::StringUTF8("BASS.BASS_ERROR_FILEOPEN");
 		case 3:
-			return Union::StringUTF8("BASS_ERROR_DRIVER");
+			return Union::StringUTF8("BASS.BASS_ERROR_DRIVER");
 		case 4:
-			return Union::StringUTF8("BASS_ERROR_BUFLOST");
+			return Union::StringUTF8("BASS.BASS_ERROR_BUFLOST");
 		case 5:
-			return Union::StringUTF8("BASS_ERROR_HANDLE");
+			return Union::StringUTF8("BASS.BASS_ERROR_HANDLE");
 		case 6:
-			return Union::StringUTF8("BASS_ERROR_FORMAT");
+			return Union::StringUTF8("BASS.BASS_ERROR_FORMAT");
 		case 7:
-			return Union::StringUTF8("BASS_ERROR_POSITION");
+			return Union::StringUTF8("BASS.BASS_ERROR_POSITION");
 		case 8:
-			return Union::StringUTF8("BASS_ERROR_INIT");
+			return Union::StringUTF8("BASS.BASS_ERROR_INIT");
 		case 9:
-			return Union::StringUTF8("BASS_ERROR_START");
+			return Union::StringUTF8("BASS.BASS_ERROR_START");
 		case 10:
-			return Union::StringUTF8("BASS_ERROR_SSL");
+			return Union::StringUTF8("BASS.BASS_ERROR_SSL");
 		case 11:
-			return Union::StringUTF8("BASS_ERROR_REINIT");
+			return Union::StringUTF8("BASS.BASS_ERROR_REINIT");
 		case 14:
-			return Union::StringUTF8("BASS_ERROR_ALREADY");
+			return Union::StringUTF8("BASS.BASS_ERROR_ALREADY");
 		case 17:
-			return Union::StringUTF8("BASS_ERROR_NOTAUDIO");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOTAUDIO");
 		case 18:
-			return Union::StringUTF8("BASS_ERROR_NOCHAN");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOCHAN");
 		case 19:
-			return Union::StringUTF8("BASS_ERROR_ILLTYPE");
+			return Union::StringUTF8("BASS.BASS_ERROR_ILLTYPE");
 		case 20:
-			return Union::StringUTF8("BASS_ERROR_ILLPARAM");
+			return Union::StringUTF8("BASS.BASS_ERROR_ILLPARAM");
 		case 21:
-			return Union::StringUTF8("BASS_ERROR_NO3D");
+			return Union::StringUTF8("BASS.BASS_ERROR_NO3D");
 		case 22:
-			return Union::StringUTF8("BASS_ERROR_NOEAX");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOEAX");
 		case 23:
-			return Union::StringUTF8("BASS_ERROR_DEVICE");
+			return Union::StringUTF8("BASS.BASS_ERROR_DEVICE");
 		case 24:
-			return Union::StringUTF8("BASS_ERROR_NOPLAY");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOPLAY");
 		case 25:
-			return Union::StringUTF8("BASS_ERROR_FREQ");
+			return Union::StringUTF8("BASS.BASS_ERROR_FREQ");
 		case 27:
-			return Union::StringUTF8("BASS_ERROR_NOTFILE");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOTFILE");
 		case 29:
-			return Union::StringUTF8("BASS_ERROR_NOHW");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOHW");
 		case 31:
-			return Union::StringUTF8("BASS_ERROR_EMPTY");
+			return Union::StringUTF8("BASS.BASS_ERROR_EMPTY");
 		case 32:
-			return Union::StringUTF8("BASS_ERROR_NONET");
+			return Union::StringUTF8("BASS.BASS_ERROR_NONET");
 		case 33:
-			return Union::StringUTF8("BASS_ERROR_CREATE");
+			return Union::StringUTF8("BASS.BASS_ERROR_CREATE");
 		case 34:
-			return Union::StringUTF8("BASS_ERROR_NOFX");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOFX");
 		case 37:
-			return Union::StringUTF8("BASS_ERROR_NOTAVAIL");
+			return Union::StringUTF8("BASS.BASS_ERROR_NOTAVAIL");
 		case 38:
-			return Union::StringUTF8("BASS_ERROR_DECODE");
+			return Union::StringUTF8("BASS.BASS_ERROR_DECODE");
 		case 39:
-			return Union::StringUTF8("BASS_ERROR_DX");
+			return Union::StringUTF8("BASS.BASS_ERROR_DX");
 		case 40:
-			return Union::StringUTF8("BASS_ERROR_TIMEOUT");
+			return Union::StringUTF8("BASS.BASS_ERROR_TIMEOUT");
 		case 41:
-			return Union::StringUTF8("BASS_ERROR_FILEFORM");
+			return Union::StringUTF8("BASS.BASS_ERROR_FILEFORM");
 		case 42:
-			return Union::StringUTF8("BASS_ERROR_SPEAKER");
+			return Union::StringUTF8("BASS.BASS_ERROR_SPEAKER");
 		case 43:
-			return Union::StringUTF8("BASS_ERROR_VERSION");
+			return Union::StringUTF8("BASS.BASS_ERROR_VERSION");
 		case 44:
-			return Union::StringUTF8("BASS_ERROR_CODEC");
+			return Union::StringUTF8("BASS.BASS_ERROR_CODEC");
 		case 45:
-			return Union::StringUTF8("BASS_ERROR_ENDED");
+			return Union::StringUTF8("BASS.BASS_ERROR_ENDED");
 		case 46:
-			return Union::StringUTF8("BASS_ERROR_BUSY");
+			return Union::StringUTF8("BASS.BASS_ERROR_BUSY");
 		case 47:
-			return Union::StringUTF8("BASS_ERROR_UNSTREAMABLE");
+			return Union::StringUTF8("BASS.BASS_ERROR_UNSTREAMABLE");
 		case 48:
-			return Union::StringUTF8("BASS_ERROR_PROTOCOL");
+			return Union::StringUTF8("BASS.BASS_ERROR_PROTOCOL");
 		case 49:
-			return Union::StringUTF8("BASS_ERROR_DENIED");
+			return Union::StringUTF8("BASS.BASS_ERROR_DENIED");
 		default:
-			return Union::StringUTF8("BASS_ERROR_UNKNOWN");
+			return Union::StringUTF8("BASS.BASS_ERROR_UNKNOWN");
 		}
 	}
 }

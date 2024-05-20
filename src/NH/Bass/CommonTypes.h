@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bass.h"
+#include "NH/Bass/BassAPI.h"
 #include "Union/String.h"
 
 namespace NH::Bass

@@ -19,7 +19,7 @@ namespace GOTHIC_NAMESPACE {
                 {
 					NH::LoggerLevel level = NH::StringToLoggerLevel(unionValue.ToChar());
 					NH::UnionConsoleLoggerAdapter::DEFAULT_LEVEL = level;
-					log->Message(level, "Logger level for UnionConsoleLoggerAdapter: {0}", unionValue.ToChar());
+					log->Info("Logger level for UnionConsoleLoggerAdapter: {0}", unionValue.ToChar());
                     unionAdapter->SetLoggerLevel(level);
                 }
                 auto* zSpyAdapter = (*it)->GetAdapter<NH::ZSpyLoggerAdapter>();
@@ -27,7 +27,7 @@ namespace GOTHIC_NAMESPACE {
                 {
 					NH::LoggerLevel level = NH::StringToLoggerLevel(zSpyValue.ToChar());
 					NH::ZSpyLoggerAdapter::DEFAULT_LEVEL = level;
-					log->Message(level, "Logger level for ZSpyLoggerAdapter: {0}", zSpyValue.ToChar());
+					log->Info("Logger level for ZSpyLoggerAdapter: {0}", zSpyValue.ToChar());
                     zSpyAdapter->SetLoggerLevel(level);
                 }
             }

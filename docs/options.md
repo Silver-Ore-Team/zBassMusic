@@ -1,4 +1,4 @@
-# Options reference (.ini)
+# OptionsType reference (.ini)
 ```ini
 [BASSMUSIC]
 

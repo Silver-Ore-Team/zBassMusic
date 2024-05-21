@@ -1,0 +1,7 @@
+#pragma once
+
+constexpr const char* BUILD_VERSION = "@PROJECT_VERSION@";
+constexpr const char* BUILD_TYPE = "@CMAKE_BUILD_TYPE@";
+constexpr const char* BUILD_TIME = "@BUILD_TIME@";
+constexpr const char* BUILD_BRANCH = "@BUILD_BRANCH@";
+constexpr const char* BUILD_REVISION = "@BUILD_REVISION@";

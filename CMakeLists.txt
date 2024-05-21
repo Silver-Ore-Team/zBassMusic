@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 set(PROJECT_VERSION "0.1.3")
-project(zBassMusic VERSION ${PROJECT_VERSION})
+set(PROJECT_VERSION_CMAKE "${PROJECT_VERSION}")
+project(zBassMusic VERSION ${PROJECT_VERSION_CMAKE})
 
 option(BUILD_VDF "Build .VDF file with plugin" ON)
 
@@ -20,4 +21,57 @@ include(cmake/union-api.cmake)
 include(cmake/gothic-api.cmake)
 include(cmake/bass.cmake)
 
-add_subdirectory(plugin)
+add_library(plugin SHARED)
+set_target_properties(plugin PROPERTIES
+        OUTPUT_NAME "zBassMusic"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}")
+
+string(TIMESTAMP BUILD_TIME "%Y-%m-%dT%H:%M:%S")
+execute_process(COMMAND git symbolic-ref --short HEAD OUTPUT_VARIABLE BUILD_BRANCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND git log --format=%H -n 1 OUTPUT_VARIABLE BUILD_REVISION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in" "${CMAKE_CURRENT_BINARY_DIR}/version.rc" @ONLY)
+configure_file("${CMAKE_SOURCE_DIR}/vdf/script.vdfs.in" "${CMAKE_BINARY_DIR}/script.vdfs")
+configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src/BuildInfo.h" @ONLY)
+
+file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Union/Memory.cpp")
+target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
+
+add_compile_options(plugin PRIVATE /W4 /WX)
+target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G1A __G2 __G2A)
+target_include_directories(plugin PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")
+target_link_libraries(plugin PRIVATE union-api gothic-api bass)
+
+install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
+install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
+if(${BUILD_VDF})
+    install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
+    install(SCRIPT "${VDF_DIR}/vdf.cmake")
+    install(CODE "execute_process(COMMAND ${CMAKE_SOURCE_DIR}/vdf/GothicVDFS.exe /B \"${CMAKE_INSTALL_PREFIX}/script.vdfs\"
+            WORKING_DIRECTORY \"${CMAKE_INSTALL_PREFIX}\")")
+endif()
+
+if(${BUILD_VDF})
+    string(REPLACE "build" "install" INSTALL_DIR "${CMAKE_BINARY_DIR}")
+    add_custom_target(plugin_vdf ALL
+            COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR} --prefix ${INSTALL_DIR}
+            DEPENDS plugin
+            COMMENT "Run install to build VDF")
+
+    if(DEFINED ENV{COPY_VDF_TARGET})
+        add_custom_target(copy_vdf ALL
+                COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/zBassMusic.vdf" "$ENV{COPY_VDF_TARGET}"
+                DEPENDS plugin_vdf
+                COMMENT "Copy plugin to target directory: $ENV{COPY_VDF_TARGET}")
+    endif()
+endif()
+
+if(DEFINED ENV{COPY_DLL_TARGET})
+    add_custom_target(copy_dll ALL
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/zBassMusic.dll" "$ENV{COPY_DLL_TARGET}/Autorun/zBassMusic.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/UnionAPI.dll" "$ENV{COPY_DLL_TARGET}/Autorun/UnionAPI.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bass.dll" "$ENV{COPY_DLL_TARGET}/bass.dll"
+            DEPENDS plugin
+            COMMENT "Copy plugin to target directory: $ENV{COPY_DLL_TARGET}")
+endif()

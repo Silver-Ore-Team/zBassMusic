@@ -69,6 +69,8 @@ jobs:
       - name: Commit version change
         if: ${{ inputs.push-version-commit == true }}
         run: |
+          New-Item -ItemType Directory -Force -Path ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
           git config --global user.name "Nekobot"
           git config --global user.email "nekobot-service.noreply@silveroreteam.pl"
           git remote set-url origin git@github.com:Silver-Ore-Team/zBassMusic.git

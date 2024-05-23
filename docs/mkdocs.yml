@@ -33,16 +33,14 @@ nav:
         - reference/options/index.md
   - Developer Guide: 
       - developer-guide/index.md
-      - Environment:
-        - developer-guide/environment/index.md
       - Architecture:
         - developer-guide/architecture/index.md
-      - Code Style:
-        - developer-guide/code-style/index.md
+      - Style Guide:
+        - developer-guide/style-guide/index.md
       - Contributing:
         - developer-guide/contributing/index.md
-      - Releases:
-        - developer-guide/releases/index.md
+      - Release:
+        - developer-guide/release/index.md
 theme:
   name: material
   logo: images/logo.svg

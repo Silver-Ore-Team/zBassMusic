@@ -4,7 +4,7 @@
 
 ### Core functions
 !!! success "Music Engine (v0.1.0)"
-    Music engine capable of replacing original DM system in the scope of playing audio and switching songs based on game events.
+    Music engine capable of replacing the original DM system in the scope of playing audio and switching songs based on game events.
 
 !!! success "Daedalus API for controlling playback (v0.1.0)"
     External functions to take control over music scheduling in Daedalus scripts. API is stable and shouldn't introduce any breaking changes.

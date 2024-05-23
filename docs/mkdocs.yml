@@ -20,10 +20,20 @@ nav:
         - user-guide/scripting/custom-scheduler.md
       - Debugging:
         - user-guide/debugging/index.md
-  - Configuration: 
-      - configuration/index.md
   - Reference: 
       - reference/index.md
+      - Classes:
+        - reference/classes/C_MUSICTHEME.md
+      - Globals:
+        - reference/globals/index.md
+        - BassMusic_ActiveThemeFilename: reference/globals/#bassmusic_activethemefilename
+      - Externals:
+        - reference/externals/index.md
+        - BassMusic_Play: reference/externals/#bassmusic_play
+      - Options (.ini):
+        - reference/options/index.md
+        - '[BassMusic]':
+          - LoggerLevelUnion: reference/options/#loggerlevelunion
   - Developer Guide: 
       - developer-guide/index.md
       - Environment:
@@ -60,7 +70,7 @@ theme:
     - content.code.select
     - content.code.annotate 
     - navigation.indexes 
-    - toc.integrate 
+    # - toc.integrate 
     - navigation.top
   icon:
     annotation: material/record-circle

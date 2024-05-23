@@ -27,30 +27,3 @@
 .zbassmusic-contributos {
     margin-top: 1rem;
 }
-
-.md-typeset code {
-    font-size: 0.8rem;
-}
-
-.zbassmusic-externals h2 {
-    font-weight: bold;
-    border-bottom: 1px solid #666;
-}
-
-.zbassmusic-externals h2 a {
-    color: rgba(226, 228, 233, 0.82);
-
-}
-
-.zbassmusic-externals ul code {
-    line-height: 2;
-}
-
-.zbassmusic-externals > p:has(> strong) {
-    margin-top: 1.5Srem;
-    margin-bottom: 0;
-}
-
-.zbassmusic-externals > ul {
-    margin-top: 0.5rem;
-}

@@ -45,9 +45,12 @@
 
 ## Future Plans
 
+!!! question "New features?"
+    We still may plan to implement some new features if they can provide value.
+
 !!! danger "Complete Product Release (v1.0.0)"
     Before we release version v1.0.0 and mark zBassMusic as a finished product, we need to:
     
     * finish all the features in the backlog
-    * battle-test the system by having it working in multiple released Gothic mods
-    * fix all bugs and crashes that have a meaningful probability of causing Access Violation on players' games
+    * battle-test the system by having it work in multiple released Gothic mods
+    * fix all bugs and crashes that have a meaningful probability of causing Access Violations on players' games

@@ -94,3 +94,12 @@
     padding: 0 !important;
     
 }
+
+.roadmap-legend .admonition  {
+    margin: 0 auto;
+    font-size: 0.7rem;
+}
+
+.md-main {
+    margin-bottom: 3rem;
+}

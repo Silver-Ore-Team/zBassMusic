@@ -13,7 +13,7 @@ with hundreds of GothicStarter entries, so you don't want to break someone's gam
 
 This method requires the player to install Union. Good option if your mod already uses other Union plugins and the runtime is there.
 
-!!! danger "Global Method"
+??? danger "Global Method"
 
     Choose either ZIP or VDF. Both work the same.
 
@@ -25,7 +25,7 @@ This method requires the player to install Union. Good option if your mod alread
     Copy `zBassMusic.vdf` <br>
     To `<GOTHIC_DIR>/Data/`
 
-!!! success "Isolated Method"
+??? success "Isolated Method"
 
     The isolated method is possible if you are placing your mod in `<GOTHIC_DIR>/Data/ModVDF` and declare .mod file in `YourMod.ini`.
 
@@ -49,7 +49,7 @@ This method requires the player to install Union. Good option if your mod alread
 It's possible to load zBassMusic on a clean Gothic with only System Pack using `pre.load` 
 file but it's always global.
 
-!!! danger "Global Method"
+??? danger "Global Method"
 
     From ZIP release:<br>
     Copy `zBassMusic.dll`, `UnionAPI.dll`, `bass.dll` <br>
@@ -69,7 +69,7 @@ file but it's always global.
 If you are using Ikarus in your scripts, it's possible to load dynamically any DLL using `LoadLibrary("AnyLib.dll")` function.
 The function is conveniently provided by Ikarus and this method is always isolated.
 
-!!! success "Isolated Method"
+??? success "Isolated Method"
 
     From ZIP release:<br>
     Copy `zBassMusic.dll`, `UnionAPI.dll`, `bass.dll` <br>

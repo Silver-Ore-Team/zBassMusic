@@ -10,11 +10,12 @@ nav:
         - user-guide/getting-started/index.md
         - user-guide/getting-started/plugin-loading.md
         - user-guide/getting-started/music-definition.md
-        - user-guide/getting-started/crossfading.md
+        - user-guide/getting-started/cross-fading.md
       - Transition Scheduler:
         - user-guide/transition-scheduler/index.md
         - user-guide/transition-scheduler/instant.md
         - user-guide/transition-scheduler/on-beat.md
+        - user-guide/transition-scheduler/jingle.md
       - Scripting (Daedalus):
         - user-guide/scripting/index.md
         - user-guide/scripting/custom-scheduler.md
@@ -26,14 +27,10 @@ nav:
         - reference/classes/C_MUSICTHEME.md
       - Globals:
         - reference/globals/index.md
-        - BassMusic_ActiveThemeFilename: reference/globals/#bassmusic_activethemefilename
       - Externals:
         - reference/externals/index.md
-        - BassMusic_Play: reference/externals/#bassmusic_play
       - Options (.ini):
         - reference/options/index.md
-        - '[BassMusic]':
-          - LoggerLevelUnion: reference/options/#loggerlevelunion
   - Developer Guide: 
       - developer-guide/index.md
       - Environment:

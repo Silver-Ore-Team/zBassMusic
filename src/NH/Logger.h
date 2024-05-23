@@ -18,15 +18,17 @@ namespace NH
         Trace = 6
     };
 
-	constexpr const char* LoggerLevelToString(LoggerLevel level) {
-		constexpr const char* values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
-		return values[(size_t) level];
-	}
+    constexpr const char* LoggerLevelToString(LoggerLevel level)
+    {
+        constexpr const char* values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" };
+        return values[(size_t)level];
+    }
 
-	constexpr const char* LoggerLevelToDisplayString(LoggerLevel level) {
-		constexpr const char* values[] = { " NONE", "FATAL", "ERROR", " WARN", " INFO", "DEBUG", "TRACE"};
-		return values[(size_t) level];
-	}
+    constexpr const char* LoggerLevelToDisplayString(LoggerLevel level)
+    {
+        constexpr const char* values[] = { " NONE", "FATAL", "ERROR", " WARN", " INFO", "DEBUG", "TRACE" };
+        return values[(size_t)level];
+    }
 
     LoggerLevel StringToLoggerLevel(String level);
 
@@ -99,7 +101,7 @@ namespace NH
 
         Union::Array<ILoggerAdapter*> GetAdapters() const { return m_Adapters; };
 
-        template <class T>
+        template<class T>
         T* GetAdapter() const
         {
             for (int i = 0; i < m_Adapters.GetCount(); i++)
@@ -118,7 +120,7 @@ namespace NH
     class UnionConsoleLoggerAdapter : public ILoggerAdapter
     {
     public:
-		static LoggerLevel DEFAULT_LEVEL;
+        static LoggerLevel DEFAULT_LEVEL;
 
         struct Color
         {
@@ -144,9 +146,9 @@ namespace NH
         String m_Prefix;
 
     public:
-		static LoggerLevel DEFAULT_LEVEL;
+        static LoggerLevel DEFAULT_LEVEL;
 
-		explicit ZSpyLoggerAdapter(LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
+        explicit ZSpyLoggerAdapter(LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
 
     protected:
         void Message(LoggerLevel level, const String& channel, const String& message) override;

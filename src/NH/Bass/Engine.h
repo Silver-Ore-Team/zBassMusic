@@ -13,51 +13,51 @@
 
 namespace NH::Bass
 {
-	class Engine
-	{
-		static NH::Logger* log;
-		static Engine* s_Instance;
-		bool m_Initialized = false;
-		float m_MasterVolume = 1.0f;
-		std::vector<Channel> m_Channels;
-		Channel* m_ActiveChannel = nullptr;
-		EventManager m_EventManager{};
-		TransitionScheduler m_TransitionScheduler{};
-		std::unordered_map<HashString, MusicDef> m_MusicDefs;
-		std::unordered_map<HashString, MusicFile> m_MusicFiles;
+    class Engine
+    {
+        static NH::Logger* log;
+        static Engine* s_Instance;
+        bool m_Initialized = false;
+        float m_MasterVolume = 1.0f;
+        std::vector<Channel> m_Channels;
+        Channel* m_ActiveChannel = nullptr;
+        EventManager m_EventManager{};
+        TransitionScheduler m_TransitionScheduler{};
+        std::unordered_map<HashString, MusicDef> m_MusicDefs;
+        std::unordered_map<HashString, MusicFile> m_MusicFiles;
 
-		std::mutex m_PlayMusicMutex;
-		std::vector<MusicDefRetry> m_PlayMusicRetryList;
+        std::mutex m_PlayMusicMutex;
+        std::vector<MusicDefRetry> m_PlayMusicRetryList;
 
-	public:
-		static Engine* GetInstance();
+    public:
+        static Engine* GetInstance();
 
-		MusicFile& CreateMusicBuffer(const Union::StringUTF8& filename);
+        MusicFile& CreateMusicBuffer(const Union::StringUTF8& filename);
 
-		void PlayMusic(MusicDef musicDef);
+        void PlayMusic(MusicDef musicDef);
 
-		void Update();
+        void Update();
 
-		void SetVolume(float volume);
+        void SetVolume(float volume);
 
-		float GetVolume() const;
+        float GetVolume() const;
 
-		EventManager& GetEM();
+        EventManager& GetEM();
 
-		TransitionScheduler& GetTransitionScheduler();
+        TransitionScheduler& GetTransitionScheduler();
 
-		void StopMusic();
+        void StopMusic();
 
-	private:
-		Engine();
+    private:
+        Engine();
 
-		MusicFile* GetMusicFile(const Union::StringUTF8& filename);
+        MusicFile* GetMusicFile(const Union::StringUTF8& filename);
 
-		Channel* FindAvailableChannel();
+        Channel* FindAvailableChannel();
 
-		void FinalizeScheduledMusic(const MusicDef& musicDef);
+        void FinalizeScheduledMusic(const MusicDef& musicDef);
 
-	public:
-		static Union::StringUTF8 ErrorCodeToString(int code);
-	};
+    public:
+        static Union::StringUTF8 ErrorCodeToString(int code);
+    };
 }

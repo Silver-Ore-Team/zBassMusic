@@ -1,22 +1,25 @@
 # zBassMusic
-zBassMusic is a modern music system for Gothic I and Gothic II NotR based on [BASS Audio Library](https://www.un4seen.com/) distributed as a Union plugin. It replaces the old DirectMusic system to let the modders create music for Gothic as regular audio files instead of unfriendly DirectMusic format.  
+
+zBassMusic is a modern music system for Gothic games based on ZenGin.
+It replaces the original DirectMusic system with a
+custom engine built on top of [BASS Audio Library](https://www.un4seen.com/) to provide easier workflow for composers
+and additional functions for the
+perfect soundtrack design. The most important features include:
 
 Features:
-* Music playback with modern audio formats like WAV, MP3, OGG
-* Out-of-the-box support for existing `C_MUSICTHEME` instances
-* Scriptable interface to control music playback from Daedalus scripts 
-* Loading music files from VDFS volumes (excluding .sgt)
-* Backwards compatibility with DirectMusic .sgt files - they are forwarded to original system
 
-## Project Status
-
-The project is under development, but starting with the v0.1.0 version, we consider its core stable for general use. 
-Now we focus on implementing more advanced control over the playback & transitions, like fine-tuning the
-transition time points to cross-fade songs right on the beat.
+* Direct playback of common audio formats (WAV, OGG, MP3) instead of DirectMusic proprietary formats
+* Out-of-the-box support for existing music theme definitions (just change the audio file)
+* Alternative scheduling & transition systems to support smooth cross-fades between themes
+* Loading of music files from VDF volumes (DirectMusic required physical files)
+* Scriptable interface for controlling the system from Deadalus scripts
+* Backward compatibility with original .sgt music (it's redirected to the DirectMusic system)
 
 ## Getting Started
 
-Download `zBassMusic.vdf` and place it inside `<GOTHIC_ROOT>/Data` with Union installed to automatically load the system at the start of the game. With default settings you can use modern audio formats directly in `MusicInst.d` like:
+Download `zBassMusic.vdf` and place it inside `<GOTHIC_ROOT>/Data` with Union installed to automatically load the system
+at the start of the game. With default settings you can use modern audio formats directly in `MusicInst.d` like:
+
 ```cpp
 instance SYS_MENU(C_MUSICTHEME_DEF)
 {
@@ -39,52 +42,50 @@ instance SYS_MENU(C_MUSICTHEME_DEF)
 
 ## Documentation
 
-For more detailed information [check the project's Wiki](https://github.com/Silver-Ore-Team/zBassMusic/wiki).
+* [zBassMusic](https://silver-ore-team.github.io/zBassMusic/)
+* [User Guide](https://silver-ore-team.github.io/zBassMusic/user-guide/)
+    * [Getting Started](https://silver-ore-team.github.io/zBassMusic/user-guide/getting-started/)
+* [Reference](https://silver-ore-team.github.io/zBassMusic/reference/)
+* [Developer Guide](https://silver-ore-team.github.io/zBassMusic/developer-guide/)
 
 ## Build
 
-To build the project you need Visual Studio 2022 with v143 toolset (eg. 14.39). Then you can clone the repository and update submodules:
-```
-git clone git@github.com:Silver-Ore-Team/zBassMusic.git
-cd zBassMusic
-git submodule init --remote
-```
-
-The project is based on CMake, so you can open it in Visual Studio, CLion or any other IDE supporting CMake, and build `plugin` target to compile `zBassMusic.dll`. 
-
-Run `cmake --install out/build/x86-release --prefix out/install/x86-release` to generate release directory with all required DLLs and VDF file to include in Gothic.
+Build instructions are available in
+the [Developer Guide](https://silver-ore-team.github.io/zBassMusic/developer-guide/).
 
 ## Support
 
-If you have found a bug in zBassMusic, please [create an issue](https://github.com/Silver-Ore-Team/zBassMusic/issues/new) and state your problem in detail. 
-Include zBassMusic version, Union version and your environment (other plugins, stack traces etc.).
+If you have found a bug in zBassMusic,
+please [create an issue](https://github.com/Silver-Ore-Team/zBassMusic/issues/new).
 
-Please enable Union console using `SystemPack.ini` and try to get the logs to include in the report.  
-```ini
-[CORE]
-ShowDebugWindow = true
-UseDebugWindowHost = true
-```
+Before creating a new issue, you can try to enable debug logging and get the logs to include in the issue.
+See [Debugging](https://silver-ore-team.github.io/zBassMusic/user-guide/debugging/)
 
 ### Discord
 
-You can meet the plugin authors on Discord if you got a quick question. Look for `tehe`.
-It's not an official support channel, so keep in mind that our SLA varies from 3 minutes to 71 weeks.   
+You can contact the authors and maintainers on Discord. 
+Look for [@tehe.official](https://discordapp.com/users/1014655735856111678).
 
 #### Gothic Modding Community
+
 Biggest community of international Gothic modders.
 https://discord.gg/6rQQGVQK
 
 #### 🇵🇱 Historia Neka
-Official Discord of Nek's History, the mod we are working on and started zBassMusic for it. 
-https://discord.gg/cvd6jhKB
+
+Official Discord of Nek's History, the mod we are working on and started zBassMusic for it.
+https://discord.gg/cvd6jhKB`
 
 ## License
 
 zBassMusic is licensed under [MIT license](LICENSE) excluding some dependencies.
 
-[union-api](https://gitlab.com/union-framework/union-api) and [gothic-api](https://gitlab.com/union-framework/gothic-api) are licensed under [GNU GENERAL PUBLIC LICENSE V3](https://gitlab.com/union-framework/union-api-/blob/main/LICENSE).
+[union-api](https://gitlab.com/union-framework/union-api)
+and [gothic-api](https://gitlab.com/union-framework/gothic-api) are licensed
+under [GNU GENERAL PUBLIC LICENSE V3](https://gitlab.com/union-framework/union-api-/blob/main/LICENSE).
 
-BASS library is licensed under a proprietary license that's free for non-commercial use only. For commercial licensing please refer to [www.un4seen.com](https://www.un4seen.com/).
+BASS library is licensed under a proprietary license that's free for non-commercial use only. For commercial licensing
+please refer to [www.un4seen.com](https://www.un4seen.com/).
 
-GothicVDFS 2.6 [Copyright (c) 2001-2003, Nico Bendlin, Copyright (c) 1994-2002, Peter Sabath / TRIACOM Software GmbH](vdf/License.txt)
+GothicVDFS
+2.6 [Copyright (c) 2001-2003, Nico Bendlin, Copyright (c) 1994-2002, Peter Sabath / TRIACOM Software GmbH](vdf/License.txt)

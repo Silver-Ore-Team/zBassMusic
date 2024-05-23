@@ -15,7 +15,7 @@ UseDebugWindowHost = true
 
 ## Logging Level
 
-By default, we print only the severity >=INFO to Union Console and >=DEBUG to ZSpy. 
+By default, we print only the severity >=INFO to Union Console and >=DEBUG to ZSpy.
 To print all logs to the console, you can set TRACE logging level in `Gothic.ini`:
 
 ```ini
@@ -29,8 +29,8 @@ LoggerLevelZSpy=TRACE
 Standard Release build does not contain debug symbols, so you cannot debug the application in the debugger easily
 because you will see only the optimized assembly code.
 
-If you encounter a crash on Release build, 
+If you encounter a crash on Release build,
 please download the builds suffixed with `-pdb` like `zBassMusic-v0.1.4-pdb.zip` and replace Release with them.
 These builds contain debug symbols, and now you can start Gothic with a debugger attached to catch the exception
-causing the crash and see the source code where it happened. 
+causing the crash and see the source code where it happened.
 If you get some additional information about the crash from the debugger, please include it in the bug report.

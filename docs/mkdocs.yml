@@ -4,43 +4,43 @@ repo_url: https://github.com/Silver-Ore-Team/zBassMusic
 nav:
   - Home: index.md
   - Roadmap: roadmap/index.md
-  - User Guide: 
+  - User Guide:
       - user-guide/index.md
       - Getting Started:
-        - user-guide/getting-started/index.md
-        - user-guide/getting-started/plugin-loading.md
-        - user-guide/getting-started/music-definition.md
-        - user-guide/getting-started/cross-fading.md
+          - user-guide/getting-started/index.md
+          - user-guide/getting-started/plugin-loading.md
+          - user-guide/getting-started/music-definition.md
+          - user-guide/getting-started/cross-fading.md
       - Transition Scheduler:
-        - user-guide/transition-scheduler/index.md
-        - user-guide/transition-scheduler/instant.md
-        - user-guide/transition-scheduler/on-beat.md
-        - user-guide/transition-scheduler/jingle.md
+          - user-guide/transition-scheduler/index.md
+          - user-guide/transition-scheduler/instant.md
+          - user-guide/transition-scheduler/on-beat.md
+          - user-guide/transition-scheduler/jingle.md
       - Scripting (Daedalus):
-        - user-guide/scripting/index.md
-        - user-guide/scripting/custom-scheduler.md
+          - user-guide/scripting/index.md
+          - user-guide/scripting/custom-scheduler.md
       - Debugging:
-        - user-guide/debugging/index.md
-  - Reference: 
+          - user-guide/debugging/index.md
+  - Reference:
       - reference/index.md
       - Classes:
-        - reference/classes/C_MUSICTHEME.md
+          - reference/classes/C_MUSICTHEME.md
       - Globals:
-        - reference/globals/index.md
+          - reference/globals/index.md
       - Externals:
-        - reference/externals/index.md
+          - reference/externals/index.md
       - Options (.ini):
-        - reference/options/index.md
-  - Developer Guide: 
+          - reference/options/index.md
+  - Developer Guide:
       - developer-guide/index.md
       - Architecture:
-        - developer-guide/architecture/index.md
+          - developer-guide/architecture/index.md
       - Style Guide:
-        - developer-guide/style-guide/index.md
+          - developer-guide/style-guide/index.md
       - Contributing:
-        - developer-guide/contributing/index.md
+          - developer-guide/contributing/index.md
       - Release:
-        - developer-guide/release/index.md
+          - developer-guide/release/index.md
 theme:
   name: material
   logo: images/logo.svg
@@ -63,8 +63,8 @@ theme:
     - navigation.tabs.sticky
     - content.code.copy
     - content.code.select
-    - content.code.annotate 
-    - navigation.indexes 
+    - content.code.annotate
+    - navigation.indexes
     # - toc.integrate 
     - navigation.top
   icon:
@@ -109,15 +109,15 @@ markdown_extensions:
 plugins:
   - search
   - offline:
-      enabled: !ENV [OFFLINE, false]
+      enabled: !ENV [ OFFLINE, false ]
 extra_css:
   - stylesheets/extra.css
-extra:  
-  generator: false  
+extra:
+  generator: false
   social:
-    - icon: fontawesome/brands/github 
+    - icon: fontawesome/brands/github
       link: https://github.com/Silver-Ore-Team/zBassMusic
-    - icon: fontawesome/brands/discord 
+    - icon: fontawesome/brands/discord
       link: https://discord.gg/cvd6jhKB
 extra_javascript:
   - javascripts/mathjax.js

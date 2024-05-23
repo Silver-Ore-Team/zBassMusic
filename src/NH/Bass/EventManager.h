@@ -7,56 +7,56 @@
 
 namespace NH::Bass
 {
-	using EventSubscriberFunction = void (*)(const MusicDef&, int data, void*);
+    using EventSubscriberFunction = void (*)(const MusicDef&, int data, void*);
 
-	enum class EventType
-	{
-		UNKNOWN = 0,
-		MUSIC_END,
-		MUSIC_TRANSITION,
-		MUSIC_CHANGE
-	};
+    enum class EventType
+    {
+        UNKNOWN = 0,
+        MUSIC_END,
+        MUSIC_TRANSITION,
+        MUSIC_CHANGE
+    };
 
-	struct EventSubscriber
-	{
-		EventType Type = EventType::UNKNOWN;
-		EventSubscriberFunction Function{};
-		void* UserData = nullptr;
+    struct EventSubscriber
+    {
+        EventType Type = EventType::UNKNOWN;
+        EventSubscriberFunction Function{};
+        void* UserData = nullptr;
 
-		bool operator==(const EventSubscriber& other) const
-		{
-			return this == &other;
-		}
-	};
+        bool operator==(const EventSubscriber& other) const
+        {
+            return this == &other;
+        }
+    };
 
-	class Engine;
+    class Engine;
 
-	class EventManager
-	{
-		static NH::Logger* log;
+    class EventManager
+    {
+        static NH::Logger* log;
 
-		struct Event
-		{
-			EventType type = EventType::UNKNOWN;
-			MusicDef music;
-			int data{};
-		};
+        struct Event
+        {
+            EventType type = EventType::UNKNOWN;
+            MusicDef music;
+            int data{};
+        };
 
-		friend Engine;
+        friend Engine;
 
-		std::vector<EventSubscriber> m_Subscribers{};
-		std::deque<Event> m_EventQueue;
+        std::vector<EventSubscriber> m_Subscribers{};
+        std::deque<Event> m_EventQueue;
 
-	public:
-		EventSubscriber* AddSubscriber(EventType type, EventSubscriberFunction function, void* userData = nullptr);
+    public:
+        EventSubscriber* AddSubscriber(EventType type, EventSubscriberFunction function, void* userData = nullptr);
 
-		void RemoveSubscriber(const EventSubscriber* subscriber);
+        void RemoveSubscriber(const EventSubscriber* subscriber);
 
-		void DispatchEvent(EventType type, const MusicDef& musicDef, int data = 0);
+        void DispatchEvent(EventType type, const MusicDef& musicDef, int data = 0);
 
-		void Update();
+        void Update();
 
-	private:
-		EventManager() = default;
-	};
+    private:
+        EventManager() = default;
+    };
 }

@@ -1,6 +1,6 @@
 # Cross-fading
 
-zBassMusic implements basic fade-in and fade-out effects to crossfade between songs, but it's activated only 
+zBassMusic implements basic fade-in and fade-out effects to crossfade between songs, but it's activated only
 if the music theme defines a correct `transtype`. We support:
 
 * `TRANSITION_TYPE_INTRO` (= 5) - fade-in effect at the start
@@ -8,7 +8,7 @@ if the music theme defines a correct `transtype`. We support:
 * `TRANSITION_TYPE_ENDANDINTRO` (= 7) - both fade-in and fade-out effects
 
 The best default is to use `TRANSITION_TYPE_ENDANDINTRO` because it defines both start and end effects.
-If you had one song with `TRANSITION_TYPE_END` and another song without `TRANSITION_TYPE_INTRO`, 
+If you had one song with `TRANSITION_TYPE_END` and another song without `TRANSITION_TYPE_INTRO`,
 then during the transition the first sound would fade out but the second one would start instantly at 100% volume.
 
 ```dae
@@ -26,6 +26,6 @@ prototype C_MUSICTHEME_FIGHT(C_MUSICTHEME)
 };
 ```
 
-Other values of `transtype` and all values of `transsubtype` are ignored because zBassMusic can't emulate them on 
-arbitrary audio files with no MIDI metadata. 
+Other values of `transtype` and all values of `transsubtype` are ignored because zBassMusic can't emulate them on
+arbitrary audio files with no MIDI metadata.
 The advanced transitions are implemented by the plugin in [Transition Scheduler](../transition-scheduler/index.md).

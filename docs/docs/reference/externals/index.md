@@ -28,7 +28,6 @@ func void BassMusic_SetFullScriptControl(int enabled) {}
 * `#!dae var int enabled`<br>
   Boolean value if full script control should be enabled.
 
-
 ## <a href="#bassmusic_onendevent">BassMusic_OnEndEvent</a>
 
 Set a callback function to be called when the music ends.

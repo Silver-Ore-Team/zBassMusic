@@ -53,6 +53,10 @@ hide:
 !!! question "New features?"
     We still may plan to implement some new features if they can provide value.
 
+!!! warning "Support late injection"
+    Right now the plugin hooks early into Gothic initialization to set itself up and replace the `zmusic` pointer with a custom implementation.
+    We should add support for late initialization and let the plugin be loaded by Daedalus/Ikaus scripts.
+
 !!! danger "Complete Product Release (v1.0.0)"
     Before we release version v1.0.0 and mark zBassMusic as a finished product, we need to:
     

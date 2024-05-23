@@ -1,3 +1,8 @@
+---
+hide:
+    - toc
+---
+
 # User Guide
 
 User Guide is the zBassMusic documentation dedicated to people who would like to include the plugin in their mod and use it as a music system. 

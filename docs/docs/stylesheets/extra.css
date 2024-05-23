@@ -28,7 +28,11 @@
     margin-top: 1rem;
 }
 
-.md-typeset code {
+/* .md-typeset code {
+    font-size: 0.8rem;
+} */
+
+.md-typeset .admonition {
     font-size: 0.8rem;
 }
 
@@ -53,4 +57,40 @@
 
 .zbassmusic-externals > ul {
     margin-top: 0.5rem;
+}
+
+.gh-release {
+    background: #111;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.gh-release-title {
+    font-weight: bold;
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+.gh-release pre {
+    overflow-x: hidden;
+}
+
+.gh-release-artifacts {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 2rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1rem;
+    font-weight: bold;
+}
+
+.gh-release-artifacts li {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    
 }

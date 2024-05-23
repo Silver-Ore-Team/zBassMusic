@@ -1,0 +1,120 @@
+site_name: zBassMusic
+copyright: Copyright &copy; 2024 Silver Ore Team
+repo_url: https://github.com/Silver-Ore-Team/zBassMusic
+nav:
+  - Home: index.md
+  - Roadmap: roadmap/index.md
+  - User Guide: 
+      - user-guide/index.md
+      - Getting Started:
+        - user-guide/getting-started/index.md
+        - user-guide/getting-started/plugin-loading.md
+        - user-guide/getting-started/music-definition.md
+        - user-guide/getting-started/crossfading.md
+      - Transition Scheduler:
+        - user-guide/transition-scheduler/index.md
+        - user-guide/transition-scheduler/instant.md
+        - user-guide/transition-scheduler/on-beat.md
+      - Scripting (Daedalus):
+        - user-guide/scripting/index.md
+        - user-guide/scripting/custom-scheduler.md
+      - Debugging:
+        - user-guide/debugging/index.md
+  - Configuration: 
+      - configuration/index.md
+  - Reference: 
+      - reference/index.md
+  - Developer Guide: 
+      - developer-guide/index.md
+      - Environment:
+        - developer-guide/environment/index.md
+      - Architecture:
+        - developer-guide/architecture/index.md
+      - Code Style:
+        - developer-guide/code-style/index.md
+      - Contributing:
+        - developer-guide/contributing/index.md
+      - Releases:
+        - developer-guide/releases/index.md
+theme:
+  name: material
+  logo: images/logo.svg
+  favicon: images/favicon.ico
+  palette:
+    scheme: slate
+    primary: custom
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - ini
+    - cpp
+    - daedalus
+    - json
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.footer
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate 
+    - navigation.indexes 
+    - toc.integrate 
+    - navigation.top
+  icon:
+    annotation: material/record-circle
+    admonition:
+      note: fontawesome/solid/note-sticky
+      abstract: fontawesome/solid/book
+      info: fontawesome/solid/circle-info
+      tip: fontawesome/solid/bullhorn
+      success: fontawesome/solid/check
+      question: fontawesome/solid/circle-question
+      warning: fontawesome/solid/triangle-exclamation
+      failure: fontawesome/solid/bomb
+      danger: fontawesome/solid/skull
+      bug: fontawesome/solid/robot
+      example: fontawesome/solid/flask
+      quote: fontawesome/solid/quote-left
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      linenums: true
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.smartsymbols
+plugins:
+  - search
+  - offline:
+      enabled: !ENV [OFFLINE, false]
+extra_css:
+  - stylesheets/extra.css
+extra:  
+  generator: false  
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/Silver-Ore-Team/zBassMusic
+    - icon: fontawesome/brands/discord 
+      link: https://discord.gg/cvd6jhKB
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js

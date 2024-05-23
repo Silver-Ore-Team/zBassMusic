@@ -3,7 +3,7 @@
 // var string BassMusic_ActiveThemeFilename
 //	Holds the filename of currently played song or the last song if none is playing now.
 // ---------------------------------------------------------------
-var string BassMusic_ActiveThemeFilename;
+var string BassMusic_ActiveThemeFilename;BassMusic_ActiveThemeFilename
 
 // ---------------------------------------------------------------
 // var string BassMusic_ActiveThemeID

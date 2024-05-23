@@ -42,7 +42,7 @@
       "displayName": "x86 Release (Debug Symbols)",
       "inherits": "x86-release",
       "cacheVariables": {
-        "CMAKE_BUILD_RELEASE_PDB": "yes"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     }
   ]

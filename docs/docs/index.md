@@ -1,5 +1,7 @@
 ---
 name: zBassMusic
+hide:
+  - navigation
 ---
 
 # zBassMusic

@@ -1,6 +1,7 @@
 # Music Definition
 
-zBassMusic uses the same music definitions as the original game, so you can work directly on existing `C_MUSICTHEME` instances. 
+zBassMusic uses the same music definitions as the original game, so you can work directly on existing `C_MUSICTHEME`
+instances.
 The instances are in `Scripts/System/Music/MusicInst.d`.
 
 ```dae
@@ -23,7 +24,8 @@ prototype C_MUSICTHEME_FIGHT(C_MUSICTHEME)
 
 ## Caveat: Reverb Effect
 
-zBassMusic emulates the original reverb effects using `BASS_DX8_REVERB` from BASS library but it has strict limits on the
+zBassMusic emulates the original reverb effects using `BASS_DX8_REVERB` from BASS library but it has strict limits on
+the
 acceptable parameters range. If you would like to use the effect, make sure that:
 
 * `reverbmix` is in range `[-96, 0]`

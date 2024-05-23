@@ -2,5 +2,5 @@
 
 namespace NH::Bass
 {
-	OptionsType* Options = new OptionsType{};
+    OptionsType* Options = new OptionsType{};
 }

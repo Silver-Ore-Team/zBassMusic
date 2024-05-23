@@ -5,8 +5,8 @@
 
 namespace NH
 {
-	namespace FNV1a
-	{
+    namespace FNV1a
+    {
         // FNV1a c++11 constexpr compile time hash functions, 32 and 64 bit
         // str should be a null terminated string literal, value should be left out
         // e.g hash_32_fnv1a_const("example")
@@ -26,32 +26,32 @@ namespace NH
         {
             return (str[0] == '\0') ? value : hash_64_fnv1a_const(&str[1], (value ^ uint64_t(str[0])) * prime_64_const);
         }
-	}
+    }
 
-	// HashString is a compile-time 64-bit FNV1a hash of a string literal.
-	// It can be used as a key in hash maps to avoid runtime string comparisons.
+    // HashString is a compile-time 64-bit FNV1a hash of a string literal.
+    // It can be used as a key in hash maps to avoid runtime string comparisons.
     class HashString
     {
         uint64_t Id;
 
     public:
-		constexpr explicit(false) HashString(const char* str) noexcept : Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
-		constexpr explicit(false) HashString(const String& str) noexcept : Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
-		constexpr explicit(false) operator uint64_t() const noexcept { return Id; } // NOLINT(google-explicit-constructor)
-		constexpr bool operator==(const HashString& other) const noexcept { return Id == other.Id; }
+        constexpr explicit(false) HashString(const char* str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
+        constexpr explicit(false) HashString(const String& str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
+        constexpr explicit(false) operator uint64_t() const noexcept { return Id; } // NOLINT(google-explicit-constructor)
+        constexpr bool operator==(const HashString& other) const noexcept { return Id == other.Id; }
     };
 
-	constexpr HashString operator"" _hs(const char* str, size_t) noexcept
-	{
-		return { str };
-	}
+    constexpr HashString operator "" _hs(const char* str, size_t) noexcept
+    {
+        return { str };
+    }
 }
 
 template<>
 struct std::hash<NH::HashString>
 {
-	std::size_t operator()(const NH::HashString& k) const
-	{
-		return std::hash<uint64_t>()(static_cast<uint64_t>(k));
-	}
+    std::size_t operator()(const NH::HashString& k) const
+    {
+        return std::hash<uint64_t>()(static_cast<uint64_t>(k));
+    }
 };

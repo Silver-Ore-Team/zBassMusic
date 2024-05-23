@@ -12,10 +12,10 @@ set(VDF_DIR "${CMAKE_SOURCE_DIR}/vdf")
 set(GOTHIC_USERAPI_DIR "${CMAKE_SOURCE_DIR}/gothic-userapi")
 
 set(CMAKE_CXX_STANDARD 23)
-if(${CMAKE_BUILD_RELEASE_PDB})
+if (${CMAKE_BUILD_RELEASE_PDB})
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
-endif()
+endif ()
 
 include(cmake/union-api.cmake)
 include(cmake/gothic-api.cmake)
@@ -45,33 +45,33 @@ target_link_libraries(plugin PRIVATE union-api gothic-api bass)
 
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
-if(${BUILD_VDF})
+if (${BUILD_VDF})
     install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
     install(SCRIPT "${VDF_DIR}/vdf.cmake")
     install(CODE "execute_process(COMMAND ${CMAKE_SOURCE_DIR}/vdf/GothicVDFS.exe /B \"${CMAKE_INSTALL_PREFIX}/script.vdfs\"
             WORKING_DIRECTORY \"${CMAKE_INSTALL_PREFIX}\")")
-endif()
+endif ()
 
-if(${BUILD_VDF})
+if (${BUILD_VDF})
     string(REPLACE "build" "install" INSTALL_DIR "${CMAKE_BINARY_DIR}")
     add_custom_target(plugin_vdf ALL
             COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR} --prefix ${INSTALL_DIR}
             DEPENDS plugin
             COMMENT "Run install to build VDF")
 
-    if(DEFINED ENV{COPY_VDF_TARGET})
+    if (DEFINED ENV{COPY_VDF_TARGET})
         add_custom_target(copy_vdf ALL
                 COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/zBassMusic.vdf" "$ENV{COPY_VDF_TARGET}"
                 DEPENDS plugin_vdf
                 COMMENT "Copy plugin to target directory: $ENV{COPY_VDF_TARGET}")
-    endif()
-endif()
+    endif ()
+endif ()
 
-if(DEFINED ENV{COPY_DLL_TARGET})
+if (DEFINED ENV{COPY_DLL_TARGET})
     add_custom_target(copy_dll ALL
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/zBassMusic.dll" "$ENV{COPY_DLL_TARGET}/Autorun/zBassMusic.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/UnionAPI.dll" "$ENV{COPY_DLL_TARGET}/Autorun/UnionAPI.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bass.dll" "$ENV{COPY_DLL_TARGET}/bass.dll"
             DEPENDS plugin
             COMMENT "Copy plugin to target directory: $ENV{COPY_DLL_TARGET}")
-endif()
+endif ()

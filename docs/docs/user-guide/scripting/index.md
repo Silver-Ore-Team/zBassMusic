@@ -1,7 +1,7 @@
 # Scripting (Daedalus)
 
 The plugin defines several external functions that let us interact with the Music Engine from Daedalus scripts.
-The full list of available functions can be found in the [Reference](../reference/index.md) page, and here we 
+The full list of available functions can be found in the [Reference](../reference/index.md) page, and here we
 will cover only the "Full Script Control" mode.
 
 ## Full Script Control
@@ -13,13 +13,12 @@ and play your own music themes without any interference from the standard mechan
 BassMusic_SetFullScriptControl(true);
 ```
 
-When the Full Script Control mode is enabled, the plugin will not play any music themes automatically and you 
+When the Full Script Control mode is enabled, the plugin will not play any music themes automatically and you
 have to do it yourself using the `BassMusic_Play` function.
 
 ```dae
 BassMusic_Play("MyTheme");
 ```
-
 
 When you are done with the custom music playback, you can disable the Full Script Control mode and get the
 original schedulers back.

@@ -5,7 +5,7 @@
 }
 
 .md-content {
-    max-width: 160ch; 
+    max-width: 160ch;
 }
 
 .grid.cards {
@@ -92,10 +92,10 @@
     list-style: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    
+
 }
 
-.roadmap-legend .admonition  {
+.roadmap-legend .admonition {
     margin: 0 auto;
     font-size: 0.7rem;
 }

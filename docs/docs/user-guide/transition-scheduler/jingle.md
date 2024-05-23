@@ -1,5 +1,5 @@
 # Jingle Transition
 
 !!! danger "Not implemented"
-    This feature is not implemented yet.
+This feature is not implemented yet.
 

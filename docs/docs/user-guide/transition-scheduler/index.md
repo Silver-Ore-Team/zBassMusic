@@ -1,12 +1,12 @@
 # Transitions Scheduler
 
 !!! note "Preview"
-    This feature is still under development and may change significantly in the future.
+This feature is still under development and may change significantly in the future.
 
 Transition Scheduler is a module providing advanced transitions between music themes that need to be precisely
 synchronized and accord to the defined rules.
-For example, OnBeat rule limits the time points when the transition can occur and schedules the transition for 
-the closest point in the future, so the composer can design seamless transitions with a perfect match to the beat. 
+For example, OnBeat rule limits the time points when the transition can occur and schedules the transition for
+the closest point in the future, so the composer can design seamless transitions with a perfect match to the beat.
 
 Available transition rules:
 

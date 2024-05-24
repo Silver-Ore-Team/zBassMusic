@@ -13,14 +13,13 @@ It explains the architecture of the system, how to build it, and how to extend i
 ## Setup Project
 
 !!! info "CMake vs IDE"
-The setup instructions assume no IDE is used, and CMake is called from the command line.
-If you use Visual Studio, CLion or any other IDE, you can use the CMake integration from it.
+    The setup instructions assume no IDE is used, and CMake is called from the command line. 
+    If you use Visual Studio, CLion or any other IDE, you can use the CMake integration from it. 
 
 ### Fork Repository
 
 Unless you are an internal contributor, you can't push directly to the repository, so you have to fork it first.
-To do it, click the "Fork" button in the top right corner of
-the [repository page](https://github.com/Silver-Ore-Team/zBassMusic).
+To do it, click the "Fork" button in the top right corner of the [repository page](https://github.com/Silver-Ore-Team/zBassMusic).
 
 ### Clone Repository
 

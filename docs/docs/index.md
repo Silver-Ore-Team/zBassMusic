@@ -27,37 +27,37 @@ The most important features include:
 
 <div class="grid cards" markdown>
 
-- ::octicons-rocket-16:{ .lg .middle } __Release Builds__
+-  ::octicons-rocket-16:{ .lg .middle } __Release Builds__
 
-   ---
+    ---
 
-  Release builds are ready to be used in Gothic and we publish them automatically on our GitHub.
+    Release builds are ready to be used in Gothic and we publish them automatically on our GitHub.
 
-  [:octicons-arrow-right-24: Releases](https://github.com/Silver-Ore-Team/zBassMusic/releases)
+    [:octicons-arrow-right-24: Releases](https://github.com/Silver-Ore-Team/zBassMusic/releases)
 
-- :fontawesome-brands-github:{ .lg .middle } __Source Code__
+-  :fontawesome-brands-github:{ .lg .middle } __Source Code__
 
-   ---
+    ---
 
-  zBassMusic is open source and you can access the code on our public repo hosted by GitHub.
+    zBassMusic is open source and you can access the code on our public repo hosted by GitHub.
 
-  [:octicons-arrow-right-24: GitHub](https://github.com/Silver-Ore-Team/zBassMusic)
+    [:octicons-arrow-right-24: GitHub](https://github.com/Silver-Ore-Team/zBassMusic)
 
-- :fontawesome-solid-bug:{ .lg .middle } __Bug Reporting__
+-  :fontawesome-solid-bug:{ .lg .middle } __Bug Reporting__
 
-   ---
+    ---
 
-  If you have found a bug in zBassMusic, please create an issue on GitHub and tell us what's wrong.
+    If you have found a bug in zBassMusic, please create an issue on GitHub and tell us what's wrong.
 
-  [:octicons-arrow-right-24: Issues](https://github.com/Silver-Ore-Team/zBassMusic/issues)
+    [:octicons-arrow-right-24: Issues](https://github.com/Silver-Ore-Team/zBassMusic/issues)
 
-- :fontawesome-regular-message:{ .lg .middle } __Discussions__
+-  :fontawesome-regular-message:{ .lg .middle } __Discussions__
 
-   ---
+    ---
 
-  We listen to ideas for new features, so if something is missing from zBassMusic, let us know and we'll do it.
+    We listen to ideas for new features, so if something is missing from zBassMusic, let us know and we'll do it.
 
-  [:octicons-arrow-right-24: Discussions](https://github.com/Silver-Ore-Team/zBassMusic/discussions)
+    [:octicons-arrow-right-24: Discussions](https://github.com/Silver-Ore-Team/zBassMusic/discussions)
 
 </div>
 

@@ -35,11 +35,6 @@ namespace NH::Bass
         EventManager m_EventManager{};
         MusicManager m_MusicManager{};
         TransitionScheduler m_TransitionScheduler{};
-        std::unordered_map<HashString, MusicDef> m_MusicDefs;
-        std::unordered_map<HashString, MusicFile> m_MusicFiles;
-
-        std::mutex m_PlayMusicMutex;
-        std::vector<MusicDefRetry> m_PlayMusicRetryList;
 
     public:
         static Engine* GetInstance();

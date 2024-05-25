@@ -188,51 +188,9 @@ namespace GOTHIC_NAMESPACE
             }
 
             m_DirectMusic->Stop();
-
             m_ActiveTheme = theme;
-
-            if (transition != zMUS_TR_DEFAULT)
-            {
-                theme->trType = transition;
-            }
-
-            if (subTransition != zMUS_TRSUB_DEFAULT)
-            {
-                theme->trSubType = subTransition;
-            }
-
-            NH::Bass::MusicDef musicDef{};
-            musicDef.Filename = theme->fileName.ToChar();
-            musicDef.Name = theme->name.ToChar();
-            musicDef.Loop = theme->loop;
-            musicDef.Volume = theme->vol;
-
-            if (theme->trType == zMUS_TR_INTRO || theme->trType == zMUS_TR_ENDANDINTRO)
-            {
-                musicDef.StartTransition.Type = NH::Bass::TransitionType::FADE;
-                musicDef.StartTransition.Duration = NH::Bass::Options->TransitionTime;
-            }
-
-            if (theme->trType == zMUS_TR_END || theme->trType == zMUS_TR_ENDANDINTRO)
-            {
-                musicDef.EndTransition.Type = NH::Bass::TransitionType::FADE;
-                musicDef.EndTransition.Duration = NH::Bass::Options->TransitionTime;
-            }
-
-            if (m_DirectMusic->prefs.globalReverbEnabled)
-            {
-                musicDef.Effects.Reverb = true;
-                musicDef.Effects.ReverbMix = theme->reverbMix;
-                musicDef.Effects.ReverbTime = theme->reverbTime;
-            }
-
-            log->Error("Deprecated code patch in CMusicSys_Bass::PlayTheme()");
-            // Engine::PlayMusic() uses a mutex, so let's submit it in a deteached thread to avoid blocking
-//            std::thread submitThread([this, musicDef]()
-//                                     {
-//                                         m_BassEngine->PlayMusic(musicDef);
-//                                     });
-//            submitThread.detach();
+            log->Warning("This path in CMusicSys_Bass::PlayTheme() shouldn't be possible");
+            PlayThemeByScript(theme->name, 0, nullptr);
         }
 
         zCMusicTheme* GetActiveTheme() override

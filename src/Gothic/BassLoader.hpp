@@ -63,15 +63,19 @@ namespace GOTHIC_NAMESPACE
                             effects.Loop.Active = input->loop;
                             effects.Volume.Active = true;
                             effects.Volume.Volume = input->vol;
-                            effects.ReverbDX8.Active = true;
-                            effects.ReverbDX8.Mix = input->reverbMix;
-                            effects.ReverbDX8.Time = input->reverbTime;
-                            if (input->trType == zMUS_TR_INTRO || input->trType == zMUS_TR_ENDANDINTRO)
+                            if (!NH::Bass::Options->ForceDisableReverb)
+                            {
+                                effects.ReverbDX8.Active = true;
+                                effects.ReverbDX8.Mix = input->reverbMix;
+                                effects.ReverbDX8.Time = input->reverbTime;
+                            }
+                            bool forceFade = NH::Bass::Options->ForceFadeTransition;
+                            if (forceFade || input->trType == zMUS_TR_INTRO || input->trType == zMUS_TR_ENDANDINTRO)
                             {
                                 effects.FadeIn.Active = true;
                                 effects.FadeIn.Duration = NH::Bass::Options->TransitionTime;
                             }
-                            if (input->trType == zMUS_TR_END || input->trType == zMUS_TR_ENDANDINTRO)
+                            if (forceFade || input->trType == zMUS_TR_END || input->trType == zMUS_TR_ENDANDINTRO)
                             {
                                 effects.FadeOut.Active = true;
                                 effects.FadeOut.Duration = NH::Bass::Options->TransitionTime;

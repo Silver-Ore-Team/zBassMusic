@@ -52,6 +52,6 @@ namespace NH
     };
 
     struct {
-        ThreadPool IO = ThreadPool("IO", 1);
+        ThreadPool IO = ThreadPool("IO", std::thread::hardware_concurrency());
     } Executors;
 }

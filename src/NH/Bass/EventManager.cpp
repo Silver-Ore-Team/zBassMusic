@@ -5,7 +5,7 @@ namespace NH::Bass
     NH::Logger* EventManager::log = NH::CreateLogger("zBassMusic::EventManager");
 
     EventSubscriber*
-    EventManager::AddSubscriber(const EventType type, const EventSubscriberFunction function, void* userData)
+    EventManager::AddSubscriber(const EventType type, const EventSubscriberFn function, void* userData)
     {
         return &m_Subscribers.emplace_back(EventSubscriber{ type, function, userData });
     }
@@ -18,9 +18,14 @@ namespace NH::Bass
         });
     }
 
-    void EventManager::DispatchEvent(const EventType type, const MusicDef& musicDef, const int data)
+    void EventManager::DispatchEvent(Event&& event)
     {
-        m_EventQueue.emplace_front(Event{ type, musicDef, data });
+        m_EventQueue.emplace_front(event);
+    }
+
+    void EventManager::DispatchEvent(const Event& event)
+    {
+        m_EventQueue.emplace_front(event);
     }
 
     void EventManager::Update()
@@ -32,9 +37,9 @@ namespace NH::Bass
             m_EventQueue.pop_back();
             for (const auto& s: m_Subscribers)
             {
-                if (s.Type == event.type)
+                if (s.Type == event.Type)
                 {
-                    s.Function(event.music, event.data, s.UserData);
+                    s.Function(event, s.UserData);
                 }
             }
         }

@@ -57,27 +57,32 @@ namespace NH::Bass
         }
     };
 
-    struct ScheduleMonitor
+    struct ScheduledAction
     {
-        Channel* Channel;
+        std::shared_ptr<Channel> Channel;
         double Position;
-        std::function<void(std::function < void( const MusicDef&)> onReady)> Action;
+        std::function<void(Engine&)> Action;
         bool Done = false;
     };
 
     class TransitionScheduler
     {
         NH::Logger* log = NH::CreateLogger("zBassMusic::TransitionScheduler");
-        std::unordered_map<std::string, TransitionScheduleRule> m_ScheduleRules;
-        std::vector<ScheduleMonitor> m_Monitors;
+        std::unordered_map<HashString, TransitionScheduleRule> m_ScheduleRules;
+        std::vector<ScheduledAction> m_ScheduledActions;
 
     public:
-        void Schedule(Channel& activeChannel, const MusicDef& nextMusic);
+        void Schedule(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic);
 
-        void Update(const std::function<void(const MusicDef&)>& onReady);
+        void Update(Engine& engine);
 
         void AddRuleOnBeat(const char* name, double interval = 0, std::vector<double> timePoints = {});
 
-        const TransitionScheduleRule& GetScheduleRule(const MusicDef& music);
+    private:
+        const TransitionScheduleRule& GetScheduleRule(HashString id);
+
+        void ScheduleInstant(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic);
+
+        void ScheduleOnBeat(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic, const TransitionScheduleRule& rule);
     };
 }

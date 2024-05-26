@@ -2,21 +2,22 @@
 
 namespace NH
 {
+    CommonExecutors Executors = {
+            .IO = ThreadPool("IO", std::thread::hardware_concurrency())
+    };
+
     ThreadPool::ThreadPool(const String& name, size_t threads)
             : Executor(), m_Name(name), log(NH::CreateLogger(String::Format("zBassMusic::ThreadPool({0})", name)))
     {
         for (size_t i = 0; i < threads; i++)
         {
-            m_Threads.emplace_back([this]()
+            auto& thread = m_Threads.emplace_back([this]()
                                    {
                                        log->Info("[thread-{0}] started", std::format("{}", std::this_thread::get_id()).c_str());
                                        EventLoop();
                                        log->Info("[thread-{0}] exiting", std::format("{}", std::this_thread::get_id()).c_str());
                                    });
-            for (auto& thread: m_Threads)
-            {
-                thread.detach();
-            }
+            thread.detach();
         }
     }
 

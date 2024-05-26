@@ -51,7 +51,9 @@ namespace NH
         void EventLoop();
     };
 
-    struct {
-        ThreadPool IO = ThreadPool("IO", std::thread::hardware_concurrency());
-    } Executors;
+    struct CommonExecutors {
+        ThreadPool IO;
+    };
+
+    extern CommonExecutors Executors;
 }

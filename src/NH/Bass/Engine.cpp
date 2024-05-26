@@ -1,5 +1,10 @@
 #include "Options.h"
 #include "Engine.h"
+
+#include <bassmidi.h>
+#include <bassopus.h>
+#include <bassflac.h>
+
 #include <algorithm>
 
 namespace NH::Bass
@@ -100,6 +105,21 @@ namespace NH::Bass
 
     Engine::Engine()
     {
+        HPLUGIN midiPlugin = BASS_PluginLoad("bassmidi.dll", 0);
+        if (midiPlugin) { BASS_PluginEnable(midiPlugin, true); }
+        else {
+            log->Warning("Could not load BASSMIDI plugin. Make sure that bassmidi.dll is in the working directory or Autorun.");
+            log->Warning("BASSMIDI plugin is required for MIDI metadata. Engine may crash without it.");
+        }
+
+        HPLUGIN opusPlugin = BASS_PluginLoad("bassopus.dll", 0);
+        if (opusPlugin) { BASS_PluginEnable(opusPlugin, true); }
+        else { log->Warning("Could not load BASSOPUS plugin (bassopus.dll). Opus files won't play."); }
+
+        HPLUGIN flacPlugin = BASS_PluginLoad("bassflac.dll", 0);
+        if (flacPlugin) { BASS_PluginEnable(flacPlugin, true); }
+        else { log->Warning("Could not load BASSFLAC plugin (bassflac.dll). FLAC files won't play."); }
+
         size_t deviceIndex = 0;
         BASS_DEVICEINFO deviceInfo;
         for (size_t i = 1; BASS_GetDeviceInfo(i, &deviceInfo); i++)

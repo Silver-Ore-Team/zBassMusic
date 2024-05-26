@@ -1,4 +1,5 @@
 #include <functional>
+#include <NH/Bass/MidiFile.h>
 
 namespace GOTHIC_NAMESPACE
 {
@@ -23,6 +24,7 @@ namespace GOTHIC_NAMESPACE
     {
         zSTRING Type;
         zSTRING Filename;
+        zSTRING MidiFile;
     };
 
     class BassLoader

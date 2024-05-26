@@ -5,6 +5,7 @@
 #include <NH/HashString.h>
 #include <NH/Executor.h>
 #include <NH/ToString.h>
+#include <NH/Bass/MidiFile.h>
 
 #include <vector>
 #include <unordered_map>
@@ -57,6 +58,7 @@ namespace NH::Bass
         String m_Name;
         std::unordered_map<HashString, AudioFile> m_AudioFiles;
         std::unordered_map<HashString, AudioEffects> m_AudioEffects;
+        std::unordered_map<HashString, std::shared_ptr<MidiFile>> m_MidiFiles;
         std::vector<HashString> m_Zones;
 
     public:
@@ -70,6 +72,8 @@ namespace NH::Bass
 
         void AddZone(HashString zone);
 
+        void AddMidiFile(HashString type, const std::shared_ptr<MidiFile>& midiFile);
+
         void LoadAudioFiles(Executor& executor);
 
         [[nodiscard]] const String& GetName() const { return m_Name; }
@@ -81,6 +85,10 @@ namespace NH::Bass
         [[nodiscard]] const AudioFile& GetAudioFile(HashString type) const { return m_AudioFiles.at(type); }
 
         [[nodiscard]] const AudioEffects& GetAudioEffects(HashString type) const;
+
+        [[nodiscard]] const std::shared_ptr<MidiFile>& GetMidiFile(HashString type) const;
+
+        [[nodiscard]] const std::vector<HashString>& GetZones() const { return m_Zones; }
 
         [[nodiscard]] bool HasZone(HashString zone) const;
 

@@ -33,6 +33,11 @@ namespace NH::Bass
         m_Zones.emplace_back(zone);
     }
 
+    void MusicTheme::AddMidiFile(HashString type, const std::shared_ptr<MidiFile>& midiFile)
+    {
+        m_MidiFiles.emplace(std::make_pair(type, midiFile));
+    }
+
     void MusicTheme::LoadAudioFiles(Executor& executor)
     {
         for (auto& [type, audioFile]: m_AudioFiles)
@@ -66,6 +71,12 @@ namespace NH::Bass
     {
         if (m_AudioFiles.contains(type)) { return m_AudioEffects.at(type); }
         return AudioEffects::None;
+    }
+
+    const std::shared_ptr<MidiFile>& MusicTheme::GetMidiFile(HashString type) const
+    {
+        if (m_MidiFiles.contains(type)) { return m_MidiFiles.at(type); }
+        return {};
     }
 
     bool MusicTheme::HasZone(HashString zone) const

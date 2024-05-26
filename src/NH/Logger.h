@@ -66,6 +66,8 @@ namespace NH
 
         void Message(LoggerLevel level, const String& message);
 
+        void PrintRaw(LoggerLevel level, const String& message) const;
+
         template<typename... Args>
         void Message(LoggerLevel level, const char* format, Args... args) { Message(level, String::Format(format, args...)); }
 

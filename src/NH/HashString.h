@@ -33,11 +33,21 @@ namespace NH
     class HashString
     {
         uint64_t Id;
+        const char* Value;
 
     public:
-        constexpr explicit(false) HashString(const char* str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
-        constexpr explicit(false) HashString(const String& str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)) {} // NOLINT(google-explicit-constructor)
+        constexpr HashString() noexcept : Id(0), Value(nullptr) {}
+        constexpr explicit(false) HashString(const char* str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)), Value(str) {} // NOLINT(google-explicit-constructor)
+        explicit(false) HashString(const String& str) noexcept: Id(FNV1a::hash_64_fnv1a_const(str)), Value(str.ToChar()) {} // NOLINT(google-explicit-constructor)
+
+        [[nodiscard]] constexpr uint64_t GetHash() const { return Id; }
+
+        [[nodiscard]] constexpr const char* GetValue() const { return Value; }
+
         constexpr explicit(false) operator uint64_t() const noexcept { return Id; } // NOLINT(google-explicit-constructor)
+        constexpr explicit(false) operator const char*() const noexcept { return Value; } // NOLINT(google-explicit-constructor)
+        explicit(false) operator String() const noexcept { return { Value }; } // NOLINT(google-explicit-constructor)
+
         constexpr bool operator==(const HashString& other) const noexcept { return Id == other.Id; }
     };
 

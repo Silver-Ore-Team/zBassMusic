@@ -3,8 +3,10 @@
 #include "NH/Bass/CommonTypes.h"
 #include "EventManager.h"
 #include "NH/Logger.h"
+#include <NH/Bass/MusicTheme.h>
 
 #include <functional>
+
 
 namespace NH::Bass
 {
@@ -22,7 +24,8 @@ namespace NH::Bass
         EventManager& m_EventManager;
         ChannelStatus m_Status = ChannelStatus::AVAILABLE;
         HSTREAM m_Stream = 0;
-        MusicDef m_Music{};
+        std::shared_ptr<MusicTheme> m_Theme = std::shared_ptr<MusicTheme>();
+        HashString m_AudioId{""};
 
     public:
         explicit Channel(size_t index, EventManager& em) : m_Index(index), m_EventManager(em)
@@ -30,7 +33,7 @@ namespace NH::Bass
             log = NH::CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
         };
 
-        void Play(const MusicDef& music, const MusicFile* file);
+        void Play(const std::shared_ptr<MusicTheme>&, HashString id = AudioFile::DEFAULT);
 
         void Stop();
 
@@ -39,11 +42,15 @@ namespace NH::Bass
             return m_Status == ChannelStatus::AVAILABLE;
         };
 
-        double CurrentPosition() const;
+        [[nodiscard]] double CurrentPosition() const;
 
-        double CurrentLength() const;
+        [[nodiscard]] double CurrentLength() const;
 
-        const MusicDef& CurrentMusic() const;
+        [[nodiscard]] std::shared_ptr<MusicTheme> CurrentTheme() const;
+
+        [[nodiscard]] const AudioFile& CurrentAudioFile() const;
+
+        [[nodiscard]] const AudioEffects& CurrentAudioEffects() const;
 
         static void CALLBACK OnTransitionSync(HSYNC, DWORD channel, DWORD data, void* userData);
 

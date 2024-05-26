@@ -17,99 +17,6 @@ namespace NH::Bass
         return s_Instance;
     }
 
-    MusicFile& Engine::CreateMusicBuffer(const Union::StringUTF8& filename)
-    {
-        for (auto& [key, m]: m_MusicFiles)
-        {
-            if (key == filename)
-            {
-                log->Debug("Buffer already exists for {0}", filename);
-                return m;
-            }
-        }
-
-        m_MusicFiles.emplace(std::make_pair(filename, MusicFile{ filename, std::vector<char>() }));
-        log->Debug("New buffer for {0}", filename);
-
-        return m_MusicFiles.at(filename);
-    }
-
-    void Engine::PlayMusic(MusicDef inMusicDef)
-    {
-        std::lock_guard<std::mutex> guard(m_PlayMusicMutex);
-        if (!m_Initialized)
-        {
-            return;
-        }
-
-        // We are taking ownership of the MusicDef from here to gurarantee it's lifetime.
-        // MusicDef lives as long as the Engine instance and other classes expect it to stay
-        // at the same place in memory, so if we receive a second MusicDef with the same filename,
-        // we just copy its' data to our instance.
-        auto musicDefKey = HashString(inMusicDef.Filename);
-        if (m_MusicDefs.find(musicDefKey) == m_MusicDefs.end())
-        {
-            m_MusicDefs[musicDefKey] = std::move(inMusicDef);
-        }
-        else
-        {
-            m_MusicDefs[musicDefKey].CopyFrom(inMusicDef);
-        }
-
-        const MusicFile* file = GetMusicFile(m_MusicDefs[musicDefKey].Filename);
-
-        if (!file)
-        {
-            log->Error("Could not play {0}. Music file is not loaded.\n  at {1}:{2}",
-                       m_MusicDefs[musicDefKey].Filename, __FILE__, __LINE__);
-            return;
-        }
-
-        if (!file->Ready && file->Loading)
-        {
-            static int32_t delay = 10;
-            log->Debug("{0} is loading, will retry after {1} ms", m_MusicDefs[musicDefKey].Filename, delay);
-            MusicDefRetry retry{ MusicDef(m_MusicDefs[musicDefKey]), delay };
-            m_PlayMusicRetryList.emplace_back(retry);
-            return;
-        }
-
-        if (!file->Ready)
-        {
-            log->Error("Invalid state. MusicDef is not ready but not loading {0}\n  at {1}:{2}",
-                       m_MusicDefs[musicDefKey].Filename, __FILE__, __LINE__);
-            return;
-        }
-
-        if (!m_ActiveChannel)
-        {
-            FinalizeScheduledMusic(m_MusicDefs[musicDefKey]);
-            return;
-        }
-
-        m_TransitionScheduler.Schedule(*m_ActiveChannel, m_MusicDefs[musicDefKey]);
-    }
-
-    void Engine::FinalizeScheduledMusic(const NH::Bass::MusicDef& musicDef)
-    {
-        Channel* channel = FindAvailableChannel();
-        if (channel == nullptr)
-        {
-            log->Error("Could not play {0}. No channel is available.\n  at {1}:{2}",
-                       musicDef.Filename, __FILE__, __LINE__);
-            return;
-        }
-
-        log->Info("Starting playback: {0}", musicDef.Filename);
-        if (m_ActiveChannel)
-        {
-            m_ActiveChannel->Stop();
-        }
-
-        m_ActiveChannel = channel;
-        m_ActiveChannel->Play(musicDef, GetMusicFile(musicDef.Filename));
-    }
-
     void Engine::Update()
     {
         if (!m_Initialized)
@@ -122,25 +29,10 @@ namespace NH::Bass
         uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
         lastTimestamp = now;
 
-        for (auto& retry: m_PlayMusicRetryList)
-        {
-            retry.delayMs -= delta;
-            if (retry.delayMs < 0)
-            {
-                log->Trace("PlayMusic({0})", retry.musicDef.Filename);
-                PlayMusic(retry.musicDef);
-            }
-        }
-        std::erase_if(m_PlayMusicRetryList, [](const MusicDefRetry& retry) { return retry.delayMs < 0; });
-
-        m_TransitionScheduler.Update([this](const MusicDef& musicDef)
-                                     {
-                                         log->Trace("onReady from scheduler {0}", musicDef.Filename);
-                                         FinalizeScheduledMusic(musicDef);
-                                     });
+        m_TransitionScheduler.Update(*this);
+        m_CommandQueue.Update(*this);
 
         BASS_Update(delta);
-
         GetEM().Update();
     }
 
@@ -181,6 +73,16 @@ namespace NH::Bass
         return m_TransitionScheduler;
     }
 
+    MusicManager& Engine::GetMusicManager()
+    {
+        return m_MusicManager;
+    }
+
+    CommandQueue& Engine::GetCommandQueue()
+    {
+        return m_CommandQueue;
+    }
+
     void Engine::StopMusic()
     {
         if (!m_Initialized)
@@ -188,9 +90,9 @@ namespace NH::Bass
             return;
         }
 
-        for (auto& channel: m_Channels)
+        for (const auto& channel: m_Channels)
         {
-            channel.Stop();
+            channel->Stop();
         }
 
         m_ActiveChannel = nullptr;
@@ -228,32 +130,19 @@ namespace NH::Bass
         m_Channels.clear();
         for (size_t i = 0; i < Channels_Max; i++)
         {
-            m_Channels.emplace_back(i, m_EventManager);
+            m_Channels.emplace_back(std::make_shared<Channel>(i, m_EventManager));
         }
 
         log->Info("Initialized with device: {0}", deviceIndex);
     }
 
-    MusicFile* Engine::GetMusicFile(const Union::StringUTF8& filename)
+    std::shared_ptr<Channel> Engine::FindAvailableChannel()
     {
-        for (auto& [key, m]: m_MusicFiles)
+        for (auto channel: m_Channels)
         {
-            if (key == filename)
+            if (channel->IsAvailable())
             {
-                return &m;
-            }
-        }
-
-        return nullptr;
-    }
-
-    Channel* Engine::FindAvailableChannel()
-    {
-        for (auto& channel: m_Channels)
-        {
-            if (channel.IsAvailable())
-            {
-                return &channel;
+                return channel;
             }
         }
 
@@ -262,92 +151,66 @@ namespace NH::Bass
 
     Union::StringUTF8 Engine::ErrorCodeToString(const int code)
     {
-        switch (code)
+        // @formatter:off
+        static String map[] = { "BASS_OK", "BASS_ERROR_MEM", "BASS_ERROR_FILEOPEN", "BASS_ERROR_DRIVER", "BASS_ERROR_BUFLOST", "BASS_ERROR_HANDLE", "BASS_ERROR_FORMAT", "BASS_ERROR_POSITION", "BASS_ERROR_INIT", "BASS_ERROR_START", "BASS_ERROR_SSL", "BASS_ERROR_REINIT", "BASS_ERROR_ALREADY", "BASS_ERROR_NOTAUDIO", "BASS_ERROR_NOCHAN", "BASS_ERROR_ILLTYPE", "BASS_ERROR_ILLPARAM", "BASS_ERROR_NO3D", "BASS_ERROR_NOEAX", "BASS_ERROR_DEVICE", "BASS_ERROR_NOPLAY", "BASS_ERROR_FREQ", "BASS_ERROR_NOTFILE", "BASS_ERROR_NOHW", "BASS_ERROR_EMPTY", "BASS_ERROR_NONET", "BASS_ERROR_CREATE", "BASS_ERROR_NOFX", "BASS_ERROR_NOTAVAIL", "BASS_ERROR_DECODE", "BASS_ERROR_DX", "BASS_ERROR_TIMEOUT", "BASS_ERROR_FILEFORM", "BASS_ERROR_SPEAKER", "BASS_ERROR_VERSION", "BASS_ERROR_CODEC", "BASS_ERROR_ENDED", "BASS_ERROR_BUSY", "BASS_ERROR_UNSTREAMABLE", "BASS_ERROR_PROTOCOL", "BASS_ERROR_DENIED", "BASS_ERROR_UNKNOWN" };
+        // @formatter:on
+        return map[code];
+    }
+
+    Logger* ChangeZoneCommand::log = CreateLogger("zBassMusic::ChangeZoneCommand");
+    Logger* PlayThemeCommand::log = CreateLogger("zBassMusic::PlayThemeCommand");
+    Logger* ScheduleThemeChangeCommand::log = CreateLogger("zBassMusic::ScheduleThemeChangeCommand");
+
+    CommandResult ChangeZoneCommand::Execute(Engine& engine)
+    {
+        log->Trace("Executing ChangeZoneCommand for zone {0}", m_Zone);
+
+        const auto themes = engine.GetMusicManager().GetThemesForZone(m_Zone);
+        if (themes.empty())
         {
-        case 0:
-            return Union::StringUTF8("BASS_OK");
-        case 1:
-            return Union::StringUTF8("BASS_ERROR_MEM");
-        case 2:
-            return Union::StringUTF8("BASS_ERROR_FILEOPEN");
-        case 3:
-            return Union::StringUTF8("BASS_ERROR_DRIVER");
-        case 4:
-            return Union::StringUTF8("BASS_ERROR_BUFLOST");
-        case 5:
-            return Union::StringUTF8("BASS_ERROR_HANDLE");
-        case 6:
-            return Union::StringUTF8("BASS_ERROR_FORMAT");
-        case 7:
-            return Union::StringUTF8("BASS_ERROR_POSITION");
-        case 8:
-            return Union::StringUTF8("BASS_ERROR_INIT");
-        case 9:
-            return Union::StringUTF8("BASS_ERROR_START");
-        case 10:
-            return Union::StringUTF8("BASS_ERROR_SSL");
-        case 11:
-            return Union::StringUTF8("BASS_ERROR_REINIT");
-        case 14:
-            return Union::StringUTF8("BASS_ERROR_ALREADY");
-        case 17:
-            return Union::StringUTF8("BASS_ERROR_NOTAUDIO");
-        case 18:
-            return Union::StringUTF8("BASS_ERROR_NOCHAN");
-        case 19:
-            return Union::StringUTF8("BASS_ERROR_ILLTYPE");
-        case 20:
-            return Union::StringUTF8("BASS_ERROR_ILLPARAM");
-        case 21:
-            return Union::StringUTF8("BASS_ERROR_NO3D");
-        case 22:
-            return Union::StringUTF8("BASS_ERROR_NOEAX");
-        case 23:
-            return Union::StringUTF8("BASS_ERROR_DEVICE");
-        case 24:
-            return Union::StringUTF8("BASS_ERROR_NOPLAY");
-        case 25:
-            return Union::StringUTF8("BASS_ERROR_FREQ");
-        case 27:
-            return Union::StringUTF8("BASS_ERROR_NOTFILE");
-        case 29:
-            return Union::StringUTF8("BASS_ERROR_NOHW");
-        case 31:
-            return Union::StringUTF8("BASS_ERROR_EMPTY");
-        case 32:
-            return Union::StringUTF8("BASS_ERROR_NONET");
-        case 33:
-            return Union::StringUTF8("BASS_ERROR_CREATE");
-        case 34:
-            return Union::StringUTF8("BASS_ERROR_NOFX");
-        case 37:
-            return Union::StringUTF8("BASS_ERROR_NOTAVAIL");
-        case 38:
-            return Union::StringUTF8("BASS_ERROR_DECODE");
-        case 39:
-            return Union::StringUTF8("BASS_ERROR_DX");
-        case 40:
-            return Union::StringUTF8("BASS_ERROR_TIMEOUT");
-        case 41:
-            return Union::StringUTF8("BASS_ERROR_FILEFORM");
-        case 42:
-            return Union::StringUTF8("BASS_ERROR_SPEAKER");
-        case 43:
-            return Union::StringUTF8("BASS_ERROR_VERSION");
-        case 44:
-            return Union::StringUTF8("BASS_ERROR_CODEC");
-        case 45:
-            return Union::StringUTF8("BASS_ERROR_ENDED");
-        case 46:
-            return Union::StringUTF8("BASS_ERROR_BUSY");
-        case 47:
-            return Union::StringUTF8("BASS_ERROR_UNSTREAMABLE");
-        case 48:
-            return Union::StringUTF8("BASS_ERROR_PROTOCOL");
-        case 49:
-            return Union::StringUTF8("BASS_ERROR_DENIED");
-        default:
-            return Union::StringUTF8("BASS_ERROR_UNKNOWN");
+            log->Warning("No themes found for zone {0}", m_Zone);
+            return CommandResult::DONE;
         }
+        engine.GetCommandQueue().AddCommandDeferred(std::make_shared<ScheduleThemeChangeCommand>(themes[0].first));
+        return CommandResult::DONE;
+    }
+
+    CommandResult PlayThemeCommand::Execute(Engine& engine)
+    {
+        log->Trace("Executing PlayThemeCommand for theme {0}", m_ThemeId);
+
+        auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
+        if (!theme->IsAudioFileReady(AudioFile::DEFAULT))
+        {
+            log->Trace("Theme {0} is not ready", m_ThemeId);
+            m_RetryCount++;
+            if (m_RetryCount > 10000)
+            {
+                log->Error("Theme {0} was not ready after 10000 retries (roughly 600ms @ 60 FPS), removing it from queue", m_ThemeId);
+                return CommandResult::DONE;
+            }
+            return CommandResult::RETRY;
+        }
+
+        auto channel = engine.FindAvailableChannel();
+        if (!channel)
+        {
+            log->Error("No available channels");
+            return CommandResult::DEFER;
+        }
+
+        if (engine.m_ActiveChannel) { engine.m_ActiveChannel->Stop(); }
+        channel->Play(theme, m_AudioId);
+        engine.m_ActiveChannel = channel;
+
+        return CommandResult::DONE;
+    }
+
+    CommandResult ScheduleThemeChangeCommand::Execute(Engine& engine)
+    {
+        log->Trace("Executing ScheduleThemeChangeCommand for theme {0}", m_ThemeId);
+        auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
+        engine.GetTransitionScheduler().Schedule(engine.m_ActiveChannel, theme);
+        return CommandResult::DONE;
     }
 }

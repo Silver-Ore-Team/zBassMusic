@@ -2,13 +2,14 @@ namespace GOTHIC_NAMESPACE
 {
     namespace BassEvent
     {
-        void Event_OnEnd(const NH::Bass::MusicDef& musicDef, int data, void* userData)
+        void Event_OnEnd(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
-            log->Trace("{0}", musicDef.Filename);
 
-            zSTRING filename{ musicDef.Filename.ToChar() };
-            zSTRING name{ musicDef.Name.ToChar() };
+            NH::Bass::Event::MusicEnd data = std::get<NH::Bass::Event::MusicEnd>(event.Data);
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
+            zSTRING name{ data.Theme->GetName() };
+            log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             for (int i = 0; i < Globals->Event_OnEnd_Functions.GetNumInList(); i++)
             {
@@ -19,30 +20,33 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void Event_OnTransition(const NH::Bass::MusicDef& musicDef, int data, void* userData)
+        void Event_OnTransition(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
-            log->Trace("{0}, {1} ms", musicDef.Filename, data);
 
-            zSTRING filename{ musicDef.Filename.ToChar() };
-            zSTRING name{ musicDef.Name.ToChar() };
+            NH::Bass::Event::MusicTransition data = std::get<NH::Bass::Event::MusicTransition>(event.Data);
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
+            zSTRING name{ data.Theme->GetName() };
+            float timeLeft = data.TimeLeft;
+            log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             for (int i = 0; i < Globals->Event_OnTransition_Functions.GetNumInList(); i++)
             {
                 const int funcId = Globals->Event_OnTransition_Functions[i];
                 Globals->BassMusic_EventThemeFilename = filename;
                 Globals->BassMusic_EventThemeID = name;
-                parser->CallFunc(funcId, data);
+                parser->CallFunc(funcId, timeLeft);
             }
         }
 
-        void Event_OnChange(const NH::Bass::MusicDef& musicDef, int data, void* userData)
+        void Event_OnChange(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
-            log->Trace("{0}", musicDef.Filename);
 
-            zSTRING filename{ musicDef.Filename.ToChar() };
-            zSTRING name{ musicDef.Name.ToChar() };
+            NH::Bass::Event::MusicChange data = std::get<NH::Bass::Event::MusicChange>(event.Data);
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
+            zSTRING name{ data.Theme->GetName() };
+            log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             Globals->BassMusic_ActiveThemeFilename = filename;
             Globals->BassMusic_ActiveThemeID = name;
@@ -114,6 +118,7 @@ namespace GOTHIC_NAMESPACE
             }
 
             zCMusicTheme* theme = new zCMusicTheme;
+            theme->name = identifier;
 
             if (!(NH::Bass::Options->CreateMainParserCMusicTheme && parser->CreateInstance(identifier, &theme->fileName)))
             {
@@ -124,60 +129,6 @@ namespace GOTHIC_NAMESPACE
             {
                 delete theme;
                 theme = m_DirectMusic->LoadThemeByScript(id);
-            }
-            else
-            {
-                theme->name = identifier;
-
-                zoptions->ChangeDir(DIR_MUSIC);
-                std::unique_ptr<zFILE> file{ zfactory->CreateZFile(theme->fileName) };
-
-                if (file->Exists())
-                {
-                    NH::Bass::MusicFile& musicFileRef = m_BassEngine->CreateMusicBuffer(theme->fileName.ToChar());
-                    if (!musicFileRef.Ready && !musicFileRef.Loading)
-                    {
-                        log->Trace("Loading music: {0}", file->GetFullPath().ToChar());
-
-                        const auto error = file->Open(false);
-
-                        if (error == 0)
-                        {
-                            musicFileRef.Loading = true;
-
-                            std::thread([loadingStart = std::chrono::system_clock::now(), this](std::unique_ptr<zFILE> myFile, NH::Bass::MusicFile* myMusicPtr)
-                                        {
-
-                                            zSTRING path = myFile->GetFullPath();
-                                            const long size = myFile->Size();
-
-                                            myMusicPtr->Buffer.resize(static_cast<size_t>(size));
-                                            const long read = myFile->Read(myMusicPtr->Buffer.data(), size);
-
-                                            if (read == size)
-                                            {
-                                                myMusicPtr->Ready = true;
-                                                log->Trace("Music ready: {0}, size = {1}", path.ToChar(), read);
-                                            }
-
-                                            myMusicPtr->Loading = false;
-                                            myFile->Close();
-
-                                            auto loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - loadingStart).count();
-
-                                            log->Trace("Loading done: {0}, time = {1}", path.ToChar(), loadingTime);
-                                        }, std::move(file), &musicFileRef).detach();
-                        }
-                        else
-                        {
-                            log->Error("Could not open file {0}\n  at {1}{2}", theme->fileName.ToChar(), __FILE__, __LINE__);
-                        }
-                    }
-                }
-                else
-                {
-                    log->Error("Could not find file {0}\n  at {1}{2}", theme->fileName.ToChar(), __FILE__, __LINE__);
-                }
             }
 
             return theme;
@@ -205,38 +156,19 @@ namespace GOTHIC_NAMESPACE
             }
 
             zCMusicTheme* theme = LoadThemeByScript(id);
-            if (theme)
+            if (theme && IsDirectMusicFormat(theme->fileName))
             {
-                if (IsDirectMusicFormat(theme->fileName))
-                {
-                    m_ActiveTheme = theme;
-                    m_BassEngine->StopMusic();
-                    return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
-                }
-
-                if (done)
-                {
-                    *done = true;
-                }
-
-                switch (manipulate)
-                {
-                case 1:
-                    PlayTheme(theme, zMUS_THEME_VOL_DEFAULT, zMUS_TR_END, zMUS_TRSUB_DEFAULT);
-                    break;
-                case 2:
-                    PlayTheme(theme, zMUS_THEME_VOL_DEFAULT, zMUS_TR_NONE, zMUS_TRSUB_DEFAULT);
-                    break;
-                default:
-                    PlayTheme(theme);
-                }
-
-                return;
+                m_ActiveTheme = theme;
+                m_BassEngine->StopMusic();
+                return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
+
+            identifier.Upper();
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
 
             if (done)
             {
-                *done = false;
+                *done = true;
             }
         }
 
@@ -256,50 +188,9 @@ namespace GOTHIC_NAMESPACE
             }
 
             m_DirectMusic->Stop();
-
-            if (transition != zMUS_TR_DEFAULT)
-            {
-                theme->trType = transition;
-            }
-
-            if (subTransition != zMUS_TRSUB_DEFAULT)
-            {
-                theme->trSubType = subTransition;
-            }
-
-            NH::Bass::MusicDef musicDef{};
-            musicDef.Filename = theme->fileName.ToChar();
-            musicDef.Name = theme->name.ToChar();
-            musicDef.Loop = theme->loop;
-            musicDef.Volume = theme->vol;
-
-            if (theme->trType == zMUS_TR_INTRO || theme->trType == zMUS_TR_ENDANDINTRO)
-            {
-                musicDef.StartTransition.Type = NH::Bass::TransitionType::FADE;
-                musicDef.StartTransition.Duration = NH::Bass::Options->TransitionTime;
-            }
-
-            if (theme->trType == zMUS_TR_END || theme->trType == zMUS_TR_ENDANDINTRO)
-            {
-                musicDef.EndTransition.Type = NH::Bass::TransitionType::FADE;
-                musicDef.EndTransition.Duration = NH::Bass::Options->TransitionTime;
-            }
-
-            if (m_DirectMusic->prefs.globalReverbEnabled)
-            {
-                musicDef.Effects.Reverb = true;
-                musicDef.Effects.ReverbMix = theme->reverbMix;
-                musicDef.Effects.ReverbTime = theme->reverbTime;
-            }
-
             m_ActiveTheme = theme;
-
-            // Engine::PlayMusic() uses a mutex, so let's submit it in a deteached thread to avoid blocking
-            std::thread submitThread([this, musicDef]()
-                                     {
-                                         m_BassEngine->PlayMusic(musicDef);
-                                     });
-            submitThread.detach();
+            log->Warning("This path in CMusicSys_Bass::PlayTheme() shouldn't be possible");
+            PlayThemeByScript(theme->name, 0, nullptr);
         }
 
         zCMusicTheme* GetActiveTheme() override

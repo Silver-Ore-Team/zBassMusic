@@ -1,122 +1,138 @@
 #include "TransitionScheduler.h"
 
+#include <NH/Bass/Engine.h>
+#include <memory>
 #include <utility>
 
 namespace NH::Bass
 {
-    void TransitionScheduler::Schedule(Channel& activeChannel, const MusicDef& nextMusic)
+    void TransitionScheduler::Schedule(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic)
     {
-        const MusicDef& music = activeChannel.CurrentMusic();
-        log->Trace("Schedule for {0} -> {1}", music.Filename, nextMusic.Filename);
-        TransitionScheduleRule rule = GetScheduleRule(music);
+        if (!activeChannel)
+        {
+            m_ScheduledActions.emplace_back(ScheduledAction{ activeChannel, 0, [id = HashString(nextMusic->GetName())](Engine& engine)
+            {
+                engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeCommand>(id, AudioFile::DEFAULT));
+            }});
+            return;
+        }
+
+        const auto& currentTheme = activeChannel->CurrentTheme();
+        const TransitionScheduleRule& rule = GetScheduleRule(currentTheme->GetName());
 
         if (rule.Type == TransitionScheduleType::INSTANT)
         {
-            log->Trace("Schedule rule type = INSTANT");
-            m_Monitors.emplace_back(ScheduleMonitor{ &activeChannel, 0,
-                                                     [&nextMusic](const std::function<void(const MusicDef&)>& onReady)
-                                                     {
-                                                         onReady(nextMusic);
-                                                     }});
+            ScheduleInstant(activeChannel, nextMusic);
             return;
         }
 
         if (rule.Type == TransitionScheduleType::ON_BEAT)
         {
-            log->Trace("Schedule rule type = ON_BEAT");
-            TransitionScheduleRule::DataOnBeat data = std::get<TransitionScheduleRule::DataOnBeat>(rule.Data);
-
-            log->Trace("OnBeat.Interval = {0}", data.Interval);
-            log->Trace("OnBeat.TimePoints.Count = {0}", data.TimePoints.size());
-
-            double overhead = music.EndTransition.Type != TransitionType::NONE ? music.EndTransition.Duration : 0;
-            log->Trace("overhead = {0}", overhead);
-            std::sort(data.TimePoints.begin(), data.TimePoints.end());
-
-            double length = activeChannel.CurrentLength();
-            double currentPosition = activeChannel.CurrentPosition();
-            log->Trace("length = {0}", length);
-            log->Trace("currentPosition = {0}", currentPosition);
-            double timePointCandidate = -1;
-            double intervalCandidate = -1;
-
-            log->Trace("Rule checking TimePoints");
-            for (const auto& item: data.TimePoints)
-            {
-                double minValue = currentPosition - overhead;
-                if (item > minValue)
-                {
-                    log->Trace("found TimePoint = {0}", item);
-                    timePointCandidate = item;
-                    break;
-                }
-            }
-
-            if (data.Interval > 0)
-            {
-                log->Trace("Rule checking Interval");
-
-                // Please don't abort me. Quick hack for preview. Fast enough.
-                for (double time = 0; time < length; time += data.Interval)
-                {
-                    double minValue = currentPosition - overhead;
-                    if (time > minValue)
-                    {
-                        log->Trace("found TimePoint = {0}", time);
-                        intervalCandidate = time;
-                        break;
-                    }
-                }
-            }
-
-            if (timePointCandidate <= 0 && intervalCandidate <= 0)
-            {
-                log->Trace("Not found any candidates, rollback to INSTANT");
-                m_Monitors.emplace_back(ScheduleMonitor{ &activeChannel, 0, [&nextMusic](
-                        const std::function<void(const MusicDef&)>& onReady)
-                {
-                    onReady(nextMusic);
-                }});
-                return;
-            }
-
-            double target = timePointCandidate > intervalCandidate ? timePointCandidate : intervalCandidate;
-            log->Trace("target = {0}", target);
-
-            log->Debug("Starting Monitor {0} -> {1}, position = {2}", music.Filename, nextMusic.Filename, target);
-            m_Monitors.emplace_back(ScheduleMonitor{ &activeChannel, target,
-                                                     [&nextMusic](const std::function<void(const MusicDef&)>& onReady)
-                                                     {
-                                                         onReady(nextMusic);
-                                                     }});
-
+            ScheduleOnBeat(activeChannel, nextMusic, rule);
             return;
         }
 
         log->Error("Unknown Schedule type = {0}", (size_t)rule.Type);
     }
 
-    void TransitionScheduler::Update(const std::function<void(const MusicDef&)>& onReady)
+    void TransitionScheduler::ScheduleInstant(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic)
     {
-        for (auto& monitor: m_Monitors)
+        m_ScheduledActions.emplace_back(ScheduledAction{ activeChannel, 0, [id = HashString(nextMusic->GetName())](Engine& engine)
         {
-            if (monitor.Position <= monitor.Channel->CurrentPosition())
+            engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeCommand>(id, AudioFile::DEFAULT));
+        }});
+    }
+
+    void TransitionScheduler::ScheduleOnBeat(const std::shared_ptr<Channel>& activeChannel, const std::shared_ptr<MusicTheme>& nextMusic, const TransitionScheduleRule& rule)
+    {
+        TransitionScheduleRule::DataOnBeat data = std::get<TransitionScheduleRule::DataOnBeat>(rule.Data);
+        const auto& currentTheme = activeChannel->CurrentTheme();
+        const auto& effects = currentTheme->GetAudioEffects(AudioFile::DEFAULT);
+
+        double overhead = effects.FadeOut.Active ? effects.FadeOut.Duration : 0;
+        std::sort(data.TimePoints.begin(), data.TimePoints.end());
+
+        double length = activeChannel->CurrentLength();
+        double currentPosition = activeChannel->CurrentPosition();
+        log->Trace("length = {0}", length);
+        log->Trace("currentPosition = {0}", currentPosition);
+        double timePointCandidate = -1;
+        double intervalCandidate = -1;
+
+        log->Trace("Rule checking TimePoints");
+        for (const auto& item: data.TimePoints)
+        {
+            double minValue = currentPosition - overhead;
+            if (item > minValue)
             {
-                if (monitor.Position > 0)
-                {
-                    double target = monitor.Position;
-                    double position = monitor.Channel->CurrentPosition();
-                    double delay = position - target;
-                    log->Debug(
-                            "Monitor for {0} completed, calling onReady\n  target = {1}\n  current = {2}\n  delay = {3}",
-                            monitor.Channel->CurrentMusic().Filename, target, position, delay);
-                }
-                monitor.Done = true;
-                monitor.Action(onReady);
+                log->Trace("found TimePoint = {0}", item);
+                timePointCandidate = item;
+                break;
             }
         }
 
-        std::erase_if(m_Monitors, [](ScheduleMonitor& monitor) { return monitor.Done; });
+        if (data.Interval > 0)
+        {
+            log->Trace("Rule checking Interval");
+
+            // Please don't abort me. Quick hack for preview. Fast enough.
+            for (double time = 0; time < length; time += data.Interval)
+            {
+                double minValue = currentPosition - overhead;
+                if (time > minValue)
+                {
+                    log->Trace("found TimePoint = {0}", time);
+                    intervalCandidate = time;
+                    break;
+                }
+            }
+        }
+
+        if (timePointCandidate <= 0 && intervalCandidate <= 0)
+        {
+            log->Trace("Not found any candidates, rollback to INSTANT");
+            ScheduleInstant(activeChannel, nextMusic);
+            return;
+        }
+
+        double target = timePointCandidate > intervalCandidate ? timePointCandidate : intervalCandidate;
+        log->Trace("target = {0}", target);
+
+        log->Debug("Starting Monitor {0} -> {1}, position = {2}", currentTheme->GetName(), nextMusic->GetName(), target);
+        m_ScheduledActions.emplace_back(ScheduledAction{ activeChannel, target, [id = HashString(nextMusic->GetName())](Engine& engine)
+        {
+            engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeCommand>(id, AudioFile::DEFAULT));
+        }});
+    }
+
+    void TransitionScheduler::Update(Engine& engine)
+    {
+        for (auto& scheduledAction : m_ScheduledActions)
+        {
+            if (!scheduledAction.Channel)
+            {
+                scheduledAction.Done = true;
+                scheduledAction.Action(engine);
+                continue;
+            }
+
+            if (scheduledAction.Position <= scheduledAction.Channel->CurrentPosition())
+            {
+                if (scheduledAction.Position > 0)
+                {
+                    double target = scheduledAction.Position;
+                    double position = scheduledAction.Channel->CurrentPosition();
+                    double delay = position - target;
+                    log->Debug(
+                            "Monitor for {0} completed, calling onReady\n  target = {1}\n  current = {2}\n  delay = {3}",
+                            scheduledAction.Channel->CurrentTheme()->GetName(), target, position, delay);
+                }
+                scheduledAction.Done = true;
+                scheduledAction.Action(engine);
+            }
+        }
+
+        std::erase_if(m_ScheduledActions, [](const ScheduledAction& monitor) { return monitor.Done; });
     }
 
     void TransitionScheduler::AddRuleOnBeat(const char* name, double interval, std::vector<double> timePoints)
@@ -125,12 +141,11 @@ namespace NH::Bass
         m_ScheduleRules.insert_or_assign(name, TransitionScheduleRule::OnBeat(interval, std::move(timePoints)));
     }
 
-    const TransitionScheduleRule& TransitionScheduler::GetScheduleRule(const MusicDef& music)
+    const TransitionScheduleRule& TransitionScheduler::GetScheduleRule(HashString id)
     {
-        const char* name = music.Filename.ToChar();
-        if (m_ScheduleRules.contains(name))
+        if (m_ScheduleRules.contains(id))
         {
-            return m_ScheduleRules.at(name);
+            return m_ScheduleRules.at(id);
         }
 
         static TransitionScheduleRule defaultRule = TransitionScheduleRule::Instant();

@@ -43,6 +43,14 @@ namespace GOTHIC_NAMESPACE
                 float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
                 zmusic->SetVolume(volume);
                 log->Info("Set music system to CMusicSys_Bass");
+
+                if (NH::Bass::Options->CreateMainParserCMusicTheme)
+                {
+                    BassLoader bassLoader(parser);
+                    bassLoader.Load();
+                }
+                BassLoader bassLoader(parserMusic);
+                bassLoader.Load();
             }
             else
             {

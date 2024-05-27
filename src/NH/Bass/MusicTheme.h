@@ -79,9 +79,12 @@ namespace NH::Bass
         void AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile);
         void LoadAudioFiles(Executor& executor);
 
-        void PlayInstant(IEngine& engine);
-        void ScheduleAfter(IEngine&, const std::shared_ptr<MusicTheme>& currentTheme);
-        void StopInstant(IEngine& engine);
+        void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
+        void Transition(IEngine& engine, MusicTheme& nextTheme);
+        void Play(IEngine& engine);
+        void Play(IEngine& engine, const struct Transition& transition, std::optional<Transition::TimePoint> timePoint = std::nullopt);
+        void Stop(IEngine& engine);
+        void Stop(IEngine& engine, const struct Transition& transition);
 
         [[nodiscard]] const String& GetName() const { return m_Name; }
         [[nodiscard]] TransitionInfo& GetTransitionInfo() { return m_TransitionInfo; };
@@ -96,28 +99,31 @@ namespace NH::Bass
 
     private:
         bool ReadyToPlay(IEngine& engine, HashString audio);
+        std::shared_ptr<IChannel> GetAcquiredChannel();
+        void ReleaseChannels();
 
-        template<typename Args>
-        const std::function<void(Args)>& CreateSyncHandler(std::unordered_map<size_t, std::function<void(Args)>>& collection, std::function<void(Args)> function)
+        const std::function<void(double)>& CreateSyncHandler(std::function<void(double)> function)
         {
             size_t id = m_SyncHandlersId++;
-            auto handler = [function = std::move(function), &collection, id](Args args) {
-                function(std::forward<Args>(args));
-                collection.erase(id);
+            log->Trace("SyncHandler id: {0}", id);
+            auto handler = [this, function = std::move(function), id](double value) {
+                function(value);
+                m_SyncHandlersWithDouble.erase(id);
             };
-            collection.emplace(id, std::move(handler));
-            return collection.at(id);
+            m_SyncHandlersWithDouble.emplace(id, std::move(handler));
+            return m_SyncHandlersWithDouble.at(id);
         }
 
-        const std::function<void()>& CreateSyncHandler(std::unordered_map<size_t, std::function<void()>>& collection, std::function<void()> function)
+        const std::function<void()>& CreateSyncHandler(std::function<void()> function)
         {
             size_t id = m_SyncHandlersId++;
-            auto handler = [function = std::move(function), &collection, id]() {
+            log->Trace("SyncHandler id: {0}", id);
+            auto handler = [this, function = std::move(function), id]() {
                 function();
-                collection.erase(id);
+                m_SyncHandlers.erase(id);
             };
-            collection.emplace(id, std::move(handler));
-            return collection.at(id);
+            m_SyncHandlers.emplace(id, std::move(handler));
+            return m_SyncHandlers.at(id);
         }
     };
 }

@@ -149,8 +149,11 @@ namespace GOTHIC_NAMESPACE
                 return;
             }
 
+            static zSTRING nowPlaying = "";
+
             zSTRING identifier = id;
-            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
+            identifier.Upper();
+            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name || nowPlaying == identifier)
             {
                 return;
             }
@@ -158,12 +161,14 @@ namespace GOTHIC_NAMESPACE
             zCMusicTheme* theme = LoadThemeByScript(id);
             if (theme && IsDirectMusicFormat(theme->fileName))
             {
+                nowPlaying = "";
                 m_ActiveTheme = theme;
                 m_BassEngine->StopMusic();
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
 
-            identifier.Upper();
+            nowPlaying = identifier;
+            m_ActiveTheme = nullptr;
             m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(NH::String(identifier.ToChar())));
 
             if (done)
@@ -219,7 +224,7 @@ namespace GOTHIC_NAMESPACE
             m_DirectMusic->Stop();
         }
 
-        float GetVolume() const override
+        [[nodiscard]] float GetVolume() const override
         {
             return m_BassEngine->GetVolume();
         }

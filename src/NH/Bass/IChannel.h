@@ -40,11 +40,13 @@ namespace NH::Bass
         virtual void SetVolume(float volume) = 0;
         virtual void SlideVolume(float targetVolume, uint32_t time) = 0;
         virtual void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) = 0;
-        virtual void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain = 0, float highFreqRTRatio = 0.001f) = 0;
+        virtual void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) = 0;
 
-        virtual void WhenAudioEnds(const std::function<void()>& onFinish) = 0;
+        virtual void OnPosition(double position, const std::function<void()>& callback) = 0;
+        virtual void OnAudioEnds(const std::function<void()>& onFinish) = 0;
         virtual void BeforeAudioEnds(double aheadSeconds, const std::function<void(double)>& onFinish) = 0;
 
+        [[nodiscard]] virtual bool IsPlaying() const = 0;
         [[nodiscard]] virtual double Position() const = 0;
         [[nodiscard]] virtual double Length() const = 0;
 

@@ -12,7 +12,7 @@ namespace NH::Bass
     MusicTheme MusicTheme::None = MusicTheme("<None>");
     Logger* MusicTheme::log = CreateLogger("zBassMusic::MusicTheme");
 
-    MusicTheme::MusicTheme(const String& name) : m_Name(name), m_TransitionInfo{m_Name} {}
+    MusicTheme::MusicTheme(const String& name) : m_Name(name), m_TransitionInfo{ m_Name } {}
 
     void MusicTheme::SetAudioFile(HashString type, const String& filename)
     {
@@ -75,64 +75,111 @@ namespace NH::Bass
         }
     }
 
-    void MusicTheme::PlayInstant(IEngine& engine)
+    void MusicTheme::Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme)
+    {
+        currentTheme->Transition(engine, *this);
+    }
+
+    void MusicTheme::Transition(IEngine& engine, MusicTheme& nextTheme)
+    {
+        if (nextTheme.GetName() == GetName()) { return; }
+        auto channel = GetAcquiredChannel();
+        if (!channel) channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
+        const auto& transition = m_TransitionInfo.GetTransition(nextTheme.GetName());
+        std::optional<Transition::TimePoint> timePoint = transition.NextAvailableTimePoint(channel->Position());
+
+        log->Debug("Transition {0} to {1}", GetName(), nextTheme.GetName());
+        log->PrintRaw(LoggerLevel::Trace, transition.ToString());
+
+        const std::function<void()>& playJingle = [&engine, &transition, this]() {
+            if (transition.Jingle)
+            {
+                auto channel = engine.AcquireFreeChannel();
+                auto result = channel->PlayInstant(transition.Jingle->GetAudioFile(AudioFile::DEFAULT));
+                if (result) { channel->OnAudioEnds(CreateSyncHandler([channel]() { channel->Release(); })); }
+                else { channel->Release(); }
+            }
+        };
+
+        if (timePoint && channel->IsPlaying())
+        {
+            log->Trace("OnPosition: {0}", String(timePoint->Start));
+            channel->OnPosition(timePoint->Start, CreateSyncHandler([&engine, &transition, this]() {
+                Stop(engine, transition);
+            }));
+            channel->OnPosition(timePoint->Start + transition.JingleDelay, playJingle);
+            channel->OnPosition(timePoint->NextStart, CreateSyncHandler([&engine, &nextTheme, &transition, timePoint]() {
+                nextTheme.Play(engine, transition, timePoint);
+            }));
+        }
+        else
+        {
+            Stop(engine, transition);
+            playJingle();
+            nextTheme.Play(engine, transition);
+        }
+    }
+
+    void MusicTheme::Play(IEngine& engine) { Play(engine, Transition::EMPTY); }
+    void MusicTheme::Play(IEngine& engine, const struct Transition& transition, std::optional<Transition::TimePoint> timePoint)
     {
         if (!ReadyToPlay(engine, AudioFile::DEFAULT)) { return; }
 
-        auto& channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
+        auto channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
         auto& effects = GetAudioEffects(AudioFile::DEFAULT);
-        auto result = channel->PlayInstant(m_AudioFiles.at(AudioFile::DEFAULT));
+        auto effect = timePoint.has_value() ? timePoint.value().NextEffect : transition.Effect;
+        auto result = channel->PlayInstant(GetAudioFile(AudioFile::DEFAULT));
         if (!result)
         {
-            engine.ReleaseChannel(channel);
-            m_AcquiredChannels.clear();
+            ReleaseChannels();
             return;
         }
 
         if (effects.ReverbDX8.Active)
         {
-            channel->SetDX8ReverbEffect(effects.ReverbDX8.Mix, effects.ReverbDX8.Time);
+            channel->SetDX8ReverbEffect(effects.ReverbDX8.Mix, effects.ReverbDX8.Time, 0, 0.001f);
         }
 
-        if (effects.FadeIn.Active)
+        if (effect == TransitionEffect::CROSSFADE)
         {
             channel->SetVolume(0.0f);
-            channel->SlideVolume(1.0f, (uint32_t)effects.FadeIn.Duration);
+            channel->SlideVolume(1.0f, timePoint.has_value() ? (uint32_t)timePoint.value().Duration * 1000 : (uint32_t)effects.FadeIn.Duration);
         }
+        else { channel->SetVolume(effects.Volume.Active ? effects.Volume.Volume : 1.0f); }
 
         if (effects.FadeOut.Active)
         {
-            channel->BeforeAudioEnds(effects.FadeOut.Duration, CreateSyncHandler<double>(m_SyncHandlersWithDouble, [this, &engine](double timeLeft) -> void {
+            channel->BeforeAudioEnds(effects.FadeOut.Duration, CreateSyncHandler([this, &engine](double timeLeft) -> void {
                 engine.GetEM().DispatchEvent(MusicTransitionEvent{ this, AudioFile::DEFAULT, static_cast<float>(timeLeft) });
             }));
         }
-        channel->WhenAudioEnds(CreateSyncHandler(m_SyncHandlers, [this, &engine]() -> void {
-            engine.GetEM().DispatchEvent(MusicEndEvent{ this, AudioFile::DEFAULT });
-        }));
+
+        channel->OnAudioEnds(CreateSyncHandler([this, &engine]() -> void { engine.GetEM().DispatchEvent(MusicEndEvent{ this, AudioFile::DEFAULT }); }));
         engine.GetEM().DispatchEvent(MusicChangeEvent{ this, AudioFile::DEFAULT });
     }
 
-    void MusicTheme::ScheduleAfter(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme)
+    void MusicTheme::Stop(IEngine& engine) { Stop(engine, m_TransitionInfo.GetDefaultTransition()); }
+    void MusicTheme::Stop(IEngine& engine, const struct Transition& transition)
     {
-        // Instant transition
-        currentTheme->StopInstant(engine);
-        PlayInstant(engine);
-    }
-
-    void MusicTheme::StopInstant(IEngine& engine)
-    {
-        for (auto& channel: m_AcquiredChannels)
+        auto channel = GetAcquiredChannel();
+        if (!channel) { ReleaseChannels(); };
+        std::optional<Transition::TimePoint> timePoint = transition.NextAvailableTimePoint(channel->Position());
+        auto effect = timePoint.has_value() ? timePoint.value().Effect : transition.Effect;
+        if (effect == TransitionEffect::CROSSFADE)
         {
-            auto& effects = GetAudioEffects(AudioFile::DEFAULT);
-            if (effects.FadeOut.Active)
-            {
-                channel->SlideVolume(0.0f, (uint32_t)effects.FadeOut.Duration, CreateSyncHandler(m_SyncHandlers, [this, &engine, &channel]() -> void {
-                    engine.ReleaseChannel(channel);
-                }));
-            }
-            else { engine.ReleaseChannel(channel); }
+            uint32_t time = timePoint.has_value() ? (uint32_t)timePoint.value().Duration * 1000 : (uint32_t)transition.EffectDuration;
+            log->Trace("Fadeout, time: {0}", time);
+            channel->SlideVolume(0.0f, time, CreateSyncHandler([channel, this]() -> void {
+                log->Trace("Fadeout done");
+                channel->StopInstant();
+                ReleaseChannels();
+            }));
         }
-        m_AcquiredChannels.clear();
+        else
+        {
+            channel->StopInstant();
+            ReleaseChannels();
+        }
     }
 
     bool MusicTheme::ReadyToPlay(IEngine& engine, HashString audio)
@@ -183,6 +230,24 @@ namespace NH::Bass
     {
         zone = String(zone.GetValue()).MakeUpper();
         return std::find(m_Zones.begin(), m_Zones.end(), zone) != m_Zones.end();
+    }
+
+    std::shared_ptr<IChannel> MusicTheme::GetAcquiredChannel()
+    {
+        for (auto& channel: m_AcquiredChannels)
+        {
+            return channel;
+        }
+        return {};
+    }
+
+    void MusicTheme::ReleaseChannels()
+    {
+        for (auto& channel: m_AcquiredChannels)
+        {
+            channel->Release();
+        }
+        m_AcquiredChannels.clear();
     }
 
     String MusicTheme::ToString() const

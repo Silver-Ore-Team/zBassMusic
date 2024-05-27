@@ -30,9 +30,11 @@ namespace NH::Bass
         void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) override;
         void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) override;
 
-        void WhenAudioEnds(const std::function<void()>& onFinish) override;
+        void OnPosition(double position, const std::function<void()>& callback) override;
+        void OnAudioEnds(const std::function<void()>& onFinish) override;
         void BeforeAudioEnds(double aheadSeconds, const std::function<void(double)>& onFinish) override;
 
+        bool IsPlaying() const override;
         [[nodiscard]] double Position() const override;
         [[nodiscard]] double Length() const override;
 
@@ -41,6 +43,7 @@ namespace NH::Bass
         bool IsAvailable() override { return m_Status == ChannelStatus::AVAILABLE; };
 
     private:
+        static void CALLBACK OnPositionSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnAudioEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK BeforeAudioEndsSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);

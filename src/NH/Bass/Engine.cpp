@@ -117,7 +117,7 @@ namespace NH::Bass
         if (!m_Initialized) { return; }
         if (m_ActiveTheme)
         {
-            m_ActiveTheme->StopInstant(*this);
+            m_ActiveTheme->Stop(*this);
             m_ActiveTheme = nullptr;
         }
     }

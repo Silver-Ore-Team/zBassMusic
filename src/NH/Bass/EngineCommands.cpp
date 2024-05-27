@@ -31,11 +31,17 @@ namespace NH::Bass
             return CommandResult::DONE;
         }
 
-        auto& activeTheme = engine.m_ActiveTheme;
-        if (activeTheme) theme->ScheduleAfter(engine, activeTheme);
-        else theme->PlayInstant(engine);
+        auto activeTheme = engine.m_ActiveTheme;
+        bool anyChannelPlaying = false;
+        for (auto& channel : engine.m_Channels)
+        {
+            if (channel->IsPlaying()) { anyChannelPlaying = true; break; }
+        }
 
+        if (activeTheme && anyChannelPlaying) theme->Schedule(engine, activeTheme);
+        else theme->Play(engine);
         engine.m_ActiveTheme = theme;
+
         return CommandResult::DONE;
     }
 }

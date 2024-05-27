@@ -21,6 +21,11 @@ namespace NH::Bass
         return m_DefaultTransition;
     }
 
+    const Transition& TransitionInfo::GetDefaultTransition() const
+    {
+        return m_DefaultTransition;
+    }
+
     void TransitionInfo::AddTransitionEffect(TransitionEffect effect, double duration, HashString filter)
     {
         Transition* transition = filter == ""_hs ? &m_DefaultTransition : GetFilteredTransition(filter);

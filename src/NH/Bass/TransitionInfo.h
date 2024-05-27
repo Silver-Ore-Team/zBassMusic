@@ -27,6 +27,7 @@ namespace NH::Bass
         void AddJingle(std::shared_ptr<MusicTheme> jingle, double delay, HashString filter = ""_hs);
 
         [[nodiscard]] const Transition& GetTransition(HashString targetTheme) const;
+        [[nodiscard]] const Transition& GetDefaultTransition() const;
         [[nodiscard]] HashString GetSourceTheme() const { return m_SourceTheme; }
 
     private:

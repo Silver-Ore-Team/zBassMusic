@@ -61,6 +61,13 @@ namespace GOTHIC_NAMESPACE
         {
             LoadGothic();
             LoadBass();
+
+            zSTRING initFuncName("BassMusic_Init");
+            zCPar_Symbol* symbol = m_Parser->GetSymbol(initFuncName);
+            if (symbol && symbol->type == zPAR_TYPE_FUNC)
+            {
+                m_Parser->CallFunc(initFuncName);
+            }
         }
 
     private:

@@ -1,5 +1,11 @@
 namespace GOTHIC_NAMESPACE
 {
+    //  G1: 0x006E5920 public: int __thiscall zCParser::Parse(class zSTRING)
+    // G1A: 0x0071E400 public: int __thiscall zCParser::Parse(class zSTRING)
+    //  G2: 0x0072F160 public: int __thiscall zCParser::Parse(class zSTRING)
+    // G2A: 0x0078EBA0 public: int __thiscall zCParser::Parse(class zSTRING)
+    void* zCParser_Parse = (void*)zSwitch(0x006E5920, 0x0071E400, 0x0072F160, 0x0078EBA0);
+
     //  G1: 0x00424AF0 public: void __thiscall CGameManager::Run(void)
     // G1A: 0x004275D0 public: void __thiscall CGameManager::Run(void)
     //  G2: 0x004254F0 public: void __thiscall CGameManager::Run(void)
@@ -24,10 +30,19 @@ namespace GOTHIC_NAMESPACE
     // G2A: 0x004DC1C0 public: virtual int __thiscall zCMenu::HandleFrame(void)
     void* zCMenu_HandleFrame = (void*)zSwitch(0x004CF470, 0x004DFD00, 0x004D9B20, 0x004DC1C0);
 
+    void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg);
+    auto Partial_zCParser_Parse = Union::CreatePartialHook(zCParser_Parse, zCParser_Parse_PartialHook);
+    void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg)
+    {
+        auto* p = (zCParser*) reg.ecx;
+        if (p == parserMusic)
+        {
+            DefineExternalsMusic();
+        }
+    }
+
     void __fastcall CGameManager_Run_PartialHook();
-
     auto Partial_CGameManager_Run = Union::CreatePartialHook(CGameManager_Run, CGameManager_Run_PartialHook);
-
     void __fastcall CGameManager_Run_PartialHook()
     {
         static NH::Logger* log = NH::CreateLogger("zBassMusic::CGameManager::Run");
@@ -61,27 +76,21 @@ namespace GOTHIC_NAMESPACE
     }
 
     void __fastcall DefineExternals_Ulfi_PartialHook(Union::Registers& reg);
-
     auto Partial_DefineExternals_Ulfi = Union::CreatePartialHook(oCGame_DefineExternals_Ulfi, &DefineExternals_Ulfi_PartialHook);
-
     void __fastcall DefineExternals_Ulfi_PartialHook(Union::Registers& reg)
     {
         DefineExternals();
     }
 
     void __fastcall oCGame_Render_PartialHook(Union::Registers& reg);
-
     auto Partial_oCGame_Render = Union::CreatePartialHook(oCGame_Render, oCGame_Render_PartialHook);
-
     void __fastcall oCGame_Render_PartialHook(Union::Registers& reg)
     {
         NH::Bass::Engine::GetInstance()->Update();
     }
 
     void __fastcall oCMenu_Render_PartialHook(Union::Registers& reg);
-
     auto Partial_oCMenu_HandleFrame = Union::CreatePartialHook(zCMenu_HandleFrame, oCMenu_Render_PartialHook);
-
     void __fastcall oCMenu_Render_PartialHook(Union::Registers& reg)
     {
         NH::Bass::Engine::GetInstance()->Update();

@@ -2,6 +2,7 @@
 
 #include <NH/Commons.h>
 #include <NH/Bass/IEngine.h>
+#include <NH/ToString.h>
 #include <vector>
 
 namespace NH::Bass
@@ -9,8 +10,10 @@ namespace NH::Bass
     class MusicTheme;
 
     enum class TransitionEffect { NONE, CROSSFADE };
-    struct Transition
+    struct Transition : public HasToString
     {
+        static Transition EMPTY;
+
         struct TimePoint
         {
             double Start{};
@@ -18,7 +21,7 @@ namespace NH::Bass
             TransitionEffect Effect = TransitionEffect::NONE;
             double NextStart = Start;
             double NextDuration = Duration;
-            TransitionEffect NextEffect = TransitionEffect::NONE;
+            TransitionEffect NextEffect = Effect;
         };
         TransitionEffect Effect = TransitionEffect::NONE;
         double EffectDuration = 0;
@@ -26,6 +29,8 @@ namespace NH::Bass
         std::shared_ptr<MusicTheme> Jingle;
         double JingleDelay = 0;
 
-        [[nodiscard]] std::optional<TimePoint> NextAvailableTimePoint(double position);
+        [[nodiscard]] std::optional<TimePoint> NextAvailableTimePoint(double position) const;
+
+        [[nodiscard]] String ToString() const override;
     };
 }

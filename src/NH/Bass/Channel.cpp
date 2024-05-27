@@ -4,17 +4,9 @@
 
 namespace NH::Bass
 {
-    struct OnSyncWhenAudioEndsData
-    {
-        HSTREAM Channel;
-        const std::function<void()>& Function;
-    };
-
-    struct OnSyncBeforeAudioEndsData
-    {
-        HSTREAM Channel;
-        const std::function<void(double)>& Function;
-    };
+    struct OnSyncPosition { HSTREAM Channel; const std::function<void()>& Function; };
+    struct OnSyncWhenAudioEndsData { HSTREAM Channel; const std::function<void()>& Function; };
+    struct OnSyncBeforeAudioEndsData { HSTREAM Channel; const std::function<void(double)>& Function; };
 
     Channel::Result<void> Channel::PlayInstant(const AudioFile& audioFile)
     {
@@ -75,7 +67,13 @@ namespace NH::Bass
         }
     }
 
-    void Channel::WhenAudioEnds(const std::function<void()>& onFinish)
+    void Channel::OnPosition(double position, const std::function<void()>& callback)
+    {
+        size_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, OnPositionSyncCallFunction, (void*)new OnSyncPosition{ m_Stream, callback });
+    }
+
+    void Channel::OnAudioEnds(const std::function<void()>& onFinish)
     {
         BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnAudioEndSyncCallFunction, (void*)new OnSyncWhenAudioEndsData{ m_Stream, onFinish });
     }
@@ -99,6 +97,12 @@ namespace NH::Bass
     void Channel::Release()
     {
         m_Status = ChannelStatus::AVAILABLE;
+        BASS_ChannelStop(m_Stream);
+    }
+
+    bool Channel::IsPlaying() const
+    {
+        return BASS_ChannelIsActive(m_Stream);
     }
 
     double Channel::Position() const
@@ -119,6 +123,14 @@ namespace NH::Bass
         return -1;
     }
 
+    void Channel::OnPositionSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData)
+    {
+        auto* payload = static_cast<OnSyncWhenAudioEndsData*>(userData);
+        if (channel != payload->Channel) return;
+        if (payload->Function) { payload->Function(); }
+        else { CreateLogger("HSYNC::OnPositionSyncCallFunction")->Error("onFinish is nullptr"); }
+    }
+
     void Channel::OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData)
     {
         auto* onFinish = static_cast<std::function<void()>*>(userData);
@@ -130,7 +142,6 @@ namespace NH::Bass
     {
         auto* payload = static_cast<OnSyncWhenAudioEndsData*>(userData);
         if (channel != payload->Channel) return;
-
         if (payload->Function) { payload->Function(); }
         else { CreateLogger("HSYNC::OnAudioEndSyncCallFunction")->Error("onFinish is nullptr"); }
     }
@@ -139,7 +150,6 @@ namespace NH::Bass
     {
         auto* payload = static_cast<OnSyncBeforeAudioEndsData*>(userData);
         if (channel != payload->Channel) return;
-
         double aheadSeconds = BASS_ChannelBytes2Seconds(channel, BASS_ChannelGetLength(channel, BASS_POS_BYTE) - BASS_ChannelGetPosition(channel, BASS_POS_BYTE));
         if (payload->Function) { payload->Function(aheadSeconds); }
         else { CreateLogger("HSYNC::BeforeAudioEndsSyncCallFunction")->Error("onFinish is nullptr"); }

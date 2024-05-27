@@ -1,6 +1,5 @@
 #pragma once
 
-#include "NH/Bass/CommonTypes.h"
 #include "EventManager.h"
 #include "NH/Logger.h"
 #include <NH/Bass/MusicTheme.h>
@@ -8,15 +7,9 @@
 
 #include <functional>
 
-
 namespace NH::Bass
 {
-    enum class ChannelStatus
-    {
-        AVAILABLE,
-        PLAYING,
-        FADING_OUT
-    };
+    enum class ChannelStatus { AVAILABLE, ACQUIRED };
 
     class Channel : public IChannel
     {
@@ -45,10 +38,7 @@ namespace NH::Bass
 
         void Acquire() override;
         void Release() override;
-        bool IsAvailable() override
-        {
-            return m_Status == ChannelStatus::AVAILABLE;
-        };
+        bool IsAvailable() override { return m_Status == ChannelStatus::AVAILABLE; };
 
     private:
         static void CALLBACK OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);

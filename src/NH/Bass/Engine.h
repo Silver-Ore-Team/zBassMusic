@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommonTypes.h"
+#include <bass.h>
 #include "EventManager.h"
 #include "Channel.h"
 #include "NH/Logger.h"

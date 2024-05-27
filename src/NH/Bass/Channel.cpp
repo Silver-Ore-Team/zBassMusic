@@ -93,7 +93,7 @@ namespace NH::Bass
         {
             log->Error("Trying to acquire a non-available channel. We will allow that to not crash the game but the music may be funky.");
         }
-        m_Status = ChannelStatus::PLAYING;
+        m_Status = ChannelStatus::ACQUIRED;
     }
 
     void Channel::Release()

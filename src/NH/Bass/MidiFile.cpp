@@ -8,7 +8,7 @@ namespace NH::Bass
 {
     Logger* MidiFile::log = CreateLogger("zBassMusic::MidiFile");
 
-    void MidiFile::LoadMidiFile(Executor& executor)
+    void MidiFile::LoadMidiFile(Executor& executor, const std::function<void(MidiFile&)>& onReady)
     {
         if (m_LoadingStatus != LoadingStatusType::NOT_LOADED)
         {
@@ -16,7 +16,7 @@ namespace NH::Bass
             return;
         }
         m_LoadingStatus = LoadingStatusType::LOADING;
-        executor.AddTask([this]()
+        executor.AddTask([this, onReady]()
                          {
                              int systems = VDF_VIRTUAL | VDF_PHYSICAL;
                              const Union::VDFS::File* file = Union::VDFS::GetDefaultInstance().GetFile(m_Filename, systems);
@@ -33,6 +33,11 @@ namespace NH::Bass
                              stream->Close();
                              m_LoadingStatus = LoadingStatusType::READY;
                              ParseMidiFile();
+
+                             if (onReady)
+                             {
+                                onReady(*this);
+                             }
                          });
     }
 

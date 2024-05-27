@@ -145,13 +145,16 @@ namespace NH::Bass
         {
             bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
             bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
-
+            log->Trace("Available device: {0} {1} {2}", deviceInfo.name, enabled ? "enabled" : "disabled", isDefault ? "default" : "");
             if (enabled && isDefault)
             {
                 deviceIndex = i;
-                break;
             }
         };
+
+        BASS_SetDevice(deviceIndex);
+        BASS_GetDeviceInfo(deviceIndex, &deviceInfo);
+        log->Info("Device Name: {0}", deviceInfo.name);
 
         m_Initialized = BASS_Init((int32_t) deviceIndex, 44100, 0, nullptr, nullptr);
         if (!m_Initialized)
@@ -163,7 +166,7 @@ namespace NH::Bass
 
         BASS_INFO info;
         BASS_GetInfo(&info);
-        log->Trace("Sample Rate: {0} Hz", info.freq);
+        log->Info("Sample Rate: {0} Hz", info.freq);
 
         static constexpr size_t Channels_Max = 16;
         m_Channels.clear();
@@ -171,8 +174,6 @@ namespace NH::Bass
         {
             m_Channels.emplace_back(std::make_shared<Channel>(i));
         }
-
-        log->Info("Initialized with device: {0}", deviceIndex);
     }
 
     Union::StringUTF8 Engine::ErrorCodeToString(const int code)

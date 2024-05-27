@@ -164,7 +164,7 @@ namespace GOTHIC_NAMESPACE
             }
 
             identifier.Upper();
-            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(NH::String(identifier.ToChar())));
 
             if (done)
             {

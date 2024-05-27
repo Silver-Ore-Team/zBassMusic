@@ -12,7 +12,9 @@ namespace NH::Bass
         std::unordered_map<HashString, std::shared_ptr<MusicTheme>> m_Themes;
 
     public:
-        void AddTheme(HashString id, std::shared_ptr<MusicTheme> theme);
+        void AddTheme(HashString id, const std::shared_ptr<MusicTheme>& theme);
+
+        void RefreshTheme(HashString id);
 
         [[nodiscard]] std::shared_ptr<MusicTheme> GetTheme(HashString id);
 

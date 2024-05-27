@@ -29,6 +29,15 @@ namespace GOTHIC_NAMESPACE
         zSTRING Type;
         zSTRING Filename;
         zSTRING MidiFile;
+        float Volume;
+        int Loop;
+        int Reverb;
+        float ReverbMix;
+        float ReverbTime;
+        int FadeIn;
+        int FadeInDuration;
+        int FadeOut;
+        int FadeOutDuration;
     };
 
     class BassLoader
@@ -85,7 +94,9 @@ namespace GOTHIC_NAMESPACE
                                 effects.FadeOut.Duration = NH::Bass::Options->TransitionTime;
                             }
                         });
-                        theme->AddZone(symbol->name.ToChar());
+                        zSTRING zone = symbol->name;
+                        zone.Upper();
+                        theme->AddZone(zone.ToChar());
                         NH::Bass::Engine::GetInstance()->GetMusicManager().AddTheme(symbol->name.ToChar(), theme);
                     });
         }
@@ -93,17 +104,53 @@ namespace GOTHIC_NAMESPACE
         void LoadBass()
         {
             ForEachClass<BassMusicTheme>(
-                    "C_BassMusic_Theme",
+                    Globals->BassMusicThemeClassName,
                     [&]() { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
-                    [&](BassMusicTheme* theme, zCPar_Symbol* symbol) {
-                        // @todo:
+                    [&](BassMusicTheme* input, zCPar_Symbol* symbol) {
+                        std::shared_ptr<NH::Bass::MusicTheme> theme = std::make_shared<NH::Bass::MusicTheme>(input->Name.ToChar());
+                        theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, [](NH::Bass::AudioEffects& effects){});
+                        auto zones = NH::String(input->Zones.ToChar()).Split(",");
+                        for (auto& zone: zones) { theme->AddZone(zone.MakeUpper()); }
+                        // input->Type ignored for now
+                        NH::Bass::Engine::GetInstance()->GetMusicManager().AddTheme(input->Name.ToChar(), theme);
                     });
 
             ForEachClass<BassMusicThemeAudio>(
-                    "C_BassMusic_ThemeAudio",
+                    Globals->BassMusicThemeAudioClassName,
                     [&]() { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
-                    [&](BassMusicThemeAudio* theme, zCPar_Symbol* symbol) {
-                        // @todo:
+                    [&](BassMusicThemeAudio* input, zCPar_Symbol* symbol) {
+                        std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
+                        NH::String type =  NH::String(input->Type.ToChar());
+                        NH::HashString id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : NH::HashString(type);
+                        theme->SetAudioFile(id, input->Filename.ToChar());
+                        theme->SetAudioEffects(id, [&](NH::Bass::AudioEffects& effects) {
+                            effects.Loop.Active = input->Loop;
+                            effects.Volume.Active = true;
+                            effects.Volume.Volume = input->Volume;
+                            if (!NH::Bass::Options->ForceDisableReverb && input->Reverb)
+                            {
+                                effects.ReverbDX8.Active = true;
+                                effects.ReverbDX8.Mix = input->ReverbMix;
+                                effects.ReverbDX8.Time = input->ReverbTime;
+                            }
+                            bool forceFade = NH::Bass::Options->ForceFadeTransition;
+                            if (forceFade || input->FadeIn)
+                            {
+                                effects.FadeIn.Active = true;
+                                effects.FadeIn.Duration = input->FadeInDuration;
+                            }
+                            if (forceFade || input->FadeOut)
+                            {
+                                effects.FadeOut.Active = true;
+                                effects.FadeOut.Duration = input->FadeOutDuration;
+                            }
+                        });
+                        if (!input->MidiFile.IsEmpty())
+                        {
+                            auto midiFile = std::make_shared<NH::Bass::MidiFile>(theme->GetName(), NH::HashString(NH::String(input->MidiFile.ToChar())));
+                            theme->AddMidiFile(NH::HashString(""), midiFile);
+                        }
+                        NH::Bass::Engine::GetInstance()->GetMusicManager().RefreshTheme(theme->GetName());
                     });
         }
 

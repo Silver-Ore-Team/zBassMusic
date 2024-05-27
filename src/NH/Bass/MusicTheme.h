@@ -7,6 +7,7 @@
 #include <NH/Bass/MidiFile.h>
 #include <NH/Bass/IEngine.h>
 #include <NH/Bass/IChannel.h>
+#include <NH/Bass/TransitionInfo.h>
 
 #include <vector>
 #include <unordered_map>
@@ -58,6 +59,7 @@ namespace NH::Bass
 
         String m_Name;
         size_t m_SyncHandlersId = 0;
+        TransitionInfo m_TransitionInfo;
         std::unordered_map<HashString, AudioFile> m_AudioFiles;
         std::unordered_map<HashString, AudioEffects> m_AudioEffects;
         std::unordered_map<HashString, std::shared_ptr<MidiFile>> m_MidiFiles;
@@ -74,7 +76,7 @@ namespace NH::Bass
         void SetAudioFile(HashString type, const String& filename);
         void SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter);
         void AddZone(HashString zone);
-        void AddMidiFile(HashString type, const std::shared_ptr<MidiFile>& midiFile);
+        void AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile);
         void LoadAudioFiles(Executor& executor);
 
         void PlayInstant(IEngine& engine);
@@ -82,6 +84,7 @@ namespace NH::Bass
         void StopInstant(IEngine& engine);
 
         [[nodiscard]] const String& GetName() const { return m_Name; }
+        [[nodiscard]] TransitionInfo& GetTransitionInfo() { return m_TransitionInfo; };
         [[nodiscard]] bool HasAudioFile(HashString type) const { return m_AudioFiles.find(type) != m_AudioFiles.end(); }
         [[nodiscard]] bool IsAudioFileReady(HashString type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
         [[nodiscard]] const AudioFile& GetAudioFile(HashString type) const { return m_AudioFiles.at(type); }

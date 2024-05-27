@@ -143,9 +143,14 @@ namespace GOTHIC_NAMESPACE
 
         parser->DefineExternal("BassMusic_TransitionRule_OnBeat", BassMusic_TransitionRule_OnBeat, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
 
+        parserMusic->AddClassOffset(Globals->BassMusicThemeClassName, sizeof(BassMusicTheme));
+        parserMusic->AddClassOffset(Globals->BassMusicThemeAudioClassName, sizeof(BassMusicThemeAudio));
+
         if (NH::Bass::Options->CreateMainParserCMusicTheme)
         {
             zCMusicTheme theme;
+            parser->AddClassOffset(Globals->BassMusicThemeClassName, sizeof(BassMusicTheme));
+            parser->AddClassOffset(Globals->BassMusicThemeAudioClassName, sizeof(BassMusicThemeAudio));
             parser->AddClassOffset(Globals->CMusicThemeClass, reinterpret_cast<int>(&theme.dScriptEnd) - reinterpret_cast<int>(&theme.fileName));
         }
     }

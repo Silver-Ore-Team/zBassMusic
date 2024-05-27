@@ -44,13 +44,14 @@ namespace GOTHIC_NAMESPACE
                 zmusic->SetVolume(volume);
                 log->Info("Set music system to CMusicSys_Bass");
 
+                BassLoader bassLoaderMusic(parserMusic);
+                bassLoaderMusic.Load();
+
                 if (NH::Bass::Options->CreateMainParserCMusicTheme)
                 {
-                    BassLoader bassLoader(parser);
-                    bassLoader.Load();
+                    BassLoader bassLoaderMain(parser);
+                    bassLoaderMain.Load();
                 }
-                BassLoader bassLoader(parserMusic);
-                bassLoader.Load();
             }
             else
             {

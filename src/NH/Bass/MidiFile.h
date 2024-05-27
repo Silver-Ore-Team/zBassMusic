@@ -35,8 +35,8 @@ namespace NH::Bass
     private:
         static Logger* log;
         HashString m_ThemeId;
-        HashString m_AudioId;
         String m_Filename;
+        String m_TargetFilter;
         std::vector<char> m_Buffer{};
         StatusType m_Status = StatusType::NOT_LOADED;
         LoadingStatusType m_LoadingStatus = LoadingStatusType::NOT_LOADED;
@@ -45,16 +45,16 @@ namespace NH::Bass
         std::vector<Tone> m_Tones{};
 
     public:
-        MidiFile(HashString themeId, HashString audioId, const String& filename)
-                : m_ThemeId(themeId), m_AudioId(audioId), m_Filename(filename) {}
+        MidiFile(HashString themeId, const String& filename, const String& targetFilter = "")
+                : m_ThemeId(themeId), m_Filename(filename), m_TargetFilter(targetFilter) {}
 
-        void LoadMidiFile(Executor& executor);
+        void LoadMidiFile(Executor& executor, const std::function<void(MidiFile&)>& onReady = nullptr);
 
         [[nodiscard]] HashString GetThemeId() const { return m_ThemeId; }
 
-        [[nodiscard]] HashString GetAudioId() const { return m_AudioId; }
-
         [[nodiscard]] const String& GetFilename() const { return m_Filename; }
+
+        [[nodiscard]] const String& GetTargetFilter() const { return m_TargetFilter; }
 
         [[nodiscard]] StatusType GetStatus() const { return m_Status; }
 

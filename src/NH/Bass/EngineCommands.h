@@ -10,9 +10,9 @@ namespace NH::Bass
     class ChangeZoneCommand : public Command
     {
         static Logger* log;
-        HashString m_Zone;
+        String m_Zone;
     public:
-        explicit ChangeZoneCommand(HashString zone) : m_Zone(zone) {};
+        explicit ChangeZoneCommand(const String& zone) : m_Zone(zone) {};
         CommandResult Execute(Engine& engine) override;
     };
 

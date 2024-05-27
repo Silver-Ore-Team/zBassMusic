@@ -12,11 +12,7 @@ namespace NH::Bass
     MusicTheme MusicTheme::None = MusicTheme("<None>");
     Logger* MusicTheme::log = CreateLogger("zBassMusic::MusicTheme");
 
-    MusicTheme::MusicTheme(const String& name)
-            : m_Name(name)
-    {
-
-    }
+    MusicTheme::MusicTheme(const String& name) : m_Name(name), m_TransitionInfo{m_Name} {}
 
     void MusicTheme::SetAudioFile(HashString type, const String& filename)
     {
@@ -27,8 +23,15 @@ namespace NH::Bass
 
     void MusicTheme::SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter)
     {
-        m_AudioEffects.emplace(std::make_pair(type, AudioEffects{}));
+        if (!m_AudioFiles.contains(type))
+        {
+            m_AudioEffects[type] = AudioEffects{};
+        }
         effectsSetter(m_AudioEffects[type]);
+        if (m_AudioEffects[type].FadeOut.Active)
+        {
+            m_TransitionInfo.AddTransitionEffect(TransitionEffect::CROSSFADE, m_AudioEffects[type].FadeOut.Duration);
+        }
     }
 
     void MusicTheme::AddZone(HashString zone)
@@ -36,9 +39,12 @@ namespace NH::Bass
         m_Zones.emplace_back(zone);
     }
 
-    void MusicTheme::AddMidiFile(HashString type, const std::shared_ptr<MidiFile>& midiFile)
+    void MusicTheme::AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile)
     {
-        m_MidiFiles.emplace(std::make_pair(type, midiFile));
+        m_MidiFiles.emplace(std::make_pair(HashString(type), midiFile));
+        m_MidiFiles[type]->LoadMidiFile(Executors.IO, [this, type](MidiFile& midi) {
+            m_TransitionInfo.AddMidiFile(midi, type);
+        });
     }
 
     void MusicTheme::LoadAudioFiles(Executor& executor)
@@ -148,7 +154,7 @@ namespace NH::Bass
                             log->Error("Trying to play a music theme that has failed to load: {0}", f.Filename);
                             return CommandResult::DONE;
                         }
-                        if (f.Status == AudioFile::StatusType::READY)
+                        if (f.Status == AudioFile::StatusType::READY || (m_MidiFiles.contains(""_hs) && m_MidiFiles[""_hs]->GetStatus() == MidiFile::StatusType::PARSING))
                         {
                             engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(m_Name));
                             return CommandResult::DONE;
@@ -175,6 +181,7 @@ namespace NH::Bass
 
     bool MusicTheme::HasZone(HashString zone) const
     {
+        zone = String(zone.GetValue()).MakeUpper();
         return std::find(m_Zones.begin(), m_Zones.end(), zone) != m_Zones.end();
     }
 

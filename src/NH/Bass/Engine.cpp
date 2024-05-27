@@ -62,7 +62,7 @@ namespace NH::Bass
             throw std::runtime_error("Too many channels");
         }
 
-        return m_Channels.emplace_back(std::make_shared<Channel>(m_Channels.size(), m_EventManager));
+        return m_Channels.emplace_back(std::make_shared<Channel>(m_Channels.size()));
     }
 
     void Engine::ReleaseChannel(const std::shared_ptr<IChannel>& channel)
@@ -89,7 +89,7 @@ namespace NH::Bass
         }
 
         m_MasterVolume = volume;
-        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000.0f * m_MasterVolume);
+        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
     }
 
     float Engine::GetVolume() const

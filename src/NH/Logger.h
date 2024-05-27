@@ -42,6 +42,7 @@ namespace NH
         LoggerLevel m_Level;
 
         explicit ILoggerAdapter(LoggerLevel level = LoggerLevel::Debug) : m_Level(level) {}
+        virtual ~ILoggerAdapter() = default;
 
         bool CanLog(LoggerLevel level) const { return level <= m_Level; }
 

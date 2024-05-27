@@ -32,6 +32,7 @@ namespace NH::Bass
 
         Event() = delete;
         Event(EventType type, DataType data) : Type(type), Data(data) {}
+        virtual ~Event() = default;
     };
 
     using EventSubscriberFn = void (*)(const Event&, void*);

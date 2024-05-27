@@ -32,6 +32,8 @@ namespace NH::Bass
         template<typename T>
         using Result = std::expected<T, Error>;
 
+        virtual ~IChannel() = default;
+
         virtual Result<void> PlayInstant(const AudioFile& audioFile) = 0;
         virtual void StopInstant() = 0;
 

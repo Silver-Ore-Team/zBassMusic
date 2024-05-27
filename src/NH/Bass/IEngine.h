@@ -10,6 +10,8 @@ namespace NH::Bass
 
     struct IEngine
     {
+        virtual ~IEngine() = default;
+
         /**
          * Get a free channel and mark it as busy
          * @return shared_ptr to a free channel (or null if all channels are busy)

@@ -22,8 +22,8 @@ namespace NH::Bass
 
     struct Command
     {
-
         virtual CommandResult Execute(Engine& engine) = 0;
+        virtual ~Command() = default;
     };
 
     class FunctionCommand : public Command

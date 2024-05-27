@@ -1,11 +1,11 @@
 #pragma once
 
+#include <NH/Commons.h>
 #include <Union/String.h>
 #include <Union/Array.h>
 
 namespace NH
 {
-    using String = Union::StringUTF8;
 
     enum class LoggerLevel : size_t
     {

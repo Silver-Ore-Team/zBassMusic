@@ -1,5 +1,7 @@
 #pragma once
 
+#include <NH/Commons.h>
+
 #include <cstdint>
 #include <unordered_map>
 

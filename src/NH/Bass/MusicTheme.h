@@ -1,11 +1,12 @@
 #pragma once
 
-#include "CommonTypes.h"
 #include <NH/Logger.h>
 #include <NH/HashString.h>
 #include <NH/Executor.h>
 #include <NH/ToString.h>
 #include <NH/Bass/MidiFile.h>
+#include <NH/Bass/IEngine.h>
+#include <NH/Bass/IChannel.h>
 
 #include <vector>
 #include <unordered_map>
@@ -56,10 +57,14 @@ namespace NH::Bass
         static Logger* log;
 
         String m_Name;
+        size_t m_SyncHandlersId = 0;
         std::unordered_map<HashString, AudioFile> m_AudioFiles;
         std::unordered_map<HashString, AudioEffects> m_AudioEffects;
         std::unordered_map<HashString, std::shared_ptr<MidiFile>> m_MidiFiles;
+        std::unordered_map<size_t, std::function<void()>> m_SyncHandlers;
+        std::unordered_map<size_t, std::function<void(double)>> m_SyncHandlersWithDouble;
         std::vector<HashString> m_Zones;
+        std::vector<std::shared_ptr<IChannel>> m_AcquiredChannels;
 
     public:
         static MusicTheme None;
@@ -67,67 +72,49 @@ namespace NH::Bass
         explicit MusicTheme(const String& name);
 
         void SetAudioFile(HashString type, const String& filename);
-
         void SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter);
-
         void AddZone(HashString zone);
-
         void AddMidiFile(HashString type, const std::shared_ptr<MidiFile>& midiFile);
-
         void LoadAudioFiles(Executor& executor);
 
+        void PlayInstant(IEngine& engine);
+        void ScheduleAfter(IEngine&, const std::shared_ptr<MusicTheme>& currentTheme);
+        void StopInstant(IEngine& engine);
+
         [[nodiscard]] const String& GetName() const { return m_Name; }
-
         [[nodiscard]] bool HasAudioFile(HashString type) const { return m_AudioFiles.find(type) != m_AudioFiles.end(); }
-
         [[nodiscard]] bool IsAudioFileReady(HashString type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
-
         [[nodiscard]] const AudioFile& GetAudioFile(HashString type) const { return m_AudioFiles.at(type); }
-
         [[nodiscard]] const AudioEffects& GetAudioEffects(HashString type) const;
-
-        [[nodiscard]] const std::shared_ptr<MidiFile>& GetMidiFile(HashString type) const;
-
+        [[nodiscard]] std::shared_ptr<MidiFile> GetMidiFile(HashString type) const;
         [[nodiscard]] const std::vector<HashString>& GetZones() const { return m_Zones; }
-
         [[nodiscard]] bool HasZone(HashString zone) const;
-
-        [[nodiscard]] String ToString() const override
-        {
-            String result = String("MusicTheme{ \n\tName: ") + m_Name + ", \n\tAudioFiles: {\n";
-            int i = 0;
-            for (auto& [type, audioFile]: m_AudioFiles)
-            {
-                result += String("\t\t") + String(type) + ": " + audioFile.ToString().Replace("\n", "\n\tt");
-                if (++i < m_AudioFiles.size())
-                {
-                    result += ",\n";
-                }
-            }
-            i = 0;
-            result += "\n\t},\n\tAudioEffects: { \n";
-            for (auto& [type, audioEffects]: m_AudioEffects)
-            {
-                result += String("\t\t") + String(type) + ": " + audioEffects.ToString().Replace("\n", "\n\t\t");
-                if (++i < m_AudioEffects.size())
-                {
-                    result += ",\n";
-                }
-            }
-            i = 0;
-            result += "\n\t},\n\tZones: { ";
-            for (auto& zone: m_Zones)
-            {
-                result += String(zone);
-                if (++i < m_Zones.size())
-                {
-                    result += ", ";
-                }
-            }
-            result += " }\n }";
-            return result;
-        }
+        [[nodiscard]] String ToString() const override;
 
     private:
+        bool ReadyToPlay(IEngine& engine, HashString audio);
+
+        template<typename Args>
+        const std::function<void(Args)>& CreateSyncHandler(std::unordered_map<size_t, std::function<void(Args)>>& collection, std::function<void(Args)> function)
+        {
+            size_t id = m_SyncHandlersId++;
+            auto handler = [function = std::move(function), &collection, id](Args args) {
+                function(std::forward<Args>(args));
+                collection.erase(id);
+            };
+            collection.emplace(id, std::move(handler));
+            return collection.at(id);
+        }
+
+        const std::function<void()>& CreateSyncHandler(std::unordered_map<size_t, std::function<void()>>& collection, std::function<void()> function)
+        {
+            size_t id = m_SyncHandlersId++;
+            auto handler = [function = std::move(function), &collection, id]() {
+                function();
+                collection.erase(id);
+            };
+            collection.emplace(id, std::move(handler));
+            return collection.at(id);
+        }
     };
 }

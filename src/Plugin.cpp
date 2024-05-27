@@ -1,9 +1,12 @@
 // Disable macro redefinition warning 
 #pragma warning(disable: 4005)
 
+// Headers required for GOTHIC_NAMESPACE files. Don't delete.
 #include <BuildInfo.h>
-#include "NH/Bass/Options.h"
-#include "NH/Bass/Engine.h"
+#include <NH/Bass/Options.h>
+#include <NH/Bass/Engine.h>
+#include <NH/Bass/Command.h>
+#include <NH/Bass/EngineCommands.h>
 #include <Union/Hook.h>
 #include <ZenGin/zGothicAPI.h>
 

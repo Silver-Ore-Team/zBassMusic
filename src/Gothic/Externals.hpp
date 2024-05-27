@@ -110,7 +110,8 @@ namespace GOTHIC_NAMESPACE
                 timePoints.push_back(point);
             }
 
-            NH::Bass::Engine::GetInstance()->GetTransitionScheduler().AddRuleOnBeat(name.ToChar(), interval, timePoints);
+            // @todo: think about Daedalus API
+            //NH::Bass::Engine::GetInstance()->GetTransitionScheduler().AddRuleOnBeat(name.ToChar(), interval, timePoints);
         }
         catch (const std::invalid_argument& e)
         {

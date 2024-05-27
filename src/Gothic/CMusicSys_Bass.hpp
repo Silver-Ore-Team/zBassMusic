@@ -187,10 +187,12 @@ namespace GOTHIC_NAMESPACE
                 return;
             }
 
+            // Called from an external
             m_DirectMusic->Stop();
             m_ActiveTheme = theme;
-            log->Warning("This path in CMusicSys_Bass::PlayTheme() shouldn't be possible");
-            PlayThemeByScript(theme->name, 0, nullptr);
+            zSTRING identifier = theme->name;
+            identifier.Upper();
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ScheduleThemeChangeCommand>(identifier.ToChar()));
         }
 
         zCMusicTheme* GetActiveTheme() override

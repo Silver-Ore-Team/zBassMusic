@@ -2,8 +2,8 @@
 
 #include "NH/Bass/CommonTypes.h"
 #include "NH/Logger.h"
-#include "MusicTheme.h"
 #include <NH/HashString.h>
+
 #include <utility>
 #include <vector>
 #include <deque>
@@ -11,6 +11,7 @@
 
 namespace NH::Bass
 {
+    class MusicTheme;
 
     enum class EventType
     {
@@ -22,16 +23,16 @@ namespace NH::Bass
 
     struct Event
     {
-        struct MusicEnd { std::shared_ptr<MusicTheme> Theme; HashString AudioId; };
-        struct MusicTransition { std::shared_ptr<MusicTheme> Theme; HashString AudioId; float TimeLeft; };
-        struct MusicChange { std::shared_ptr<MusicTheme> Theme; HashString AudioId; };
+        struct MusicEnd { MusicTheme const* Theme = nullptr; HashString AudioId; };
+        struct MusicTransition { MusicTheme const* Theme = nullptr; HashString AudioId; float TimeLeft = 0; };
+        struct MusicChange { MusicTheme const* Theme = nullptr; HashString AudioId; };
         using DataType = std::variant<MusicEnd, MusicTransition, MusicChange>;
 
         EventType Type = EventType::UNKNOWN;
         DataType Data;
 
         Event() = delete;
-        Event(EventType type, DataType data) : Type(type), Data(std::move(data)) {}
+        Event(EventType type, DataType data) : Type(type), Data(data) {}
     };
 
     using EventSubscriberFn = void (*)(const Event&, void*);
@@ -77,19 +78,19 @@ namespace NH::Bass
     struct MusicEndEvent : public Event
     {
         MusicEnd Data;
-        MusicEndEvent(std::shared_ptr<MusicTheme> theme, HashString audioId) : Event(EventType::MUSIC_END, MusicEnd{std::move(theme), audioId}) {}
+        MusicEndEvent(MusicTheme* theme, HashString audioId) : Event(EventType::MUSIC_END, MusicEnd{theme, audioId}) {}
     };
 
     struct MusicTransitionEvent : public Event
     {
         MusicTransition Data;
-        MusicTransitionEvent(std::shared_ptr<MusicTheme> theme, HashString audioId, float timeLeft)
-            : Event(EventType::MUSIC_TRANSITION, MusicTransition{std::move(theme), audioId, timeLeft}) {}
+        MusicTransitionEvent(MusicTheme* theme, HashString audioId, float timeLeft)
+            : Event(EventType::MUSIC_TRANSITION, MusicTransition{theme, audioId, timeLeft}) {}
     };
 
     struct MusicChangeEvent : public Event
     {
         MusicChange Data;
-        MusicChangeEvent(std::shared_ptr<MusicTheme> theme, HashString audioId) : Event(EventType::MUSIC_CHANGE, MusicChange{std::move(theme), audioId}) {}
+        MusicChangeEvent(MusicTheme* theme, HashString audioId) : Event(EventType::MUSIC_CHANGE, MusicChange{theme, audioId}) {}
     };
 }

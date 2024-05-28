@@ -41,7 +41,7 @@ target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/ver
 add_compile_options(plugin PRIVATE /W4 /WX)
 target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G1A __G2 __G2A)
 target_include_directories(plugin PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")
-target_link_libraries(plugin PRIVATE union-api gothic-api bass)
+target_link_libraries(plugin PRIVATE union-api gothic-api bass_all)
 
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
@@ -72,6 +72,9 @@ if (DEFINED ENV{COPY_DLL_TARGET})
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/zBassMusic.dll" "$ENV{COPY_DLL_TARGET}/Autorun/zBassMusic.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/UnionAPI.dll" "$ENV{COPY_DLL_TARGET}/Autorun/UnionAPI.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bass.dll" "$ENV{COPY_DLL_TARGET}/bass.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bassmidi.dll" "$ENV{COPY_DLL_TARGET}/bassmidi.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bassopus.dll" "$ENV{COPY_DLL_TARGET}/bassopus.dll"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bassflac.dll" "$ENV{COPY_DLL_TARGET}/bassflac.dll"
             DEPENDS plugin
             COMMENT "Copy plugin to target directory: $ENV{COPY_DLL_TARGET}")
 endif ()

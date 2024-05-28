@@ -17,6 +17,7 @@ namespace NH
     {
         virtual void AddTask(TaskFN&& task) = 0;
         virtual void AddTask(const TaskFN& task) = 0;
+        virtual ~Executor() = default;
     };
 
     class InstantExecutor : public Executor

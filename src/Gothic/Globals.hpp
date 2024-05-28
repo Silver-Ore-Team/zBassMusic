@@ -5,6 +5,8 @@ namespace GOTHIC_NAMESPACE
     struct GlobalsDef
     {
         zSTRING CMusicThemeClass = "C_MUSICTHEME";
+        zSTRING BassMusicThemeClassName = "C_BassMusic_Theme";
+        zSTRING BassMusicThemeAudioClassName = "C_BassMusic_ThemeAudio";
         zSTRING BassMusic_ActiveThemeFilename = "";
         zSTRING BassMusic_ActiveThemeID = "";
         zSTRING BassMusic_EventThemeFilename = "";

@@ -2,12 +2,34 @@
 
 namespace NH::Bass
 {
-    void MusicManager::AddTheme(HashString id, std::shared_ptr<MusicTheme> theme)
+    void MusicManager::AddTheme(HashString id, const std::shared_ptr<MusicTheme>& theme)
     {
-        m_Themes.emplace(id, theme);
-        m_Themes.at(id)->LoadAudioFiles(Executors.IO);
+        m_Themes[id] = theme;
+        m_Themes[id]->LoadAudioFiles(Executors.IO);
         log->Info("New theme {0}", id);
-        log->PrintRaw(LoggerLevel::Debug, m_Themes.at(id)->ToString());
+        log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString());
+    }
+
+    void MusicManager::AddJingle(HashString id, const String& jingleFilename, double delay, HashString filter)
+    {
+        if (m_Themes.contains(id))
+        {
+            m_Themes[id]->AddJingle(jingleFilename, delay, filter);
+        }
+        else
+        {
+            log->Error("Theme {0} does not exist", String(id));
+        }
+    }
+
+    void MusicManager::RefreshTheme(HashString id)
+    {
+        if (m_Themes.contains(id))
+        {
+            m_Themes[id]->LoadAudioFiles(Executors.IO);
+            log->Info("Refresh theme {0}", id);
+            log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString());
+        }
     }
 
     std::vector<std::pair<HashString, std::shared_ptr<MusicTheme>>> MusicManager::GetThemesForZone(HashString zone)
@@ -29,6 +51,6 @@ namespace NH::Bass
         {
             return {};
         }
-        return m_Themes.at(id);
+        return m_Themes[id];
     }
 }

@@ -1,63 +1,51 @@
 #pragma once
 
-#include "NH/Bass/CommonTypes.h"
 #include "EventManager.h"
 #include "NH/Logger.h"
 #include <NH/Bass/MusicTheme.h>
+#include <NH/Bass/IChannel.h>
 
 #include <functional>
 
-
 namespace NH::Bass
 {
-    enum class ChannelStatus
-    {
-        AVAILABLE,
-        PLAYING,
-        FADING_OUT
-    };
+    enum class ChannelStatus { AVAILABLE, ACQUIRED };
 
-    class Channel
+    class Channel : public IChannel
     {
         NH::Logger* log;
-        size_t m_Index;
-        EventManager& m_EventManager;
         ChannelStatus m_Status = ChannelStatus::AVAILABLE;
         HSTREAM m_Stream = 0;
-        std::shared_ptr<MusicTheme> m_Theme = std::shared_ptr<MusicTheme>();
-        HashString m_AudioId{""};
 
     public:
-        explicit Channel(size_t index, EventManager& em) : m_Index(index), m_EventManager(em)
+        explicit Channel(size_t index)
         {
             log = NH::CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
         };
 
-        void Play(const std::shared_ptr<MusicTheme>&, HashString id = AudioFile::DEFAULT);
+        Result<void> PlayInstant(const AudioFile& audioFile) override;
+        void StopInstant() override;
+        void SetVolume(float volume) override;
+        void SlideVolume(float targetVolume, uint32_t time) override;
+        void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) override;
+        void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) override;
 
-        void Stop();
+        void OnPosition(double position, const std::function<void()>& callback) override;
+        void OnAudioEnds(const std::function<void()>& onFinish) override;
+        void BeforeAudioEnds(double aheadSeconds, const std::function<void(double)>& onFinish) override;
 
-        bool IsAvailable()
-        {
-            return m_Status == ChannelStatus::AVAILABLE;
-        };
+        bool IsPlaying() const override;
+        [[nodiscard]] double Position() const override;
+        [[nodiscard]] double Length() const override;
 
-        [[nodiscard]] double CurrentPosition() const;
-
-        [[nodiscard]] double CurrentLength() const;
-
-        [[nodiscard]] std::shared_ptr<MusicTheme> CurrentTheme() const;
-
-        [[nodiscard]] const AudioFile& CurrentAudioFile() const;
-
-        [[nodiscard]] const AudioEffects& CurrentAudioEffects() const;
-
-        static void CALLBACK OnTransitionSync(HSYNC, DWORD channel, DWORD data, void* userData);
-
-        static void CALLBACK OnEndSync(HSYNC, DWORD channel, DWORD data, void* userData);
-
-        static void CALLBACK OnVolumeSlideSync(HSYNC, DWORD channel, DWORD data, void* userData);
+        void Acquire() override;
+        void Release() override;
+        bool IsAvailable() override { return m_Status == ChannelStatus::AVAILABLE; };
 
     private:
+        static void CALLBACK OnPositionSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
+        static void CALLBACK OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
+        static void CALLBACK OnAudioEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
+        static void CALLBACK BeforeAudioEndsSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
     };
 }

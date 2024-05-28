@@ -12,10 +12,11 @@ namespace NH::Bass
         std::unordered_map<HashString, std::shared_ptr<MusicTheme>> m_Themes;
 
     public:
-        void AddTheme(HashString id, std::shared_ptr<MusicTheme> theme);
+        void AddTheme(HashString id, const std::shared_ptr<MusicTheme>& theme);
+        void AddJingle(HashString id, const String& jingleFilename, double delay, HashString filter = ""_hs);
+        void RefreshTheme(HashString id);
 
         [[nodiscard]] std::shared_ptr<MusicTheme> GetTheme(HashString id);
-
         std::vector<std::pair<HashString, std::shared_ptr<MusicTheme>>> GetThemesForZone(HashString zone);
     };
 }

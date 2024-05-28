@@ -76,52 +76,81 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    // func void BassMusic_TransitionRule_OnBeat(var string name, var string interval, var string timePoints)
-    int BassMusic_TransitionRule_OnBeat()
+    // func void BassMusic_AddMidiFile(var string theme, var string filter, var midiFilename)
+    int BassMusic_AddMidiFile()
     {
-        NH::Logger* log = NH::CreateLogger("zBassMusic::BassMusic_TransitionRule_OnBeat");
+        static NH::Logger* log = NH::CreateLogger("zBassMusic::AddMidiFile");
 
-        zSTRING name;
-        zSTRING inInterval;
-        zSTRING inTimePoints;
+        zSTRING theme, filter, midiFilename;
+        parser->GetParameter(midiFilename);
+        parser->GetParameter(filter);
+        parser->GetParameter(theme);
 
-        parser->GetParameter(inTimePoints);
-        parser->GetParameter(inInterval);
-        parser->GetParameter(name);
-
-        log->Trace("name = {0}", name.ToChar());
-        log->Trace("interval = {0}", inInterval.ToChar());
-        log->Trace("timePoints = {0}", inTimePoints.ToChar());
-
-        try
+        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme));
+        if (!target)
         {
-            // Parse interval
-            double interval = std::stod(inInterval.ToChar());
-            log->Trace("parsed interval = {0}", interval);
+            log->Error("Theme {0} not found", theme.ToChar());
+            return 0;
+        }
 
-            // Parse time points
-            std::vector<double> timePoints;
-            std::stringstream timePointsStream(inTimePoints.ToChar());
-            std::string timePoint;
-            while (std::getline(timePointsStream, timePoint, ';'))
-            {
-                double point = std::stod(timePoint);
-                log->Trace("parsed point = {0}", point);
-                timePoints.push_back(point);
-            }
+        target->AddMidiFile(NH::String(filter), std::make_shared<NH::Bass::MidiFile>(target->GetName(), NH::String(midiFilename.ToChar())));
+        return 0;
+    }
 
-            NH::Bass::Engine::GetInstance()->GetTransitionScheduler().AddRuleOnBeat(name.ToChar(), interval, timePoints);
-        }
-        catch (const std::invalid_argument& e)
+    // func void BassMusic_AddTransitionTimePoint(var string theme, var string filter, var float start, var float duration, var int effect, var float nextStart, var float nextDuration, var int nextEffect)
+    int BassMusic_AddTransitionTimePoint()
+    {
+        static NH::Logger* log = NH::CreateLogger("zBassMusic::AddTransitionTimePoint");
+
+        zSTRING theme, filter;
+        float start, duration, nextStart, nextDuration;
+        int effect, nextEffect;
+        parser->GetParameter(nextEffect);
+        parser->GetParameter(nextDuration);
+        parser->GetParameter(nextStart);
+        parser->GetParameter(effect);
+        parser->GetParameter(duration);
+        parser->GetParameter(start);
+        parser->GetParameter(filter);
+        parser->GetParameter(theme);
+
+        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme.ToChar()));
+        if (!target)
         {
-            log->Fatal("invalid_argument: {0}\n  at {1}:{2}", e.what(), __FILE__, __LINE__);
+            log->Error("Theme {0} not found", theme.ToChar());
+            return 0;
         }
-        catch (const std::out_of_range& e)
-        {
-            log->Fatal("out_of_range: {0}\n  at {1}:{2}", e.what(), __FILE__, __LINE__);
-        }
+
+        NH::Bass::Transition::TimePoint tp { start, duration, (NH::Bass::TransitionEffect)effect, nextStart, nextDuration, (NH::Bass::TransitionEffect)nextEffect };
+        target->GetTransitionInfo().AddTimePoint(tp, NH::String(filter.ToChar()));
 
         return 0;
+    }
+
+    // func void BassMusic_AddJingle(var string name, var string filter, var string jingle, var float delay)
+    int BassMusic_AddJingle()
+    {
+        static NH::Logger* log = NH::CreateLogger("zBassMusic::AddJingle");
+
+        zSTRING name, filter, jingle;
+        float delay;
+        parser->GetParameter(delay);
+        parser->GetParameter(jingle);
+        parser->GetParameter(filter);
+        parser->GetParameter(name);
+
+        NH::Bass::Engine::GetInstance()->GetMusicManager().AddJingle(name.ToChar(), jingle.ToChar(), delay, filter.ToChar());
+
+        return 0;
+    }
+
+    void DefineExternalsMusic()
+    {
+        parserMusic->AddClassOffset(Globals->BassMusicThemeClassName, sizeof(BassMusicTheme));
+        parserMusic->AddClassOffset(Globals->BassMusicThemeAudioClassName, sizeof(BassMusicThemeAudio));
+        parserMusic->DefineExternal("BassMusic_AddMidiFile", BassMusic_AddMidiFile, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
+        parserMusic->DefineExternal("BassMusic_AddTransitionTimePoint", BassMusic_AddTransitionTimePoint, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_FLOAT, zPAR_TYPE_FLOAT, zPAR_TYPE_INT, zPAR_TYPE_FLOAT, zPAR_TYPE_FLOAT, zPAR_TYPE_INT, zPAR_TYPE_VOID);
+        parserMusic->DefineExternal("BassMusic_AddJingle", BassMusic_AddJingle, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
     }
 
     void DefineExternals()
@@ -140,11 +169,15 @@ namespace GOTHIC_NAMESPACE
         parser->DefineExternal("BassMusic_Opt_ForceDisableReverb", BassMusic_Opt_ForceDisableReverb, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
         parser->DefineExternal("BassMusic_Opt_ForceFadeTransition", BassMusic_Opt_ForceFadeTransition, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
 
-        parser->DefineExternal("BassMusic_TransitionRule_OnBeat", BassMusic_TransitionRule_OnBeat, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
+        parser->DefineExternal("BassMusic_AddMidiFile", BassMusic_AddMidiFile, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
+        parser->DefineExternal("BassMusic_AddTransitionTimePoint", BassMusic_AddTransitionTimePoint, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_FLOAT, zPAR_TYPE_FLOAT, zPAR_TYPE_INT, zPAR_TYPE_FLOAT, zPAR_TYPE_FLOAT, zPAR_TYPE_INT, zPAR_TYPE_VOID);
+        parser->DefineExternal("BassMusic_AddJingle", BassMusic_AddJingle, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
 
         if (NH::Bass::Options->CreateMainParserCMusicTheme)
         {
             zCMusicTheme theme;
+            parser->AddClassOffset(Globals->BassMusicThemeClassName, sizeof(BassMusicTheme));
+            parser->AddClassOffset(Globals->BassMusicThemeAudioClassName, sizeof(BassMusicThemeAudio));
             parser->AddClassOffset(Globals->CMusicThemeClass, reinterpret_cast<int>(&theme.dScriptEnd) - reinterpret_cast<int>(&theme.fileName));
         }
     }

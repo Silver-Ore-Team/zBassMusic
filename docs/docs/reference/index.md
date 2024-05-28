@@ -3,11 +3,15 @@
 ## Classes
 
 * [C_MUSICTHEME](classes/C_MUSICTHEME.md)
+* [C_BassMusic_Theme](classes/C_BassMusic_Theme.md)
+* [C_BassMusic_ThemeAudio](classes/C_BassMusic_ThemeAudio.md)
 
 ## Globals
 
 * [BassMusic_ActiveThemeFilename](globals/index.md#bassmusic_activethemefilename)
 * [BassMusic_ActiveThemeID](globals/index.md#bassmusic_activethemeid)
+* [BassMusic_EventThemeFilename](globals/index.md#bassmusic_eventthemefilename)
+* [BassMusic_EventThemeID](globals/index.md#bassmusic_eventthemeid)
 
 ## Externals
 
@@ -19,7 +23,9 @@
 * [BassMusic_Opt_TransitionTime](externals/index.md#bassmusic_opt_transitiontime)
 * [BassMusic_Opt_ForceDisableReverb](externals/index.md#bassmusic_opt_forcedisablereverb)
 * [BassMusic_Opt_ForceFadeTransition](externals/index.md#bassmusic_opt_forcefadetransition)
-* [BassMusic_TransitionRule_OnBeat](externals/index.md#bassmusic_transitionrule_onbeat)
+* [BassMusic_AddMidiFile](externals/index.md#bassmusic_addmidifile)
+* [BassMusic_AddTransitionTimePoint](externals/index.md#bassmusic_addtransitiontimepoint)
+* [BassMusic_AddJingle](externals/index.md#bassmusic_addjingle)
 
 ## Options (.ini)
 

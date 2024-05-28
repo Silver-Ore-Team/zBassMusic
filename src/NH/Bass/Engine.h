@@ -1,13 +1,13 @@
 #pragma once
 
-#include "CommonTypes.h"
+#include <bass.h>
 #include "EventManager.h"
 #include "Channel.h"
-#include "TransitionScheduler.h"
 #include "NH/Logger.h"
 #include "NH/HashString.h"
-#include "NH/Bass/MusicManager.h"
-#include "NH/Bass/Command.h"
+#include <NH/Bass/IEngine.h>
+#include <NH/Bass/MusicManager.h>
+#include <NH/Bass/Command.h>
 #include <vector>
 #include <mutex>
 #include <chrono>
@@ -16,13 +16,11 @@
 namespace NH::Bass
 {
     class ChangeZoneCommand;
-    class PlayThemeCommand;
     class ScheduleThemeChangeCommand;
 
-    class Engine
+    class Engine : public IEngine
     {
         friend class ChangeZoneCommand;
-        friend class PlayThemeCommand;
         friend class ScheduleThemeChangeCommand;
 
         static NH::Logger* log;
@@ -30,66 +28,30 @@ namespace NH::Bass
         bool m_Initialized = false;
         float m_MasterVolume = 1.0f;
         std::vector<std::shared_ptr<Channel>> m_Channels;
-        std::shared_ptr<Channel> m_ActiveChannel = nullptr;
+        std::shared_ptr<MusicTheme> m_ActiveTheme = nullptr;
         CommandQueue m_CommandQueue{};
         EventManager m_EventManager{};
         MusicManager m_MusicManager{};
-        TransitionScheduler m_TransitionScheduler{};
 
     public:
         static Engine* GetInstance();
 
         void Update();
-
+        void StopMusic();
         void SetVolume(float volume);
-
         [[nodiscard]] float GetVolume() const;
 
-        EventManager& GetEM();
+        std::shared_ptr<IChannel> AcquireFreeChannel() override;
+        void ReleaseChannel(const std::shared_ptr<IChannel>& channel) override;
 
-        TransitionScheduler& GetTransitionScheduler();
-
-        MusicManager& GetMusicManager();
-
-        CommandQueue& GetCommandQueue();
-
-        void StopMusic();
+        EventManager& GetEM() override;
+        MusicManager& GetMusicManager() override;
+        CommandQueue& GetCommandQueue() override;
 
     private:
         Engine();
 
-        std::shared_ptr<Channel> FindAvailableChannel();
-
     public:
         static Union::StringUTF8 ErrorCodeToString(int code);
-    };
-
-    class ChangeZoneCommand : public Command
-    {
-        static Logger* log;
-        HashString m_Zone;
-    public:
-        explicit ChangeZoneCommand(HashString zone) : m_Zone(zone) {};
-        CommandResult Execute(Engine& engine) override;
-    };
-
-    class PlayThemeCommand : public Command
-    {
-        static Logger* log;
-        HashString m_ThemeId;
-        HashString m_AudioId;
-        size_t m_RetryCount = 0;
-    public:
-        explicit PlayThemeCommand(HashString themeId, HashString audioId) : m_ThemeId(themeId), m_AudioId(audioId) {};
-        CommandResult Execute(Engine& engine) override;
-    };
-
-    class ScheduleThemeChangeCommand : public Command
-    {
-        static Logger* log;
-        HashString m_ThemeId;
-    public:
-        explicit ScheduleThemeChangeCommand(HashString themeId) : m_ThemeId(themeId) {};
-        CommandResult Execute(Engine& engine) override;
     };
 }

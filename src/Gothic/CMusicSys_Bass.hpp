@@ -149,8 +149,11 @@ namespace GOTHIC_NAMESPACE
                 return;
             }
 
+            static zSTRING nowPlaying = "";
+
             zSTRING identifier = id;
-            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
+            identifier.Upper();
+            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name || nowPlaying == identifier)
             {
                 return;
             }
@@ -158,13 +161,15 @@ namespace GOTHIC_NAMESPACE
             zCMusicTheme* theme = LoadThemeByScript(id);
             if (theme && IsDirectMusicFormat(theme->fileName))
             {
+                nowPlaying = "";
                 m_ActiveTheme = theme;
                 m_BassEngine->StopMusic();
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
 
-            identifier.Upper();
-            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
+            nowPlaying = identifier;
+            m_ActiveTheme = nullptr;
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(NH::String(identifier.ToChar())));
 
             if (done)
             {
@@ -187,10 +192,12 @@ namespace GOTHIC_NAMESPACE
                 return;
             }
 
+            // Called from an external
             m_DirectMusic->Stop();
             m_ActiveTheme = theme;
-            log->Warning("This path in CMusicSys_Bass::PlayTheme() shouldn't be possible");
-            PlayThemeByScript(theme->name, 0, nullptr);
+            zSTRING identifier = theme->name;
+            identifier.Upper();
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ScheduleThemeChangeCommand>(identifier.ToChar()));
         }
 
         zCMusicTheme* GetActiveTheme() override
@@ -217,7 +224,7 @@ namespace GOTHIC_NAMESPACE
             m_DirectMusic->Stop();
         }
 
-        float GetVolume() const override
+        [[nodiscard]] float GetVolume() const override
         {
             return m_BassEngine->GetVolume();
         }

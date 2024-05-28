@@ -11,11 +11,17 @@ nav:
           - user-guide/getting-started/plugin-loading.md
           - user-guide/getting-started/music-definition.md
           - user-guide/getting-started/cross-fading.md
-      - Transition Scheduler:
-          - user-guide/transition-scheduler/index.md
-          - user-guide/transition-scheduler/instant.md
-          - user-guide/transition-scheduler/on-beat.md
-          - user-guide/transition-scheduler/jingle.md
+      - Concepts:
+          - user-guide/concepts/index.md
+      - Themes:
+          - user-guide/theme-definition/index.md
+          - user-guide/theme-definition/cmusictheme.md
+          - user-guide/theme-definition/basstheme.md
+      - Transitions:
+          - user-guide/transitions/index.md
+          - user-guide/transitions/timing.md
+          - user-guide/transitions/jingle.md
+          - user-guide/transitions/midi.md
       - Scripting (Daedalus):
           - user-guide/scripting/index.md
           - user-guide/scripting/custom-scheduler.md
@@ -25,6 +31,8 @@ nav:
       - reference/index.md
       - Classes:
           - reference/classes/C_MUSICTHEME.md
+          - reference/classes/C_BassMusic_Theme.md
+          - reference/classes/C_BassMusic_ThemeAudio.md
       - Globals:
           - reference/globals/index.md
       - Externals:

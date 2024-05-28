@@ -26,7 +26,7 @@ namespace NH::Bass
         TransitionEffect Effect = TransitionEffect::NONE;
         double EffectDuration = 0;
         std::vector<TimePoint> TimePoints;
-        std::shared_ptr<MusicTheme> Jingle;
+        std::shared_ptr<AudioFile> Jingle;
         double JingleDelay = 0;
 
         [[nodiscard]] std::optional<TimePoint> NextAvailableTimePoint(double position) const;

@@ -62,7 +62,7 @@ namespace NH::Bass
         transition->TimePoints.push_back(timePoint);
     }
 
-    void TransitionInfo::AddJingle(std::shared_ptr<MusicTheme> jingle, double delay, HashString filter)
+    void TransitionInfo::AddJingle(std::shared_ptr<AudioFile> jingle, double delay, HashString filter)
     {
         Transition* transition = filter == ""_hs ? &m_DefaultTransition : GetFilteredTransition(filter);
         transition->Jingle = std::move(jingle);

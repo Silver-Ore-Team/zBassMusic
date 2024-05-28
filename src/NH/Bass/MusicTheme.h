@@ -77,6 +77,7 @@ namespace NH::Bass
         void SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter);
         void AddZone(HashString zone);
         void AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile);
+        void AddJingle(const String& filename, double delay, HashString filter);
         void LoadAudioFiles(Executor& executor);
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);

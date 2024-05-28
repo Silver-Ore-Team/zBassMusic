@@ -24,7 +24,7 @@ namespace NH::Bass
         void AddTransitionEffect(TransitionEffect effect, double duration = 0, HashString filter = ""_hs);
         void AddMidiFile(MidiFile& file, HashString filter = ""_hs);
         void AddTimePoint(Transition::TimePoint timePoint, HashString filter = ""_hs);
-        void AddJingle(std::shared_ptr<MusicTheme> jingle, double delay, HashString filter = ""_hs);
+        void AddJingle(std::shared_ptr<AudioFile> jingle, double delay, HashString filter = ""_hs);
 
         [[nodiscard]] const Transition& GetTransition(HashString targetTheme) const;
         [[nodiscard]] const Transition& GetDefaultTransition() const;

@@ -10,6 +10,18 @@ namespace NH::Bass
         log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString());
     }
 
+    void MusicManager::AddJingle(HashString id, const String& jingleFilename, double delay, HashString filter)
+    {
+        if (m_Themes.contains(id))
+        {
+            m_Themes[id]->AddJingle(jingleFilename, delay, filter);
+        }
+        else
+        {
+            log->Error("Theme {0} does not exist", String(id));
+        }
+    }
+
     void MusicManager::RefreshTheme(HashString id)
     {
         if (m_Themes.contains(id))

@@ -114,7 +114,7 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(theme);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme));
+        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme.ToChar()));
         if (!target)
         {
             log->Error("Theme {0} not found", theme.ToChar());
@@ -122,7 +122,7 @@ namespace GOTHIC_NAMESPACE
         }
 
         NH::Bass::Transition::TimePoint tp { start, duration, (NH::Bass::TransitionEffect)effect, nextStart, nextDuration, (NH::Bass::TransitionEffect)nextEffect };
-        target->GetTransitionInfo().AddTimePoint(tp, NH::String(filter));
+        target->GetTransitionInfo().AddTimePoint(tp, NH::String(filter.ToChar()));
 
         return 0;
     }
@@ -139,16 +139,8 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(name);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(name));
-        if (!target)
-        {
-            log->Error("Theme {0} not found", name.ToChar());
-            return 0;
-        }
+        NH::Bass::Engine::GetInstance()->GetMusicManager().AddJingle(name.ToChar(), jingle.ToChar(), delay, filter.ToChar());
 
-        auto jingleTheme = std::make_shared<NH::Bass::MusicTheme>(jingle.ToChar());
-        NH::Bass::Engine::GetInstance()->GetMusicManager().AddTheme(jingleTheme->GetName(), jingleTheme);
-        target->GetTransitionInfo().AddJingle(jingleTheme, delay, NH::String(filter));
         return 0;
     }
 

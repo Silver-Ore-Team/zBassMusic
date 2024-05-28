@@ -47,6 +47,16 @@ namespace NH::Bass
         });
     }
 
+    void MusicTheme::AddJingle(const String& filename, double delay, HashString filter)
+    {
+        HashString key = String("Jingle_") + String(filter);
+        SetAudioFile(key, filename);
+        LoadAudioFiles(Executors.IO);
+        AudioFile& jingle = m_AudioFiles.at(key);
+        m_TransitionInfo.AddJingle(std::shared_ptr<AudioFile>(&jingle), delay, filter);
+        log->Info("New jingle created {0}: {1}", String(filter), filename);
+    }
+
     void MusicTheme::LoadAudioFiles(Executor& executor)
     {
         for (auto& [type, audioFile]: m_AudioFiles)
@@ -91,15 +101,19 @@ namespace NH::Bass
         log->Debug("Transition {0} to {1}", GetName(), nextTheme.GetName());
         log->PrintRaw(LoggerLevel::Trace, transition.ToString());
 
-        const std::function<void()>& playJingle = [&engine, &transition, this]() {
+        const std::function<void()>& playJingle = CreateSyncHandler([&engine, &transition, this]() {
             if (transition.Jingle)
             {
                 auto channel = engine.AcquireFreeChannel();
-                auto result = channel->PlayInstant(transition.Jingle->GetAudioFile(AudioFile::DEFAULT));
+                auto result = channel->PlayInstant(*transition.Jingle);
                 if (result) { channel->OnAudioEnds(CreateSyncHandler([channel]() { channel->Release(); })); }
-                else { channel->Release(); }
+                else
+                {
+                    log->Error("Could not play jingle: {0}", result.error().what());
+                    channel->Release();
+                }
             }
-        };
+        });
 
         if (timePoint && channel->IsPlaying())
         {
@@ -107,7 +121,12 @@ namespace NH::Bass
             channel->OnPosition(timePoint->Start, CreateSyncHandler([&engine, &transition, this]() {
                 Stop(engine, transition);
             }));
-            channel->OnPosition(timePoint->Start + transition.JingleDelay, playJingle);
+            engine.GetCommandQueue().AddCommand(std::make_shared<OnTimeCommand>(
+                    std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((long long)((timePoint->Start + transition.JingleDelay) * 1000)),
+                    std::make_shared<FunctionCommand>([&playJingle](Engine& engine) -> CommandResult {
+                        playJingle();
+                        return CommandResult::DONE;
+                    })));
             channel->OnPosition(timePoint->NextStart, CreateSyncHandler([&engine, &nextTheme, &transition, timePoint]() {
                 nextTheme.Play(engine, transition, timePoint);
             }));
@@ -115,7 +134,12 @@ namespace NH::Bass
         else
         {
             Stop(engine, transition);
-            playJingle();
+            engine.GetCommandQueue().AddCommand(std::make_shared<OnTimeCommand>(
+                    std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((long long)(transition.JingleDelay * 1000)),
+                    std::make_shared<FunctionCommand>([&playJingle](Engine& engine) -> CommandResult {
+                        playJingle();
+                        return CommandResult::DONE;
+                    })));
             nextTheme.Play(engine, transition);
         }
     }

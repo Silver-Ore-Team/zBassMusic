@@ -1,7 +1,7 @@
 # Scripting (Daedalus)
 
 The plugin defines several external functions that let us interact with the Music Engine from Daedalus scripts.
-The full list of available functions can be found in the [Reference](../reference/index.md) page, and here we
+The full list of available functions can be found in the [Reference](../../reference/index.md) page, and here we
 will cover only the "Full Script Control" mode.
 
 ## Full Script Control

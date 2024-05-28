@@ -9,7 +9,7 @@ namespace NH::Bass
 {
     class MusicTheme;
 
-    enum class TransitionEffect { NONE, CROSSFADE };
+    enum class TransitionEffect { NONE = 0, CROSSFADE = 1 };
     struct Transition : public HasToString
     {
         static Transition EMPTY;

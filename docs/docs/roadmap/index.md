@@ -14,7 +14,6 @@ hide:
 
 ## Done
 
-### Core functions
 ??? success "Music Engine (v0.1.0)"
     Music engine capable of replacing the original DM system in the scope of playing audio and switching songs based on game events.
 
@@ -25,13 +24,8 @@ hide:
     Every music theme can opt-in for simple fade-in and fade-out transitions to smoothly crossfade changing themes. The crossfade time is 
     set globally and the transition starts instantly after receiving an event from the game.
 
-
-## In Progress 
-
-###  Transition Scheduler
-
-??? info "Transition Scheduler (v0.2.x)"
-    Scheduler for executing advanced transitions between songs based on defined rules. The system should be flexible and offer different 
+??? success "Transition Scheduler (v0.3.0)"
+    Scheduler for executing advanced transitions between songs based on defined rules. The system should be flexible and offer different
     transition effects behind an easy-to-use interface. The artist should be able to define rules with high precision (soft goal: <10ms latency).
 
     ??? success "Instant Transition (Done)"
@@ -41,11 +35,11 @@ hide:
         Transition accepts a list of time points when the transition can happen and schedules it for the closest point. This way the song may 
         switch exactly in a moment when the beat ends to match the rhythm.
 
-    ??? warning "Jingle Transition (To Do)"
+    ??? success "Jingle Transition (Done)"
         Transition plays an additional short audio during the transition as a one-time jingle. For example, battle music transitioning into 
         normal can play some theme to emphasize the end of a fight.
 
-??? info "MIDI bridge for Transition Scheduler (v0.2.x)"
+??? success "MIDI bridge for Transition Scheduler (v0.3.0)"
     The MIDI format is the best option for defining rules for the Transition Scheduler. The composer can just
     put all the information about the transitions as MIDI events on some muted track in DAW and export it to the plugin.  
     The composer uses a tool he knows, and we can extract precise information from the MIDI file perfectly synchronized
@@ -54,10 +48,18 @@ hide:
     The bridge defines a spec how to interpret MIDI events and how they map to the internal structures of the Transition Scheduler.
     Then the bridge can load MIDI files and provide the rules to the scheduler.
 
+## In Progress
+
+??? info "Additional Transitions (v0.4.0)"
+    Additional transition options based on ideas from the composer. 
+
 ## Future Plans
 
 ??? question "New features?"
     We still may plan to implement some new features if they can provide value.
+
+??? info "Adaptive Audio"
+    Add additional options for setting up adaptive music.
 
 ??? danger "Support late injection"
     Right now the plugin hooks early into Gothic initialization to set itself up and replace the `zmusic` pointer with a custom implementation.

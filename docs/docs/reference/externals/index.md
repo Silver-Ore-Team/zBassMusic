@@ -109,22 +109,67 @@ func void BassMusic_Opt_ForceFadeTransition(var int enabled) {}
 * `#!dae var int enabled`<br>
   If true, the fade transition is globally enabled
 
-## <a href="#bassmusic_opt_transitionrule_onbeat">BassMusic_TransitionRule_OnBeat</a>
+## <a href="#bassmusic_addmidifile">BassMusic_AddMidiFile</a>
 
-Add a new OnBeat rule to the Transition Scheduler.
+Add a [MIDI File](../../user-guide/transitions/midi.md) to a theme.
 
 ```dae
-func void BassMusic_TransitionRule_OnBeat(var string name, var string interval, var string timeCodes) {}
+func void BassMusic_AddMidiFile(var string theme, var string filter, var string midiFilename) {}
 ```
 
 **Parameters**
 
-* `#!dae var string name`<br>
-  Input music theme name
-* `#!dae var string interval`<br>
-  String formatted as double, the interval of a beat in seconds. Set "0" to disable.
-* `#!dae var string timeCodes`<br>
-  String formatted as a list of semicolon-separated doubles, the time codes in seconds when the transition can happen,
-  eg. `"0.0;1.0;2.0;3.0"`
+* `#!dae var string theme`<br>
+  Music theme name
+* `#!dae var string filter`<br>
+  [Transition filter](../../user-guide/transitions/index.md#filter)
+* `#!dae var string midiFilename`<br>
+  Filename of a MIDI file
 
+## <a href="#bassmusic_addtransitiontimepoint">BassMusic_AddTransitionTimePoint</a>
+
+Add a time point for [Timing Transition](../../user-guide/transitions/timing.md).
+
+```dae
+func void BassMusic_AddTransitionTimePoint(var string theme, var string filter, var float start, var float duration, var int effect, var float nextStart, var float nextDuration, var int nextEffect) {}
+```
+
+**Parameters**
+
+* `#!dae var string theme`<br>
+  Music theme name
+* `#!dae var string filter`<br>
+  [Transition filter](../../user-guide/transitions/index.md#filter)
+* `#!dae var float start`<br>
+  Transition start in seconds
+* `#!dae var float duration`<br>
+  Transition duration in seconds
+* `#!dae var int effect`<br>
+  Effect ID (NONE = 0, CROSSFADE = 0)
+* `#!dae var float nextStart`<br>
+  Transition start in seconds (next song)
+* `#!dae var float nextDuration`<br>
+  Transition duration in seconds (next song)
+* `#!dae var int nextEffect`<br>
+  Effect ID (NONE = 0, CROSSFADE = 0)
+
+## <a href="#bassmusic_addjingle">BassMusic_AddJingle</a>
+
+Add a [Jingle](../../user-guide/transitions/jingle.md) to a theme.
+
+```dae
+func void BassMusic_AddJingle(var string theme, var string filter, var string jingle, var float delay) {}
+```
+
+**Parameters**
+
+* `#!dae var string theme`<br>
+  Music theme name
+* `#!dae var string filter`<br>
+  [Transition filter](../../user-guide/transitions/index.md#filter)
+* `#!dae var string jingle`<br>
+  Filename of a jingle audio file
+* `#!dae var float delay`
+  Delay in seconds before the jingle starts
+  
 </div>

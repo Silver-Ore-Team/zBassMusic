@@ -69,7 +69,7 @@ so you can use the plugin for free in any project[^1].
 It's built using the new [union-api](https://gitlab.com/union-framework/union-api) and can be embedded
 either as a Union 1.0m plugin or as a completely standalone plugin for base Gothic with System Pack.
 
-Check out [Getting Started](getting-started/index.md) for instructions how to start working with zBassMusic.
+Check out [Getting Started](user-guide/getting-started/index.md) for instructions how to start working with zBassMusic.
 
 [^1]: zBassMusic depends on vendored libraries [union-api](https://gitlab.com/union-framework/union-api)
 and [gothic-api]()

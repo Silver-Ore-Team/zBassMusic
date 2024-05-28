@@ -76,7 +76,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    // func void BassMusic_AddTransitionTimePoint(var string theme, var string filter, var midiFilename)
+    // func void BassMusic_AddMidiFile(var string theme, var string filter, var midiFilename)
     int BassMusic_AddMidiFile()
     {
         static NH::Logger* log = NH::CreateLogger("zBassMusic::AddMidiFile");

@@ -127,6 +127,9 @@ extra:
       link: https://github.com/Silver-Ore-Team/zBassMusic
     - icon: fontawesome/brands/discord
       link: https://discord.gg/cvd6jhKB
+  analytics:
+    provider: google
+    property: G-GPGQ5YCRVB
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6

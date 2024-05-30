@@ -12,7 +12,7 @@ Jingle works alongside Default and Timing, scheduling itself on every transition
 
 ## Daedalus
 
-TO set up jingle, you have to add it to a theme using Daedalus API.
+To set up jingle, you have to add it to a theme using Daedalus API.
 
 ```dae
 BassMusic_AddJingle(

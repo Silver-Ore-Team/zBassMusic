@@ -15,6 +15,8 @@ The available docs are:
 
 * [Getting Started](getting-started/index.md) - basics of zBassMusic, plugin loading, music definition, simple crossfade
   effect
-* [Transition Scheduler](transition-scheduler/index.md) - configuration of advance transitions between songs
+* [Concepts](concepts/index.md) - glossary of the terminology used in the plugin
+* [Themes](theme-definition/index.md) - configuration of music themes
+* [Transitions](transitions/index.md) - configuration of advanced transitions
 * [Scripting (Daedalus)](scripting/index.md) - using zBassMusic in the scripts, creating a custom scheduler
 * [Debugging](debugging/index.md) - helpful tips for debugging plugin problems or working with a debugger

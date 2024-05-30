@@ -1,3 +1,5 @@
 mkdocs
 mkdocs-material
+mkdocs-build-plantuml-plugin
+mkdocs_puml
 git+https://github.com/kamilkrzyskow/gothic-lexer.git

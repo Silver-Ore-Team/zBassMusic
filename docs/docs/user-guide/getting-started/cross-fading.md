@@ -28,4 +28,14 @@ prototype C_MUSICTHEME_FIGHT(C_MUSICTHEME)
 
 Other values of `transtype` and all values of `transsubtype` are ignored because zBassMusic can't emulate them on
 arbitrary audio files with no MIDI metadata.
-The advanced transitions are implemented by the plugin in [Transition Scheduler](../transition-scheduler/index.md).
+
+Instead of trying to emulate DirectMusic effects, we implement our own transition scheduler to perform advanced transitions. 
+To learn more you can check next:
+
+* [zBassMusic Theme Class](../theme-definition/basstheme.md) - an extended version of `C_MUSICTHEME` class made specifically for zBassMusic.
+    You can use it instead of the Gothic's one to enable additional features.
+* [Transitions](../transitions/index.md) - the new transition system that gives you a full control over how music changes.
+    You can set up custom timing, add an in-between jingle sound or use a MIDI file to provide metadata for the engine.
+    With a well-prepared transitions, your music will hit better. Like, literally - it will hit on the beat.
+* [Scripting](../scripting/index.md) - external functions to control the music playback from Daedalus scripts. You can use it
+    to implement a special theme flow for specific moments in the story.  

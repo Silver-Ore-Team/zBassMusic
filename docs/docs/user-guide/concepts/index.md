@@ -20,12 +20,12 @@ Effects are the audio effects applied on a song during playback. Supported effec
 
 ### Transitions
 
-Rules defining how the to schedule the change of a song. Transition may define the time span when change
+Rules defining how to schedule the change of a song. Transition may define the time span when change
 occurs and the effects used to switch thet theme.
 
 ### Zone
 
-The area where a song will play. Music zone are created using Spacer and a song may be attached to it.
+The area where a song plays. Music zone are created using Spacer and a song may be attached to it.
 
 ## VDFS
 

@@ -100,7 +100,6 @@ markdown_extensions:
       use_pygments: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
@@ -114,10 +113,17 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.smartsymbols
+  - pymdownx.superfences:
 plugins:
   - search
   - offline:
       enabled: !ENV [ OFFLINE, false ]
+  - plantuml:
+      puml_url: https://www.plantuml.com/plantuml/
+      format: png
+      num_workers: 8
+      puml_keyword: puml
+      verify_ssl: true
 extra_css:
   - stylesheets/extra.css
 extra:

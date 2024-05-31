@@ -18,13 +18,6 @@ namespace NH::Bass
         m_DeferredCommands.push_back(std::move(command));
     }
 
-    void CommandQueue::AddCommandOnFront(std::shared_ptr<Command> command)
-    {
-        std::lock_guard<std::mutex> lock(m_DeferredMutex);
-        log->Trace("Adding command to queue");
-        m_DeferredCommands.push_front(std::move(command));
-    }
-
     void CommandQueue::AddPerFrameCommand(std::shared_ptr<Command> command)
     {
         std::lock_guard<std::mutex> lock(m_PerFrameDeferredMutex);

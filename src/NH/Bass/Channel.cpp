@@ -102,7 +102,7 @@ namespace NH::Bass
 
     bool Channel::IsPlaying() const
     {
-        return BASS_ChannelIsActive(m_Stream);
+        return BASS_ChannelIsActive(m_Stream) == BASS_ACTIVE_PLAYING;
     }
 
     double Channel::Position() const

@@ -24,4 +24,13 @@ namespace NH::Bass
         explicit ScheduleThemeChangeCommand(HashString themeId) : m_ThemeId(themeId) {};
         CommandResult Execute(Engine& engine) override;
     };
+
+    class PlayThemeInstantCommand : public Command
+    {
+        static Logger* log;
+        HashString m_ThemeId;
+    public:
+        explicit PlayThemeInstantCommand(HashString themeId) : m_ThemeId(themeId) {};
+        CommandResult Execute(Engine& engine) override;
+    };
 }

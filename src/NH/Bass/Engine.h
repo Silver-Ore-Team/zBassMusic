@@ -41,6 +41,9 @@ namespace NH::Bass
         void SetVolume(float volume);
         [[nodiscard]] float GetVolume() const;
 
+        std::shared_ptr<MusicTheme> GetActiveTheme();
+        void SetActiveTheme(std::shared_ptr<MusicTheme> theme);
+
         std::shared_ptr<IChannel> AcquireFreeChannel() override;
         void ReleaseChannel(const std::shared_ptr<IChannel>& channel) override;
 

@@ -93,13 +93,33 @@ namespace NH::Bass
     void MusicTheme::Transition(IEngine& engine, MusicTheme& nextTheme)
     {
         if (nextTheme.GetName() == GetName()) { return; }
-        auto channel = GetAcquiredChannel();
-        if (!channel) channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
-        const auto& transition = m_TransitionInfo.GetTransition(nextTheme.GetName());
-        std::optional<Transition::TimePoint> timePoint = transition.NextAvailableTimePoint(channel->Position());
 
+        const auto& transition = m_TransitionInfo.GetTransition(nextTheme.GetName());
         log->Debug("Transition {0} to {1}", GetName(), nextTheme.GetName());
         log->PrintRaw(LoggerLevel::Trace, transition.ToString());
+
+        if (!HasAudioFile(AudioFile::DEFAULT))
+        {
+            log->Error("{0} needs to transition into {1} but it doesn't have a DEFAULT audio. Switching to {1} without transitions",
+                    GetName(), nextTheme.GetName());
+            return;
+        }
+
+        if (!ReadyToPlay(engine, AudioFile::DEFAULT))
+        {
+            const auto& file = GetAudioFile(AudioFile::DEFAULT);
+            if (file.Status == AudioFile::StatusType::FAILED)
+            {
+                log->Warning("{0} needs to transition into {1} but the audio file failed to load. Switching to {1} without transitions",
+                        GetName(), nextTheme.GetName());
+                engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeInstantCommand>(nextTheme.GetName()));
+                return;
+            }
+        }
+
+        auto channel = GetAcquiredChannel();
+        if (!channel) channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
+        std::optional<Transition::TimePoint> timePoint = transition.NextAvailableTimePoint(channel->Position());
 
         const std::function<void()>& playJingle = CreateSyncHandler([&engine, &transition, this]() {
             if (transition.Jingle)
@@ -147,6 +167,11 @@ namespace NH::Bass
     void MusicTheme::Play(IEngine& engine) { Play(engine, Transition::EMPTY); }
     void MusicTheme::Play(IEngine& engine, const struct Transition& transition, std::optional<Transition::TimePoint> timePoint)
     {
+        if (!HasAudioFile(AudioFile::DEFAULT))
+        {
+            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName());
+            return;
+        }
         if (!ReadyToPlay(engine, AudioFile::DEFAULT)) { return; }
 
         auto channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
@@ -186,7 +211,12 @@ namespace NH::Bass
     void MusicTheme::Stop(IEngine& engine, const struct Transition& transition)
     {
         auto channel = GetAcquiredChannel();
-        if (!channel) { ReleaseChannels(); };
+        if (!channel)
+        {
+            log->Warning("Requested to stop {0} but it does not have any playing channels.", m_Name);
+            ReleaseChannels();
+            return;
+        };
         std::optional<Transition::TimePoint> timePoint = transition.NextAvailableTimePoint(channel->Position());
         auto effect = timePoint.has_value() ? timePoint.value().Effect : transition.Effect;
         if (effect == TransitionEffect::CROSSFADE)
@@ -208,6 +238,12 @@ namespace NH::Bass
 
     bool MusicTheme::ReadyToPlay(IEngine& engine, HashString audio)
     {
+        if (!HasAudioFile(AudioFile::DEFAULT))
+        {
+            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName());
+            return false;
+        }
+
         const auto& file = GetAudioFile(AudioFile::DEFAULT);
         if (file.Status == AudioFile::StatusType::FAILED)
         {

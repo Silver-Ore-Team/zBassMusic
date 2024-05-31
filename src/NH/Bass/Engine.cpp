@@ -97,6 +97,16 @@ namespace NH::Bass
         return m_MasterVolume;
     }
 
+    std::shared_ptr<MusicTheme> Engine::GetActiveTheme()
+    {
+        return m_ActiveTheme;
+    }
+
+    void Engine::SetActiveTheme(std::shared_ptr<MusicTheme> theme)
+    {
+        m_ActiveTheme = theme;
+    }
+
     EventManager& Engine::GetEM()
     {
         return m_EventManager;

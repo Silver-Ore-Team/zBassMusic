@@ -65,8 +65,6 @@ namespace NH::Bass
     public:
         void AddCommand(std::shared_ptr<Command> command);
 
-        void AddCommandOnFront(std::shared_ptr<Command> command);
-
         void AddPerFrameCommand(std::shared_ptr<Command> command);
 
         void Update(Engine& engine);

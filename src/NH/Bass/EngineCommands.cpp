@@ -7,6 +7,7 @@ namespace NH::Bass
 {
     Logger* ChangeZoneCommand::log = CreateLogger("zBassMusic::ChangeZoneCommand");
     Logger* ScheduleThemeChangeCommand::log = CreateLogger("zBassMusic::ScheduleThemeChangeCommand");
+    Logger* PlayThemeInstantCommand::log = CreateLogger("zBassMusic::PlayThemeInstantCommand");
 
     CommandResult ChangeZoneCommand::Execute(Engine& engine)
     {
@@ -41,6 +42,24 @@ namespace NH::Bass
         if (activeTheme && anyChannelPlaying) theme->Schedule(engine, activeTheme);
         else theme->Play(engine);
         engine.m_ActiveTheme = theme;
+
+        return CommandResult::DONE;
+    }
+
+    CommandResult PlayThemeInstantCommand::Execute(Engine& engine)
+    {
+        log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId);
+        auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
+        if (!theme)
+        {
+            log->Error("Theme {0} doesn't exist", m_ThemeId);
+            return CommandResult::DONE;
+        }
+
+        auto activeTheme = engine.GetActiveTheme();
+        if (activeTheme) { activeTheme->Stop(engine); }
+        theme->Play(engine);
+        engine.SetActiveTheme(theme);
 
         return CommandResult::DONE;
     }

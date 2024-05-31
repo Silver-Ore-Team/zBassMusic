@@ -74,7 +74,7 @@ namespace NH::Bass
                         return;
                     }
 
-                    Union::Stream* stream = file->Open();
+                    auto* stream = new Union::FileReader(file->GetFullName());
                     m_AudioFiles[type].Buffer.resize(stream->GetSize());
                     stream->Read(m_AudioFiles[type].Buffer.data(), m_AudioFiles[type].Buffer.size());
                     stream->Close();

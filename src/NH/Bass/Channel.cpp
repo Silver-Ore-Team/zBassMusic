@@ -39,6 +39,11 @@ namespace NH::Bass
         BASS_ChannelSetAttribute(m_Stream, BASS_ATTRIB_VOL, volume);
     }
 
+    void Channel::SetLoop(bool loop)
+    {
+        BASS_ChannelFlags(m_Stream, BASS_SAMPLE_LOOP, loop ? BASS_SAMPLE_LOOP : 0);
+    }
+
     void Channel::SlideVolume(float targetVolume, uint32_t time)
     {
         BASS_ChannelSlideAttribute(m_Stream, BASS_ATTRIB_VOL, targetVolume, time);

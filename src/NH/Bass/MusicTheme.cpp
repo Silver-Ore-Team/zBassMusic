@@ -125,6 +125,7 @@ namespace NH::Bass
             if (transition.Jingle)
             {
                 auto channel = engine.AcquireFreeChannel();
+                channel->SetLoop(false);
                 auto result = channel->PlayInstant(*transition.Jingle);
                 if (result) { channel->OnAudioEnds(CreateSyncHandler([channel]() { channel->Release(); })); }
                 else
@@ -183,6 +184,8 @@ namespace NH::Bass
             ReleaseChannels();
             return;
         }
+
+        channel->SetLoop(effects.Loop.Active);
 
         if (effects.ReverbDX8.Active)
         {

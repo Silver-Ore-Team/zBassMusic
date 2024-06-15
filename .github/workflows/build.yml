@@ -25,7 +25,7 @@ on:
       msvc-toolkit:
         required: false
         type: string
-        default: 14.39
+        default: 14.40
       project-version:
         required: false
         type: string

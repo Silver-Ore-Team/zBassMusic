@@ -38,6 +38,7 @@ namespace NH::Bass
         virtual void StopInstant() = 0;
 
         virtual void SetVolume(float volume) = 0;
+        virtual void SetLoop(bool loop) = 0;
         virtual void SlideVolume(float targetVolume, uint32_t time) = 0;
         virtual void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) = 0;
         virtual void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) = 0;

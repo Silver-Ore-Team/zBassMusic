@@ -25,7 +25,9 @@ namespace NH::Bass
 
         Result<void> PlayInstant(const AudioFile& audioFile) override;
         void StopInstant() override;
+
         void SetVolume(float volume) override;
+        void SetLoop(bool loop) override;
         void SlideVolume(float targetVolume, uint32_t time) override;
         void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) override;
         void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) override;

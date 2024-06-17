@@ -6,6 +6,12 @@ on:
       SSH_KEY:
         required: false
         description: SSH private key for pushing version changes
+      SONAR_TOKEN:
+        required: false
+        description: SonarCloud token for code analysis
+      SONAR_HOST_URL:
+        required: false
+        description: SonarCloud host URL
     inputs:
       cmake-preset:
         required: true
@@ -38,15 +44,27 @@ on:
         required: false
         type: string
         default: main
+      enable-sonar:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
     name: MSVC / Windows 2022
     runs-on: windows-2022
+    env:
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
+      - name: Install sonar-scanner and build-wrapper
+        uses: sonarsource/sonarqube-github-c-cpp@v1
+        if: ${{ inputs.enable-sonar == true }}
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x86
@@ -86,8 +104,22 @@ jobs:
           }
       - name: CMake Configure
         run: cmake --preset ${{ inputs.cmake-preset }}
-      - name: Ninja Build
-        run: ninja -C out/build/${{ inputs.cmake-preset }} -j 20
+      - name: CMake Build
+        if: ${{ inputs.enable-sonar == false }}
+        run: |
+          cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
+      - name: CMake Build (Sonar Wrapper)
+        if: ${{ inputs.enable-sonar == true }}
+        run: |
+          build-wrapper-win-x86-64.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
+      - name: Sonar Scanner
+        if: ${{ inputs.enable-sonar == true }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          sonar-scanner.bat --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
       - name: CMake Install
         run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}
       - name: Archive DLL

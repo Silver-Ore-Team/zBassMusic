@@ -415,3 +415,4 @@ out
 .idea
 
 !docs/**/release
+.scannerwork

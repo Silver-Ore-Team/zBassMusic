@@ -1,0 +1,10 @@
+{
+  "name": "zbassmusic",
+  "version": "0.3.2",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "spdlog"
+    }
+  ]
+}

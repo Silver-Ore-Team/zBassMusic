@@ -113,7 +113,7 @@ jobs:
       - name: CMake Build (Sonar Wrapper)
         if: ${{ inputs.enable-sonar == true }}
         run: |
-          ./build-wrapper-win-x86/build-wrapper-win-x86.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
+          ./build-wrapper-win-x86/build-wrapper-win-x86-64.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
       - name: Sonar Scanner
         if: ${{ inputs.enable-sonar == true }}
         env:

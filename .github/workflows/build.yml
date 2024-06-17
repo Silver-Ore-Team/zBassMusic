@@ -60,11 +60,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-      - name: Install sonar-scanner and build-wrapper
-        uses: sonarsource/sonarqube-github-c-cpp@v1
-        if: ${{ inputs.enable-sonar == true }}
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x86
@@ -108,10 +103,17 @@ jobs:
         if: ${{ inputs.enable-sonar == false }}
         run: |
           cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
+      - name: Install Sonar
+        if: ${{ inputs.enable-sonar == true }}
+        run: |
+          Invoke-WebRequest https://sonarcloud.io/static/cpp/build-wrapper-win-x86.zip -OutFile build-wrapper-win-x86.zip
+          Expand-Archive build-wrapper-win-x86.zip
+          Invoke-WebRequest https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.0.0.4432-windows.zip -OutFile sonar-scanner-cli-6.0.0.4432-windows.zip
+          Expand-Archive sonar-scanner-cli-6.0.0.4432-windows.zip
       - name: CMake Build (Sonar Wrapper)
         if: ${{ inputs.enable-sonar == true }}
         run: |
-          build-wrapper-win-x86-64.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
+          ./build-wrapper-win-x86/build-wrapper-win-x86.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target plugin -j 16
       - name: Sonar Scanner
         if: ${{ inputs.enable-sonar == true }}
         env:
@@ -119,7 +121,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          sonar-scanner.bat --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+          ./sonar-scanner-cli-6.0.0.4432-windows/bin/sonar-scanner.bat --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
       - name: CMake Install
         run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}
       - name: Archive DLL

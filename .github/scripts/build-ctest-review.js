@@ -23,6 +23,6 @@ module.exports = async ({github, context, pull_number, status, log}) => {
         owner: context.repo.owner,
         repo: context.repo.repo,
         body: (status === 'success' ? '😍 Tests passed!' : '😨 Tests failed!') + '\n\n```\n' + log.replaceAll('%%%', "\n") + '\n```',
-        event: (status === 'success' ? 'APPROVE' : 'REQUEST_CHANGES')
+        event: (status === 'success' ? 'COMMENT' : 'REQUEST_CHANGES')
     });
 }

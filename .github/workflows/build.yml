@@ -112,7 +112,7 @@ jobs:
       - name: CMake Build
         if: ${{ inputs.enable-sonar == false }}
         run: |
-          cmake --build out/build/${{ inputs.cmake-preset }} -j 16
+          cmake --build out/build/${{ inputs.cmake-preset }} --target zbassmusic_vdf -j 16
       - name: Install Sonar
         if: ${{ inputs.enable-sonar == true }}
         run: |
@@ -123,7 +123,7 @@ jobs:
       - name: CMake Build (Sonar Wrapper)
         if: ${{ inputs.enable-sonar == true }}
         run: |
-          ./build-wrapper-win-x86/build-wrapper-win-x86-64.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} -j 16
+          ./build-wrapper-win-x86/build-wrapper-win-x86-64.exe --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build/${{ inputs.cmake-preset }} --target zbassmusic_vdf -j 16
       - name: Sonar Scanner
         if: ${{ inputs.enable-sonar == true }}
         env:
@@ -137,6 +137,7 @@ jobs:
         if: ${{ inputs.enable-tests == true }}
         run: |
           $status = $false;
+          cmake --build out/build/${{ inputs.cmake-preset }} --target tests -j 16
           if (ctest --test-dir out/build/${{ inputs.cmake-preset }}/tests -j 16) {
             echo "tests=success" >> $env:GITHUB_OUTPUT
             $status = $true;

@@ -156,10 +156,11 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const pull_number = ${{ github.event.number }};
             const status = '${{ steps.tests.outputs.tests }}';
             const log = '${{ steps.tests.outputs.tests_log }}';
             require('./.github/scripts/build-ctest-review.js')({
-              github, context, status, log
+              github, context, pull_number, status, log
             });
       - name: CMake Install
         run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}

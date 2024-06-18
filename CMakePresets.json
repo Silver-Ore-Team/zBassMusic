@@ -39,11 +39,11 @@
       }
     },
     {
-      "name": "x86-release-pdb",
-      "displayName": "x86 Release (Debug Symbols)",
+      "name": "x86-relwithdebinfo",
+      "displayName": "x86 RelWithDebInfo",
       "inherits": "x86-release",
       "cacheVariables": {
-        "CMAKE_BUILD_RELEASE_PDB": "yes"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     }
   ]

@@ -1,13 +1,15 @@
 #pragma once
 
-#include <NH/Logger.h>
+#include "NH/Logger.h"
 
+#pragma warning(push, 1)
 #include <deque>
 #include <chrono>
 #include <memory>
 #include <utility>
 #include <mutex>
 #include <functional>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

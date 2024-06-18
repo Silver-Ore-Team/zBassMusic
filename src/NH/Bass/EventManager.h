@@ -1,12 +1,14 @@
 #pragma once
 
 #include "NH/Logger.h"
-#include <NH/HashString.h>
+#include "NH/HashString.h"
 
+#pragma warning(push, 1)
 #include <utility>
 #include <vector>
 #include <deque>
 #include <variant>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

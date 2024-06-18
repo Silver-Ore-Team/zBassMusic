@@ -1,17 +1,20 @@
 #pragma once
 
-#include <bass.h>
 #include "EventManager.h"
 #include "Channel.h"
 #include "NH/Logger.h"
 #include "NH/HashString.h"
-#include <NH/Bass/IEngine.h>
-#include <NH/Bass/MusicManager.h>
-#include <NH/Bass/Command.h>
+#include "NH/Bass/IEngine.h"
+#include "NH/Bass/MusicManager.h"
+#include "NH/Bass/Command.h"
+
+#pragma warning(push, 1)
+#include <bass.h>
 #include <vector>
 #include <mutex>
 #include <chrono>
 #include <unordered_map>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Transition.h"
-#include <NH/Commons.h>
-#include <NH/HashString.h>
+#include "NH/Commons.h"
+#include "NH/HashString.h"
 
+#pragma warning(push, 1)
 #include <unordered_map>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

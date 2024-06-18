@@ -1,8 +1,9 @@
 #include "Logger.h"
 
+#pragma warning(push, 1)
 #include <ZenGin/zGothicAPI.h>
-
 #include <utility>
+#pragma warning(pop)
 
 namespace NH
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <NH/HashString.h>
-#include <NH/Logger.h>
-#include <NH/Bass/Command.h>
-#include <NH/Bass/IEngine.h>
+#include "NH/HashString.h"
+#include "NH/Logger.h"
+#include "NH/Bass/Command.h"
+#include "NH/Bass/IEngine.h"
 
 namespace NH::Bass
 {

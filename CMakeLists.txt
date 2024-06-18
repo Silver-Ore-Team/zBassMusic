@@ -3,26 +3,34 @@ set(PROJECT_VERSION "0.1.3")
 set(PROJECT_VERSION_CMAKE "0.3.2")
 set(VCPKG_TARGET_ARCHITECTURE "x86")
 set(VCPKG_PLATFORM_TOOLSET "v143")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(zBassMusic VERSION "${PROJECT_VERSION_CMAKE}" LANGUAGES CXX)
 
 option(BUILD_VDF "Build .VDF file with plugin" ON)
+option(BUILD_TESTS "Build tests" ON)
 
-set(UNION_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/union-api")
-set(GOTHIC_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/gothic-api")
+#set(UNION_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/union-api")
+#set(GOTHIC_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/gothic-api")
 set(BASS_DIR "${CMAKE_SOURCE_DIR}/dependencies/bass")
 set(VDF_DIR "${CMAKE_SOURCE_DIR}/vdf")
 set(GOTHIC_USERAPI_DIR "${CMAKE_SOURCE_DIR}/gothic-userapi")
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_FLAGS "${CMAE_CXX_FLAGS} /Zc:__cplusplus")
 if (${CMAKE_BUILD_RELEASE_PDB})
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif ()
 
-find_package(spdlog CONFIG REQUIRED)
+include(FetchContent)
+set(BUILD_UNION_API_STATIC OFF CACHE INTERNAL "Disable static build of UnionAPI")
+FetchContent_Declare(
+        UnionAPI
+        GIT_REPOSITORY https://github.com/piotrmacha/union-api.cmake.git
+        GIT_TAG main)
+FetchContent_MakeAvailable(UnionAPI)
 
-include(cmake/union-api.cmake)
-include(cmake/gothic-api.cmake)
+find_package(spdlog CONFIG REQUIRED)
 include(cmake/bass.cmake)
 
 add_library(zbassmusic SHARED)
@@ -39,16 +47,27 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in" "${CMAKE_CURRENT_BINA
 configure_file("${CMAKE_SOURCE_DIR}/vdf/script.vdfs.in" "${CMAKE_BINARY_DIR}/script.vdfs")
 configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src/BuildInfo.h" @ONLY)
 
-file(GLOB_RECURSE ZBASSMUSIC_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Union/Memory.cpp")
+add_library(zbassmusic_gothicapi STATIC)
+target_compile_options(zbassmusic_gothicapi PRIVATE /W1 /wd4530 /wd4005)
+target_compile_definitions(zbassmusic_gothicapi PRIVATE __G1 __G1A __G2 __G2A)
+target_link_libraries(zbassmusic_gothicapi PRIVATE GothicAPI)
+
+file(GLOB_RECURSE ZBASSMUSIC_SOURCES "src/**.cpp")
 target_sources(zbassmusic PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/version.rc" ${ZBASSMUSIC_SOURCES})
+target_compile_options(zbassmusic PRIVATE /W4 /WX /wd4530 /wd4005)
+target_compile_definitions(zbassmusic PRIVATE __G1 __G1A __G2 __G2A)
+target_include_directories(zbassmusic PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/" "gothic-userapi"
+        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/gothic-api"
+        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/gothic-api/ZenGin/Gothic_UserAPI")
+target_link_libraries(zbassmusic PRIVATE UnionAPI zbassmusic_gothicapi bass_all)
 
-add_compile_options(zbassmusic PRIVATE /W4 /WX)
-target_compile_definitions(zbassmusic PRIVATE _UNION_API_DLL __G1 __G1A __G2 __G2A)
-target_include_directories(zbassmusic PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")
-target_link_libraries(zbassmusic PRIVATE union-api gothic-api bass_all)
+if (${BUILD_TESTS})
+    enable_testing()
+    add_subdirectory(tests)
+endif ()
 
-install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
-install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
+install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> DESTINATION ${CMAKE_BINARY_DIR})
+install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> TYPE BIN)
 if (${BUILD_VDF})
     install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
     install(SCRIPT "${VDF_DIR}/vdf.cmake")

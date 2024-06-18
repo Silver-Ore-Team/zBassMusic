@@ -23,6 +23,7 @@ jobs:
       upload-artifact-dll-pdb: debug-dll-pdb
       upload-artifact-vdf: debug-vdf
       enable-sonar: true
+      notify-tests: true
 
   build-release:
     name: Build Release

@@ -1,11 +1,12 @@
 #include "Options.h"
 #include "Engine.h"
 
+#pragma warning(push, 1)
 #include <bassmidi.h>
 #include <bassopus.h>
 #include <bassflac.h>
-
 #include <algorithm>
+#pragma warning(pop)
 
 namespace NH::Bass
 {
@@ -31,7 +32,7 @@ namespace NH::Bass
 
         static auto lastTimestamp = std::chrono::system_clock::now();
         auto now = std::chrono::system_clock::now();
-        uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
+        uint32_t delta = static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count());
         lastTimestamp = now;
 
         m_CommandQueue.Update(*this);
@@ -89,7 +90,7 @@ namespace NH::Bass
         }
 
         m_MasterVolume = volume;
-        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
+        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, static_cast<uint32_t>(10000 * m_MasterVolume));
     }
 
     float Engine::GetVolume() const

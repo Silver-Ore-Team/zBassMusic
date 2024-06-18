@@ -2,10 +2,12 @@
 
 #include "EventManager.h"
 #include "NH/Logger.h"
-#include <NH/Bass/MusicTheme.h>
-#include <NH/Bass/IChannel.h>
+#include "NH/Bass/MusicTheme.h"
+#include "NH/Bass/IChannel.h"
 
+#pragma warning(push, 1)
 #include <functional>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

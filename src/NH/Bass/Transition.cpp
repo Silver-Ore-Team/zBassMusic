@@ -1,6 +1,6 @@
 #include "Transition.h"
 
-#include <NH/Bass/MusicTheme.h>
+#include "NH/Bass/MusicTheme.h"
 
 namespace NH::Bass
 {

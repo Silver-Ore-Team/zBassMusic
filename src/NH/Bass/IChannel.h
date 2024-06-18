@@ -1,11 +1,13 @@
 #pragma once
 
+#pragma warning(push, 1)
 #include <functional>
 #include <expected>
+#pragma warning(pop)
 
 namespace NH::Bass
 {
-    class AudioFile;
+    struct AudioFile;
 
     struct IChannel
     {

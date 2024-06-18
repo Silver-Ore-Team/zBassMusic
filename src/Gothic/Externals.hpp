@@ -1,6 +1,8 @@
+#pragma warning(push, 1)
 #include <thread>
 #include <string>
 #include <sstream>
+#pragma warning(pop)
 
 namespace GOTHIC_NAMESPACE
 {

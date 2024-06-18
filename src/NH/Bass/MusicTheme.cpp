@@ -1,9 +1,11 @@
 #include "MusicTheme.h"
 #include "EngineCommands.h"
+#include "NH/Bass/Command.h"
+#include "NH/Bass/EventManager.h"
 
+#pragma warning(push, 1)
 #include <Union/VDFS.h>
-#include <NH/Bass/Command.h>
-#include <NH/Bass/EventManager.h>
+#pragma warning(pop)
 
 namespace NH::Bass
 {
@@ -144,7 +146,7 @@ namespace NH::Bass
             }));
             engine.GetCommandQueue().AddCommand(std::make_shared<OnTimeCommand>(
                     std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((long long)((timePoint->Start + transition.JingleDelay) * 1000)),
-                    std::make_shared<FunctionCommand>([&playJingle](Engine& engine) -> CommandResult {
+                    std::make_shared<FunctionCommand>([&playJingle]([[maybe_unused]] Engine& engine) -> CommandResult {
                         playJingle();
                         return CommandResult::DONE;
                     })));
@@ -157,7 +159,7 @@ namespace NH::Bass
             Stop(engine, transition);
             engine.GetCommandQueue().AddCommand(std::make_shared<OnTimeCommand>(
                     std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((long long)(transition.JingleDelay * 1000)),
-                    std::make_shared<FunctionCommand>([&playJingle](Engine& engine) -> CommandResult {
+                    std::make_shared<FunctionCommand>([&playJingle]([[maybe_unused]] Engine& engine) -> CommandResult {
                         playJingle();
                         return CommandResult::DONE;
                     })));
@@ -211,7 +213,7 @@ namespace NH::Bass
     }
 
     void MusicTheme::Stop(IEngine& engine) { Stop(engine, m_TransitionInfo.GetDefaultTransition()); }
-    void MusicTheme::Stop(IEngine& engine, const struct Transition& transition)
+    void MusicTheme::Stop([[maybe_unused]] IEngine& engine, const struct Transition& transition)
     {
         auto channel = GetAcquiredChannel();
         if (!channel)
@@ -239,7 +241,7 @@ namespace NH::Bass
         }
     }
 
-    bool MusicTheme::ReadyToPlay(IEngine& engine, HashString audio)
+    bool MusicTheme::ReadyToPlay(IEngine& engine, [[maybe_unused]] HashString audio)
     {
         if (!HasAudioFile(AudioFile::DEFAULT))
         {
@@ -257,7 +259,7 @@ namespace NH::Bass
         if (file.Status != AudioFile::StatusType::READY)
         {
             engine.GetCommandQueue().AddCommand(std::make_shared<FunctionCommand>(
-                    [this, &engine](Engine& e) -> CommandResult {
+                    [this, &engine]([[maybe_unused]] Engine& e) -> CommandResult {
                         const AudioFile& f = GetAudioFile(AudioFile::DEFAULT);
                         if (f.Status == AudioFile::StatusType::FAILED)
                         {
@@ -297,11 +299,7 @@ namespace NH::Bass
 
     std::shared_ptr<IChannel> MusicTheme::GetAcquiredChannel()
     {
-        for (auto& channel: m_AcquiredChannels)
-        {
-            return channel;
-        }
-        return {};
+        return m_AcquiredChannels.size() > 0 ? m_AcquiredChannels.front() : nullptr;
     }
 
     void MusicTheme::ReleaseChannels()
@@ -316,7 +314,7 @@ namespace NH::Bass
     String MusicTheme::ToString() const
     {
         String result = String("MusicTheme{ \n\tName: ") + m_Name + ", \n\tAudioFiles: {\n";
-        int i = 0;
+        uint32_t i = 0;
         for (auto& [type, audioFile]: m_AudioFiles)
         {
             result += String("\t\t") + String(type) + ": " + audioFile.ToString().Replace("\n", "\n\tt");

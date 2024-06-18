@@ -1,13 +1,15 @@
 #pragma once
 
-#include <NH/Logger.h>
+#include "NH/Logger.h"
 
+#pragma warning(push, 1)
 #include <cstdint>
 #include <vector>
 #include <thread>
 #include <functional>
 #include <deque>
 #include <mutex>
+#pragma warning(pop)
 
 namespace NH
 {

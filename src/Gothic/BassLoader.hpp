@@ -1,5 +1,8 @@
+#pragma warning(push, 1)
 #include <functional>
-#include <NH/Bass/MidiFile.h>
+#pragma warning(pop)
+
+#include "NH/Bass/MidiFile.h"
 
 namespace GOTHIC_NAMESPACE
 {

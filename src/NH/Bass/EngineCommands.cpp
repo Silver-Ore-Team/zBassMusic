@@ -1,7 +1,7 @@
 #include "EngineCommands.h"
 
-#include <NH/Bass/Engine.h>
-#include <NH/Bass/Options.h>
+#include "NH/Bass/Engine.h"
+#include "NH/Bass/Options.h"
 
 namespace NH::Bass
 {

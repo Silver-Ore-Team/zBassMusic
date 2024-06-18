@@ -48,11 +48,21 @@ on:
         required: false
         type: boolean
         default: false
+      enable-tests:
+        required: false
+        type: boolean
+        default: false
+      notify-tests:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
     name: MSVC / Windows 2022
     runs-on: windows-2022
+    permissions:
+      pull-requests: write
     env:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output
     steps:
@@ -122,6 +132,37 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           ./sonar-scanner-6.0.0.4432-windows/bin/sonar-scanner.bat --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+      - name: CTest
+        id: tests
+        if: ${{ inputs.enable-tests == true }}
+        run: |
+          $status = $false;
+          if (ctest --test-dir out/build/${{ inputs.cmake-preset }}/tests -j 16) {
+            echo "tests=success" >> $env:GITHUB_OUTPUT
+            $status = $true;
+          } else {
+            echo "tests=failed" >> $env:GITHUB_OUTPUT
+          }
+          $testsLog = (Get-Content -Path out/build/x86-debug/tests/Testing/Temporary/LastTest.log) -join "%%%"
+          echo "tests_log=${testsLog}" >> $env:GITHUB_OUTPUT
+          cat out/build/x86-debug/tests/Testing/Temporary/LastTest.log
+          if (-not $status) {
+            exit -1
+          }
+      - name: CTest Result PR
+        if: ${{ inputs.enable-tests == true && inputs.notify-tests == true && github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const status = '${{ steps.tests.outputs.tests }}';
+            const log = '${{ steps.output.outputs.tests_log }}';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: (status === 'success' ? '😍 Tests passed!' : '😨 Tests failed!') + '\n\n' + log.replace('%%%', '\n')
+            })
       - name: CMake Install
         run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}
       - name: Archive DLL

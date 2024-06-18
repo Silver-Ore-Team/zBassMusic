@@ -1,8 +1,11 @@
 #pragma once
 
-#include <NH/Commons.h>
+#include "NH/Commons.h"
+
+#pragma warning(push, 1)
 #include <Union/String.h>
 #include <Union/Array.h>
+#pragma warning(pop)
 
 namespace NH
 {
@@ -107,7 +110,7 @@ namespace NH
         template<class T>
         T* GetAdapter() const
         {
-            for (int i = 0; i < m_Adapters.GetCount(); i++)
+            for (uint32_t i = 0; i < m_Adapters.GetCount(); i++)
             {
                 ILoggerAdapter* adapter = m_Adapters[i];
                 T* ptr = dynamic_cast<T*>(adapter);

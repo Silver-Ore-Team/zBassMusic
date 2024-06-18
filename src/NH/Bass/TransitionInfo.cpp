@@ -1,10 +1,11 @@
 #include "TransitionInfo.h"
 #include "Transition.h"
+#include "NH/Bass/MidiFile.h"
+#include "NH/Bass/MusicTheme.h"
 
-#include <NH/Bass/MidiFile.h>
-#include <NH/Bass/MusicTheme.h>
-
+#pragma warning(push, 1)
 #include <utility>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

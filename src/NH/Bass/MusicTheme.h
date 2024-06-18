@@ -1,17 +1,19 @@
 #pragma once
 
-#include <NH/Logger.h>
-#include <NH/HashString.h>
-#include <NH/Executor.h>
-#include <NH/ToString.h>
-#include <NH/Bass/MidiFile.h>
-#include <NH/Bass/IEngine.h>
-#include <NH/Bass/IChannel.h>
-#include <NH/Bass/TransitionInfo.h>
+#include "NH/Logger.h"
+#include "NH/HashString.h"
+#include "NH/Executor.h"
+#include "NH/ToString.h"
+#include "NH/Bass/MidiFile.h"
+#include "NH/Bass/IEngine.h"
+#include "NH/Bass/IChannel.h"
+#include "NH/Bass/TransitionInfo.h"
 
+#pragma warning(push, 1)
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

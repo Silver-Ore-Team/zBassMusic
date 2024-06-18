@@ -1,7 +1,10 @@
 #pragma once
 
-#include <NH/Bass/MusicTheme.h>
+#include "NH/Bass/MusicTheme.h"
+
+#pragma warning(push, 1)
 #include <vector>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

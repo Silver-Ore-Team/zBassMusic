@@ -3,6 +3,3 @@
 	url = https://gitlab.com/union-framework/union-api.git
 [submodule ".\\dependencies\\union-api"]
 	url = https://gitlab.com/union-framework/union-api.git
-[submodule "dependencies/gothic-api"]
-	path = dependencies/gothic-api
-	url = https://gitlab.com/union-framework/gothic-api

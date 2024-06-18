@@ -1,8 +1,10 @@
 #include "MidiFile.h"
 
+#pragma warning(push, 1)
 #include <Union/VDFS.h>
 #include <unordered_map>
 #include <vector>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

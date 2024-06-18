@@ -1,9 +1,12 @@
 #pragma once
 
-#include <NH/Commons.h>
-#include <NH/Bass/IEngine.h>
-#include <NH/ToString.h>
+#include "NH/Commons.h"
+#include "NH/Bass/IEngine.h"
+#include "NH/ToString.h"
+
+#pragma warning(push, 1)
 #include <vector>
+#pragma warning(pop)
 
 namespace NH::Bass
 {

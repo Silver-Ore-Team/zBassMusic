@@ -1,5 +1,12 @@
 # zBassMusic
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=bugs)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=zbassmusic&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=zbassmusic)
+
 zBassMusic is a modern music system for Gothic games based on ZenGin.
 It replaces the original DirectMusic system with a
 custom engine built on top of [BASS Audio Library](https://www.un4seen.com/) to provide easier workflow for composers

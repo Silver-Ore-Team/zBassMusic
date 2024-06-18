@@ -1,9 +1,11 @@
 #pragma once
 
-#include <NH/Commons.h>
+#include "NH/Commons.h"
 
+#pragma warning(push, 1)
 #include <cstdint>
 #include <unordered_map>
+#pragma warning(pop)
 
 namespace NH
 {

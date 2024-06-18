@@ -1,4 +1,6 @@
+#pragma warning(push, 1)
 #include <deque>
+#pragma warning(pop)
 
 namespace GOTHIC_NAMESPACE
 {

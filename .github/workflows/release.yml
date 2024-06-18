@@ -19,13 +19,13 @@ jobs:
       project-version: ${{ github.ref_name }}
       push-version-commit: true
 
-  build-release-pdb:
-    name: Build Release (Debug Symbols)
+  build-relwithdebinfo:
+    name: Build RelWithDebInfo
     uses: ./.github/workflows/build.yml
     with:
-      cmake-preset: x86-release-pdb
-      upload-artifact-dll-pdb: release-dll-pdb
-      upload-artifact-vdf: release-vdf-pdb
+      cmake-preset: x86-relwithdebinfo
+      upload-artifact-dll-pdb: relwithdebinfo-dll
+      upload-artifact-vdf: relwithdebinfo-vdf
       project-version: ${{ github.ref_name }}
 
   publish:
@@ -33,7 +33,7 @@ jobs:
     runs-on: windows-2022
     needs:
       - build-release
-      - build-release-pdb
+      - build-relwithdebinfo
     steps:
       - name: Download Release DLL
         uses: actions/download-artifact@v4
@@ -48,13 +48,13 @@ jobs:
       - name: Download Release DLL PDB
         uses: actions/download-artifact@v4
         with:
-          name: release-dll-pdb
-          path: out/build/x86-release-pdb/
+          name: relwithdebinfo-dll
+          path: out/build/x86-relwithdebinfo/
       - name: Download Release DLL VDF
         uses: actions/download-artifact@v4
         with:
-          name: release-vdf-pdb
-          path: out/install/x86-release-pdb/
+          name: relwithdebinfo-vdf
+          path: out/install/x86-relwithdebinfo/
       - name: Prepare Release Files
         id: prepare-release
         shell: powershell
@@ -63,9 +63,9 @@ jobs:
         run: |
           $tag = $env:GITHUB_REF -replace '^refs/tags/', ''
           Compress-Archive out/install/x86-release/bin/* zBassMusic-${tag}.zip
-          Compress-Archive out/build/x86-release-pdb/* zBassMusic-${tag}-pdb.zip
+          Compress-Archive out/build/x86-relwithdebinfo/* zBassMusic-${tag}-relwithdebinfo.zip
           Copy-Item out/install/x86-release/zBassMusic.vdf zBassMusic-${tag}.vdf
-          Copy-Item out/install/x86-release-pdb/zBassMusic.vdf zBassMusic-${tag}-pdb.vdf
+          Copy-Item out/install/x86-relwithdebinfo/zBassMusic.vdf zBassMusic-${tag}-relwithdebinfo.vdf
           $prerelease = if (-not ($tag -match '^v?(\d+\.\d+\.\d+)$')) { 'true' } else { 'false' }
           echo "prerelease=${prerelease}" >> $env:GITHUB_OUTPUT
       - name: Release

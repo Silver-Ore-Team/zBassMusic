@@ -34,9 +34,9 @@ jobs:
       upload-artifact-vdf: release-vdf
 
   build-release-pdb:
-    name: Build Release (Debug Symbols)
+    name: Build RelWithDebInfo
     uses: ./.github/workflows/build.yml
     with:
-      cmake-preset: x86-release-pdb
-      upload-artifact-dll-pdb: release-dll-pdb
-      upload-artifact-vdf: release-vdf-pdb
+      cmake-preset: x86-relwithdebinfo
+      upload-artifact-dll-pdb: relwithdebinfo-dll
+      upload-artifact-vdf: relwithdebinfo-vdf

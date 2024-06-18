@@ -5,6 +5,8 @@ module.exports = async ({github, context, pull_number, status, log}) => {
         repo: context.repo.repo,
     });
 
+    console.log(reviews);
+
     for (let review of reviews) {
         if (review.user.login === 'github-actions' && review.state === 'COMMENTED') {
             await github.rest.pulls.dismissReview({

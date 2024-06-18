@@ -144,9 +144,9 @@ jobs:
           } else {
             echo "tests=failed" >> $env:GITHUB_OUTPUT
           }
-          $testsLog = (Get-Content -Path out/build/x86-debug/tests/Testing/Temporary/LastTest.log) -join "%%%"
+          $testsLog = (Get-Content -Path out/build/${{ inputs.cmake-preset }}/tests/Testing/Temporary/LastTest.log) -join "%%%"
           echo "tests_log=${testsLog}" >> $env:GITHUB_OUTPUT
-          cat out/build/x86-debug/tests/Testing/Temporary/LastTest.log
+          cat out/build/${{ inputs.cmake-preset }}/tests/Testing/Temporary/LastTest.log
           if (-not $status) {
             exit -1
           }

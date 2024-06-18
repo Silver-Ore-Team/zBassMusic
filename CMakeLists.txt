@@ -26,9 +26,12 @@ include(FetchContent)
 set(BUILD_UNION_API_STATIC OFF CACHE INTERNAL "Disable static build of UnionAPI")
 FetchContent_Declare(
         UnionAPI
-        GIT_REPOSITORY https://github.com/piotrmacha/union-api.cmake.git
-        GIT_TAG main)
+        URL https://github.com/piotrmacha/union-api.cmake/releases/latest/download/UnionAPI-v143-windows-2022.zip)
 FetchContent_MakeAvailable(UnionAPI)
+FetchContent_GetProperties(UnionAPI SOURCE_DIR UnionAPI_SOURCE_DIR)
+set(CMAKE_FIND_PACKAGE_REDIRECTS_DIR ${UnionAPI_SOURCE_DIR})
+set(UnionAPI_DIR ${UnionAPI_SOURCE_DIR}/lib/cmake/UnionAPI)
+find_package(UnionAPI CONFIG REQUIRED)
 
 find_package(spdlog CONFIG REQUIRED)
 include(cmake/bass.cmake)
@@ -50,16 +53,16 @@ configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src
 add_library(zbassmusic_gothicapi STATIC)
 target_compile_options(zbassmusic_gothicapi PRIVATE /W1 /wd4530 /wd4005)
 target_compile_definitions(zbassmusic_gothicapi PRIVATE __G1 __G1A __G2 __G2A)
-target_link_libraries(zbassmusic_gothicapi PRIVATE GothicAPI)
+target_link_libraries(zbassmusic_gothicapi PRIVATE UnionAPI::GothicAPI)
 
 file(GLOB_RECURSE ZBASSMUSIC_SOURCES "src/**.cpp")
 target_sources(zbassmusic PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/version.rc" ${ZBASSMUSIC_SOURCES})
 target_compile_options(zbassmusic PRIVATE /W4 /WX /wd4530 /wd4005)
 target_compile_definitions(zbassmusic PRIVATE __G1 __G1A __G2 __G2A)
 target_include_directories(zbassmusic PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/" "gothic-userapi"
-        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/gothic-api"
-        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/gothic-api/ZenGin/Gothic_UserAPI")
-target_link_libraries(zbassmusic PRIVATE UnionAPI zbassmusic_gothicapi bass_all)
+        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/include"
+        "${CMAKE_BINARY_DIR}/_deps/unionapi-src/include/ZenGin/Gothic_UserAPI")
+target_link_libraries(zbassmusic PRIVATE UnionAPI::UnionAPI zbassmusic_gothicapi bass_all)
 
 if (${BUILD_TESTS})
     enable_testing()
@@ -68,6 +71,15 @@ endif ()
 
 install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> DESTINATION ${CMAKE_BINARY_DIR})
 install(FILES $<TARGET_RUNTIME_DLLS:zbassmusic> TYPE BIN)
+install(TARGETS zbassmusic
+        EXPORT zBassMusicTargets
+        LIBRARY DESTINATION bin
+        ARCHIVE DESTINATION bin
+        RUNTIME DESTINATION bin)
+install(EXPORT zBassMusicTargets
+        FILE zBassMusicTargets.cmake
+        DESTINATION lib/cmake/Plugin)
+
 if (${BUILD_VDF})
     install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
     install(SCRIPT "${VDF_DIR}/vdf.cmake")

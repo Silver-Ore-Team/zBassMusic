@@ -157,7 +157,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const status = '${{ steps.tests.outputs.tests }}';
-            const log = '${{ steps.output.outputs.tests_log }}';
+            const log = '${{ steps.tests.outputs.tests_log }}';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

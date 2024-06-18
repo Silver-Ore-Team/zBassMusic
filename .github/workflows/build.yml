@@ -162,7 +162,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: (status === 'success' ? '😍 Tests passed!' : '😨 Tests failed!') + '\n\n' + log.replace('%%%', '\n')
+              body: (status === 'success' ? '😍 Tests passed!' : '😨 Tests failed!') + '\n\n```\n' + log.replaceAll('%%%', "\n") + '\n```'
             })
       - name: CMake Install
         run: cmake --install out/build/${{ inputs.cmake-preset }} --prefix out/install/${{ inputs.cmake-preset }}

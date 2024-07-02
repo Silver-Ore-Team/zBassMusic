@@ -6,6 +6,11 @@ namespace GOTHIC_NAMESPACE
 {
     int BassMusic_Play()
     {
+        if (s_musicSystemDisabled)
+        {
+            log->Error("Music system disabled.");
+            return 0;
+        }
         zSTRING id;
         parser->GetParameter(id);
         zCMusicTheme* theme = zmusic->LoadThemeByScript(id);

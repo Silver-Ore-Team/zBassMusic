@@ -4,7 +4,7 @@
 
 ## <a href="#bassmusic_play">BassMusic_Play</a>
 
-Triggers an event to start a new music theme.
+Triggers an event to start a new music theme. If the player has turned off the music in the menu, the theme will not be played.
 
 ```dae
 func void BassMusic_Play(var string id)

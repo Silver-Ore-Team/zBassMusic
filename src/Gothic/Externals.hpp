@@ -8,6 +8,12 @@ namespace GOTHIC_NAMESPACE
     {
         zSTRING id;
         parser->GetParameter(id);
+        if (zCMusicSystem::s_musicSystemDisabled)
+        {
+            static NH::Logger* log = NH::CreateLogger("zBassMusic::BassMusic_Play");
+            log->Error("Music system disabled.");
+            return 0;
+        }
         zCMusicTheme* theme = zmusic->LoadThemeByScript(id);
         zmusic->PlayTheme(theme, zMUS_THEME_VOL_DEFAULT, zMUS_TR_DEFAULT, zMUS_TRSUB_DEFAULT);
         return 0;

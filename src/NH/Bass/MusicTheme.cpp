@@ -5,23 +5,25 @@
 #include <NH/Bass/Command.h>
 #include <NH/Bass/EventManager.h>
 
+#include <utility>
+
 namespace NH::Bass
 {
-    HashString AudioFile::DEFAULT = "DEFAULT";
+    std::string AudioFile::DEFAULT = "DEFAULT";
     AudioEffects AudioEffects::None = {};
     MusicTheme MusicTheme::None = MusicTheme("<None>");
     Logger* MusicTheme::log = CreateLogger("zBassMusic::MusicTheme");
 
-    MusicTheme::MusicTheme(const String& name) : m_Name(name), m_TransitionInfo{ m_Name } {}
+    MusicTheme::MusicTheme(std::string  name) : m_Name(std::move(name)), m_TransitionInfo{ std::string(m_Name) } {}
 
-    void MusicTheme::SetAudioFile(HashString type, const String& filename)
+    void MusicTheme::SetAudioFile(const std::string& type, const std::string& filename)
     {
         m_AudioFiles.emplace(std::make_pair(type, AudioFile{}));
         m_AudioFiles[type].Filename = filename;
         m_AudioFiles[type].Status = AudioFile::StatusType::NOT_LOADED;
     }
 
-    void MusicTheme::SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter)
+    void MusicTheme::SetAudioEffects(const std::string& type, const std::function<void(AudioEffects&)>& effectsSetter)
     {
         if (!m_AudioFiles.contains(type))
         {
@@ -34,27 +36,27 @@ namespace NH::Bass
         }
     }
 
-    void MusicTheme::AddZone(HashString zone)
+    void MusicTheme::AddZone(const std::string& zone)
     {
         m_Zones.emplace_back(zone);
     }
 
-    void MusicTheme::AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile)
+    void MusicTheme::AddMidiFile(const std::string& type, const std::shared_ptr<MidiFile>& midiFile)
     {
-        m_MidiFiles.emplace(std::make_pair(HashString(type), midiFile));
-        m_MidiFiles[type]->LoadMidiFile(Executors.IO, [this, type](MidiFile& midi) {
+        m_MidiFiles.emplace(std::make_pair(std::string(type), midiFile));
+        m_MidiFiles[type]->LoadMidiFile(Executors.IO, [this, type](const MidiFile& midi) {
             m_TransitionInfo.AddMidiFile(midi, type);
         });
     }
 
-    void MusicTheme::AddJingle(const String& filename, double delay, HashString filter)
+    void MusicTheme::AddJingle(const std::string& filename, double delay, const std::string& filter)
     {
-        HashString key = String("Jingle_") + String(filter);
+        std::string key = "Jingle_" + filter;
         SetAudioFile(key, filename);
         LoadAudioFiles(Executors.IO);
         AudioFile& jingle = m_AudioFiles.at(key);
         m_TransitionInfo.AddJingle(std::shared_ptr<AudioFile>(&jingle), delay, filter);
-        log->Info("New jingle created {0}: {1}", String(filter), filename);
+        log->Info("New jingle created {0}: {1}", filter.c_str(), filename.c_str());
     }
 
     void MusicTheme::LoadAudioFiles(Executor& executor)
@@ -66,7 +68,7 @@ namespace NH::Bass
                 audioFile.Status = AudioFile::StatusType::LOADING;
                 executor.AddTask([type, this]() {
                     int systems = VDF_VIRTUAL | VDF_PHYSICAL;
-                    const Union::VDFS::File* file = Union::VDFS::GetDefaultInstance().GetFile(m_AudioFiles[type].Filename, systems);
+                    const Union::VDFS::File* file = Union::VDFS::GetDefaultInstance().GetFile(m_AudioFiles[type].Filename.c_str(), systems);
                     if (!file)
                     {
                         m_AudioFiles[type].Status = AudioFile::StatusType::FAILED;
@@ -95,23 +97,23 @@ namespace NH::Bass
         if (nextTheme.GetName() == GetName()) { return; }
 
         const auto& transition = m_TransitionInfo.GetTransition(nextTheme.GetName());
-        log->Debug("Transition {0} to {1}", GetName(), nextTheme.GetName());
-        log->PrintRaw(LoggerLevel::Trace, transition.ToString());
+        log->Debug("Transition {0} to {1}", GetName().c_str(), nextTheme.GetName().c_str());
+        log->PrintRaw(LoggerLevel::Trace, transition.ToString().c_str());
 
         if (!HasAudioFile(AudioFile::DEFAULT))
         {
             log->Error("{0} needs to transition into {1} but it doesn't have a DEFAULT audio. Switching to {1} without transitions",
-                    GetName(), nextTheme.GetName());
+                    GetName().c_str(), nextTheme.GetName().c_str());
             return;
         }
 
-        if (!ReadyToPlay(engine, AudioFile::DEFAULT))
+        if (!ReadyToPlay(engine))
         {
             const auto& file = GetAudioFile(AudioFile::DEFAULT);
             if (file.Status == AudioFile::StatusType::FAILED)
             {
                 log->Warning("{0} needs to transition into {1} but the audio file failed to load. Switching to {1} without transitions",
-                        GetName(), nextTheme.GetName());
+                        GetName().c_str(), nextTheme.GetName().c_str());
                 engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeInstantCommand>(nextTheme.GetName()));
                 return;
             }
@@ -170,10 +172,10 @@ namespace NH::Bass
     {
         if (!HasAudioFile(AudioFile::DEFAULT))
         {
-            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName());
+            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName().c_str());
             return;
         }
-        if (!ReadyToPlay(engine, AudioFile::DEFAULT)) { return; }
+        if (!ReadyToPlay(engine)) { return; }
 
         auto channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
         auto& effects = GetAudioEffects(AudioFile::DEFAULT);
@@ -216,7 +218,7 @@ namespace NH::Bass
         auto channel = GetAcquiredChannel();
         if (!channel)
         {
-            log->Warning("Requested to stop {0} but it does not have any playing channels.", m_Name);
+            log->Warning("Requested to stop {0} but it does not have any playing channels.", m_Name.c_str());
             ReleaseChannels();
             return;
         };
@@ -239,18 +241,18 @@ namespace NH::Bass
         }
     }
 
-    bool MusicTheme::ReadyToPlay(IEngine& engine, HashString audio)
+    bool MusicTheme::ReadyToPlay(IEngine& engine)
     {
         if (!HasAudioFile(AudioFile::DEFAULT))
         {
-            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName());
+            log->Error("{0} can't play because it doesn't have DEFAULT audio file", GetName().c_str());
             return false;
         }
 
         const auto& file = GetAudioFile(AudioFile::DEFAULT);
         if (file.Status == AudioFile::StatusType::FAILED)
         {
-            log->Error("Trying to play a music theme that has failed to load: {0}", file);
+            log->Error("Trying to play a music theme that has failed to load: {0}", file.Filename.c_str());
             return false;
         }
 
@@ -261,10 +263,10 @@ namespace NH::Bass
                         const AudioFile& f = GetAudioFile(AudioFile::DEFAULT);
                         if (f.Status == AudioFile::StatusType::FAILED)
                         {
-                            log->Error("Trying to play a music theme that has failed to load: {0}", f.Filename);
+                            log->Error("Trying to play a music theme that has failed to load: {0}", f.Filename.c_str());
                             return CommandResult::DONE;
                         }
-                        if (f.Status == AudioFile::StatusType::READY || (m_MidiFiles.contains(""_hs) && m_MidiFiles[""_hs]->GetStatus() == MidiFile::StatusType::PARSING))
+                        if (f.Status == AudioFile::StatusType::READY || (m_MidiFiles.contains("") && m_MidiFiles[""]->GetStatus() == MidiFile::StatusType::PARSING))
                         {
                             engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(m_Name));
                             return CommandResult::DONE;
@@ -277,21 +279,21 @@ namespace NH::Bass
         return true;
     }
 
-    const AudioEffects& MusicTheme::GetAudioEffects(HashString type) const
+    const AudioEffects& MusicTheme::GetAudioEffects(const std::string& type) const
     {
         if (m_AudioFiles.contains(type)) { return m_AudioEffects.at(type); }
         return AudioEffects::None;
     }
 
-    std::shared_ptr<MidiFile> MusicTheme::GetMidiFile(HashString type) const
+    std::shared_ptr<MidiFile> MusicTheme::GetMidiFile(const std::string& type) const
     {
         if (m_MidiFiles.contains(type)) { return m_MidiFiles.at(type); }
         return {};
     }
 
-    bool MusicTheme::HasZone(HashString zone) const
+    bool MusicTheme::HasZone(std::string zone) const
     {
-        zone = String(zone.GetValue()).MakeUpper();
+        zone = String(zone.c_str()).MakeUpper();
         return std::find(m_Zones.begin(), m_Zones.end(), zone) != m_Zones.end();
     }
 
@@ -313,13 +315,13 @@ namespace NH::Bass
         m_AcquiredChannels.clear();
     }
 
-    String MusicTheme::ToString() const
+    std::string MusicTheme::ToString() const
     {
-        String result = String("MusicTheme{ \n\tName: ") + m_Name + ", \n\tAudioFiles: {\n";
+        std::string result = "MusicTheme{ \n\tName: " + m_Name + ", \n\tAudioFiles: {\n";
         int i = 0;
         for (auto& [type, audioFile]: m_AudioFiles)
         {
-            result += String("\t\t") + String(type) + ": " + audioFile.ToString().Replace("\n", "\n\tt");
+            result += "\t\t" + type + ": " + String(audioFile.ToString().c_str()).Replace("\n", "\n\tt").ToChar();
             if (++i < m_AudioFiles.size())
             {
                 result += ",\n";
@@ -329,7 +331,7 @@ namespace NH::Bass
         result += "\n\t},\n\tAudioEffects: { \n";
         for (auto& [type, audioEffects]: m_AudioEffects)
         {
-            result += String("\t\t") + String(type) + ": " + audioEffects.ToString().Replace("\n", "\n\t\t");
+            result += "\t\t" + type + ": " + String(audioEffects.ToString().c_str()).Replace("\n", "\n\t\t").ToChar();
             if (++i < m_AudioEffects.size())
             {
                 result += ",\n";
@@ -339,7 +341,7 @@ namespace NH::Bass
         result += "\n\t},\n\tZones: { ";
         for (auto& zone: m_Zones)
         {
-            result += String(zone);
+            result += zone;
             if (++i < m_Zones.size())
             {
                 result += ", ";

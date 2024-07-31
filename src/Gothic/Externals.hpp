@@ -92,14 +92,14 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(theme);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme));
+        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
             log->Error("Theme {0} not found", theme.ToChar());
             return 0;
         }
 
-        target->AddMidiFile(NH::String(filter), std::make_shared<NH::Bass::MidiFile>(target->GetName(), NH::String(midiFilename.ToChar())));
+        target->AddMidiFile(filter.ToChar(), std::make_shared<NH::Bass::MidiFile>(target->GetName(), NH::String(midiFilename.ToChar())));
         return 0;
     }
 
@@ -120,7 +120,7 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(theme);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(NH::String(theme.ToChar()));
+        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
             log->Error("Theme {0} not found", theme.ToChar());
@@ -128,7 +128,7 @@ namespace GOTHIC_NAMESPACE
         }
 
         NH::Bass::Transition::TimePoint tp { start, duration, (NH::Bass::TransitionEffect)effect, nextStart, nextDuration, (NH::Bass::TransitionEffect)nextEffect };
-        target->GetTransitionInfo().AddTimePoint(tp, NH::String(filter.ToChar()));
+        target->GetTransitionInfo().AddTimePoint(tp, filter.ToChar());
 
         return 0;
     }

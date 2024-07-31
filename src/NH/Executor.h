@@ -2,7 +2,6 @@
 
 #include <NH/Logger.h>
 
-#include <cstdint>
 #include <vector>
 #include <thread>
 #include <functional>
@@ -39,7 +38,7 @@ namespace NH
     public:
         explicit ThreadPool(const String& name, size_t threads = std::thread::hardware_concurrency());
 
-        ~ThreadPool();
+        ~ThreadPool() override;
 
         void AddTask(TaskFN&& task) override;
 

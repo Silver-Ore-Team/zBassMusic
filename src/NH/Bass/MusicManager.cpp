@@ -2,39 +2,39 @@
 
 namespace NH::Bass
 {
-    void MusicManager::AddTheme(HashString id, const std::shared_ptr<MusicTheme>& theme)
+    void MusicManager::AddTheme(const std::string& id, const std::shared_ptr<MusicTheme>& theme)
     {
         m_Themes[id] = theme;
         m_Themes[id]->LoadAudioFiles(Executors.IO);
-        log->Info("New theme {0}", id);
-        log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString());
+        log->Info("New theme {0}", id.c_str());
+        log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString().c_str());
     }
 
-    void MusicManager::AddJingle(HashString id, const String& jingleFilename, double delay, HashString filter)
+    void MusicManager::AddJingle(const std::string& id, const String& jingleFilename, double delay, const std::string& filter)
     {
         if (m_Themes.contains(id))
         {
-            m_Themes[id]->AddJingle(jingleFilename, delay, filter);
+            m_Themes[id]->AddJingle(jingleFilename.ToChar(), delay, filter);
         }
         else
         {
-            log->Error("Theme {0} does not exist", String(id));
+            log->Error("Theme {0} does not exist", id.c_str());
         }
     }
 
-    void MusicManager::RefreshTheme(HashString id)
+    void MusicManager::RefreshTheme(const std::string& id)
     {
         if (m_Themes.contains(id))
         {
             m_Themes[id]->LoadAudioFiles(Executors.IO);
-            log->Info("Refresh theme {0}", id);
-            log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString());
+            log->Info("Refresh theme {0}", id.c_str());
+            log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString().c_str());
         }
     }
 
-    std::vector<std::pair<HashString, std::shared_ptr<MusicTheme>>> MusicManager::GetThemesForZone(HashString zone)
+    std::vector<std::pair<std::string, std::shared_ptr<MusicTheme>>> MusicManager::GetThemesForZone(const std::string& zone)
     {
-        std::vector<std::pair<HashString, std::shared_ptr<MusicTheme>>> themes;
+        std::vector<std::pair<std::string, std::shared_ptr<MusicTheme>>> themes;
         for (auto& [id, theme] : m_Themes)
         {
             if (theme->HasZone(zone))
@@ -45,7 +45,7 @@ namespace NH::Bass
         return std::move(themes);
     }
 
-    std::shared_ptr<MusicTheme> MusicManager::GetTheme(HashString id)
+    std::shared_ptr<MusicTheme> MusicManager::GetTheme(const std::string& id)
     {
         if (!m_Themes.contains(id))
         {

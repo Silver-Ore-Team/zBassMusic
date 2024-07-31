@@ -1,7 +1,6 @@
 #pragma once
 
 #include <NH/Logger.h>
-#include <NH/HashString.h>
 #include <NH/Executor.h>
 
 #include <bass.h>
@@ -34,7 +33,7 @@ namespace NH::Bass
 
     private:
         static Logger* log;
-        HashString m_ThemeId;
+        std::string m_ThemeId;
         String m_Filename;
         String m_TargetFilter;
         std::vector<char> m_Buffer{};
@@ -45,12 +44,12 @@ namespace NH::Bass
         std::vector<Tone> m_Tones{};
 
     public:
-        MidiFile(HashString themeId, const String& filename, const String& targetFilter = "")
+        MidiFile(const std::string& themeId, const String& filename, const String& targetFilter = "")
                 : m_ThemeId(themeId), m_Filename(filename), m_TargetFilter(targetFilter) {}
 
         void LoadMidiFile(Executor& executor, const std::function<void(MidiFile&)>& onReady = nullptr);
 
-        [[nodiscard]] HashString GetThemeId() const { return m_ThemeId; }
+        [[nodiscard]] std::string GetThemeId() const { return m_ThemeId; }
 
         [[nodiscard]] const String& GetFilename() const { return m_Filename; }
 

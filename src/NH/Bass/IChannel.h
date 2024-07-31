@@ -1,7 +1,10 @@
 #pragma once
 
+#include "NH/Commons.h"
+
 #include <functional>
 #include <expected>
+#include <stdexcept>
 
 namespace NH::Bass
 {
@@ -16,17 +19,17 @@ namespace NH::Bass
         {
             ErrorType Type;
             int32_t Code;
-            String Details;
+            std::string Details;
         public:
-            Error(ErrorType type, int32_t code, const String& details)
-                    : std::runtime_error(String::Format("{0} error: {1}, message: %s", ErrorTypeStrings[static_cast<int>(type)], code, details)),
+            Error(ErrorType type, const int32_t code, const std::string& details)
+                    : std::runtime_error(String::Format("{0} error: {1}, message: %s", ErrorTypeStrings[static_cast<int>(type)], code, details.c_str()).ToChar()),
                       Type(type), Code(code), Details(details) {};
-            Error(ErrorType type, int32_t code, const String&& details)
-                    : std::runtime_error(String::Format("{0} error: {1}, message: %s", ErrorTypeStrings[static_cast<int>(type)], code, details)),
+            Error(ErrorType type, const int32_t code, const std::string&& details)
+                    : std::runtime_error(String::Format("{0} error: {1}, message: %s", ErrorTypeStrings[static_cast<int>(type)], code, details.c_str()).ToChar()),
                       Type(type), Code(code), Details(details) {};
             [[nodiscard]] ErrorType GetType() const { return Type; }
             [[nodiscard]] int32_t GetCode() const { return Code; }
-            [[nodiscard]] const char* GetDetails() const { return Details; }
+            [[nodiscard]] const char* GetDetails() const { return Details.c_str(); }
         };
 
         template<typename T>

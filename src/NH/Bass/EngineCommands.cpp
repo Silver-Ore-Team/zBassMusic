@@ -11,11 +11,11 @@ namespace NH::Bass
 
     CommandResult ChangeZoneCommand::Execute(Engine& engine)
     {
-        log->Info("Music zone changed: {0}", m_Zone);
+        log->Info("Music zone changed: {0}", m_Zone.c_str());
         const auto themes = engine.GetMusicManager().GetThemesForZone(m_Zone);
         if (themes.empty())
         {
-            log->Warning("No themes found for zone {0}", m_Zone);
+            log->Warning("No themes found for zone {0}", m_Zone.c_str());
             return CommandResult::DONE;
         }
         engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(themes[0].first));
@@ -24,11 +24,11 @@ namespace NH::Bass
 
     CommandResult ScheduleThemeChangeCommand::Execute(Engine& engine)
     {
-        log->Info("Scheduling theme: {0}", m_ThemeId);
+        log->Info("Scheduling theme: {0}", m_ThemeId.c_str());
         auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
-            log->Error("Theme {0} doesn't exist", m_ThemeId);
+            log->Error("Theme {0} doesn't exist", m_ThemeId.c_str());
             return CommandResult::DONE;
         }
 
@@ -48,11 +48,11 @@ namespace NH::Bass
 
     CommandResult PlayThemeInstantCommand::Execute(Engine& engine)
     {
-        log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId);
+        log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId.c_str());
         auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
-            log->Error("Theme {0} doesn't exist", m_ThemeId);
+            log->Error("Theme {0} doesn't exist", m_ThemeId.c_str());
             return CommandResult::DONE;
         }
 

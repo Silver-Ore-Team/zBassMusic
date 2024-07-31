@@ -18,15 +18,15 @@ namespace NH::Bass
         return std::nullopt;
     }
 
-    String Transition::ToString() const
+    std::string Transition::ToString() const
     {
-        static String effects[] = {"NONE", "CROSSFADE"};
-        return String("Transition {\n")
-                + "\tEffect: " + effects[(size_t)Effect] + ",\n"
-                + "\tEffectDuration: " + String(EffectDuration) + ",\n"
+        static std::string effects[] = {"NONE", "CROSSFADE"};
+        return std::string("Transition {\n")
+                + "\tEffect: " + effects[static_cast<size_t>(Effect)] + ",\n"
+                + "\tEffectDuration: " + String(EffectDuration).ToChar() + ",\n"
                 + "\tTimePoints: " + "not_impl" + ",\n"
                 + "\tJingle: " + "not_impl" + ",\n"
-                + "\tJingleDelay: " + String(JingleDelay) + "\n"
+                + "\tJingleDelay: " + String(JingleDelay).ToChar() + "\n"
             + "}";
     }
 }

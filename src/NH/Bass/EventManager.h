@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NH/Logger.h"
-#include <NH/HashString.h>
 
 #include <utility>
 #include <vector>
@@ -22,16 +21,16 @@ namespace NH::Bass
 
     struct Event
     {
-        struct MusicEnd { MusicTheme const* Theme = nullptr; HashString AudioId; };
-        struct MusicTransition { MusicTheme const* Theme = nullptr; HashString AudioId; float TimeLeft = 0; };
-        struct MusicChange { MusicTheme const* Theme = nullptr; HashString AudioId; };
+        struct MusicEnd { MusicTheme const* Theme = nullptr; std::string AudioId; };
+        struct MusicTransition { MusicTheme const* Theme = nullptr; std::string AudioId; float TimeLeft = 0; };
+        struct MusicChange { MusicTheme const* Theme = nullptr; std::string AudioId; };
         using DataType = std::variant<MusicEnd, MusicTransition, MusicChange>;
 
         EventType Type = EventType::UNKNOWN;
         DataType Data;
 
         Event() = delete;
-        Event(EventType type, DataType data) : Type(type), Data(data) {}
+        Event(EventType type, DataType data) : Type(type), Data(std::move(data)) {}
         virtual ~Event() = default;
     };
 
@@ -78,19 +77,19 @@ namespace NH::Bass
     struct MusicEndEvent : public Event
     {
         MusicEnd Data;
-        MusicEndEvent(MusicTheme* theme, HashString audioId) : Event(EventType::MUSIC_END, MusicEnd{theme, audioId}) {}
+        MusicEndEvent(const MusicTheme* theme, const std::string& audioId) : Event(EventType::MUSIC_END, MusicEnd{theme, audioId}) {}
     };
 
     struct MusicTransitionEvent : public Event
     {
         MusicTransition Data;
-        MusicTransitionEvent(MusicTheme* theme, HashString audioId, float timeLeft)
+        MusicTransitionEvent(const MusicTheme* theme, const std::string& audioId, const float timeLeft)
             : Event(EventType::MUSIC_TRANSITION, MusicTransition{theme, audioId, timeLeft}) {}
     };
 
     struct MusicChangeEvent : public Event
     {
         MusicChange Data;
-        MusicChangeEvent(MusicTheme* theme, HashString audioId) : Event(EventType::MUSIC_CHANGE, MusicChange{theme, audioId}) {}
+        MusicChangeEvent(const MusicTheme* theme, const std::string& audioId) : Event(EventType::MUSIC_CHANGE, MusicChange{theme, audioId}) {}
     };
 }

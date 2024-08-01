@@ -18,8 +18,32 @@ namespace NH::Bass
 
     void MusicTheme::SetAudioFile(const std::string& type, const std::string& filename)
     {
-        m_AudioFiles.emplace(std::make_pair(type, AudioFile{}));
+        if (type.empty()) {
+            log->Error("MusicTheme::SetAudio(type, filename): error in {0}.", m_Name.c_str());
+            log->Error("MusicTheme::SetAudio(type, filename): type is empty or invalid string. Skipping.");
+            if (!filename.empty()) {
+                log->Error("MusicTheme::SetAudio(type, filename): filename was not empty and is equal to {0}.", filename.c_str());
+            }
+            return;
+        }
+        if (filename.empty()) {
+            log->Error("MusicTheme::SetAudio(type, filename): error in {0}.", m_Name.c_str());
+            log->Error("MusicTheme::SetAudio(type, filename): filename is empty or invalid string. Skipping.");
+            if (!type.empty()) {
+                log->Error("MusicTheme::SetAudio(type, filename): type was not empty and is equal to {0}.", filename.c_str());
+            }
+            return;
+        }
+
+        if (!m_AudioFiles.contains(type)) {
+            log->Info("MusicTheme::SetAudioFile(type, filename): Emplacing new audio file {0} to {1}.", type.c_str(), filename.c_str());
+            m_AudioFiles.emplace(std::string(type), AudioFile{});
+        } else {
+            log->Info("MusicTheme::SetAudioFile(type, filename): File audio object already exists {0} to {1}, skipping emplacement.", type.c_str(), filename.c_str());
+        }
+        log->Info("MusicTheme::SetAudioFile(type, filename): Setting .Filename to {0}.", filename.c_str());
         m_AudioFiles[type].Filename = filename;
+        log->Info("MusicTheme::SetAudioFile(type, filename): Setting .Status to AudioFile::StatusType::NOT_LOADED.");
         m_AudioFiles[type].Status = AudioFile::StatusType::NOT_LOADED;
     }
 

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Transition.h"
-#include <NH/Commons.h>
-#include <NH/HashString.h>
 
 #include <unordered_map>
+#include <utility>
 
 namespace NH::Bass
 {
@@ -12,26 +11,26 @@ namespace NH::Bass
 
     class TransitionInfo
     {
-        HashString m_SourceTheme;
+        std::string m_SourceTheme;
         Transition m_DefaultTransition;
-        std::unordered_map<HashString, Transition> m_FilteredTransitions;
+        std::unordered_map<std::string, Transition> m_FilteredTransitions;
 
     public:
-        explicit TransitionInfo(HashString sourceTheme)
-            : m_SourceTheme(sourceTheme)
+        explicit TransitionInfo(std::string sourceTheme)
+            : m_SourceTheme(std::move(sourceTheme))
         {}
 
-        void AddTransitionEffect(TransitionEffect effect, double duration = 0, HashString filter = ""_hs);
-        void AddMidiFile(MidiFile& file, HashString filter = ""_hs);
-        void AddTimePoint(Transition::TimePoint timePoint, HashString filter = ""_hs);
-        void AddJingle(std::shared_ptr<AudioFile> jingle, double delay, HashString filter = ""_hs);
+        void AddTransitionEffect(TransitionEffect effect, double duration = 0, const std::string& filter = "");
+        void AddMidiFile(const MidiFile& file, const std::string& filter = "");
+        void AddTimePoint(const Transition::TimePoint& timePoint, const std::string& filter = "");
+        void AddJingle(std::shared_ptr<AudioFile> jingle, double delay, const std::string& filter = "");
 
-        [[nodiscard]] const Transition& GetTransition(HashString targetTheme) const;
+        [[nodiscard]] const Transition& GetTransition(const std::string& targetTheme) const;
         [[nodiscard]] const Transition& GetDefaultTransition() const;
-        [[nodiscard]] HashString GetSourceTheme() const { return m_SourceTheme; }
+        [[nodiscard]] std::string GetSourceTheme() const { return m_SourceTheme; }
 
     private:
-        Transition* GetFilteredTransition(HashString filter);
+        Transition* GetFilteredTransition(std::string filter);
     };
 
 }

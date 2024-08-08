@@ -110,6 +110,8 @@ namespace GOTHIC_NAMESPACE
 
         void LoadBass()
         {
+            static NH::Logger* log = NH::CreateLogger("BassLoader::LoadBass");
+
             ForEachClass<BassMusicTheme>(
                     Globals->BassMusicThemeClassName,
                     [&]() { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
@@ -117,7 +119,7 @@ namespace GOTHIC_NAMESPACE
                         std::shared_ptr<NH::Bass::MusicTheme> theme = std::make_shared<NH::Bass::MusicTheme>(input->Name.ToChar());
                         theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, [](NH::Bass::AudioEffects& effects){});
                         auto zones = NH::String(input->Zones.ToChar()).Split(",");
-                        for (auto& zone: zones) { theme->AddZone(zone.MakeUpper()); }
+                        for (auto& zone: zones) { theme->AddZone(std::string(zone.MakeUpper().ToChar())); }
                         // input->Type ignored for now
                         NH::Bass::Engine::GetInstance()->GetMusicManager().AddTheme(input->Name.ToChar(), theme);
                     });
@@ -127,8 +129,13 @@ namespace GOTHIC_NAMESPACE
                     [&]() { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
                     [&](BassMusicThemeAudio* input, zCPar_Symbol* symbol) {
                         std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
-                        NH::String type =  NH::String(input->Type.ToChar());
-                        NH::HashString id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : NH::HashString(type);
+                        if (!theme) {
+                            log->Error("Could not find theme '{0}' referenced by {1}(BassMusic_ThemeAudio). Skipping...", input->Theme.ToChar(), symbol->name.ToChar());
+                            log->Error("Make sure that {0}.theme == BassMusic_Theme.name.", symbol->name.ToChar());
+                            return;
+                        }
+                        auto type = NH::String(input->Type.ToChar());
+                        const std::string id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : type.ToChar();
                         theme->SetAudioFile(id, input->Filename.ToChar());
                         theme->SetAudioEffects(id, [&](NH::Bass::AudioEffects& effects) {
                             effects.Loop.Active = input->Loop;
@@ -154,8 +161,8 @@ namespace GOTHIC_NAMESPACE
                         });
                         if (!input->MidiFile.IsEmpty())
                         {
-                            auto midiFile = std::make_shared<NH::Bass::MidiFile>(theme->GetName(), NH::HashString(NH::String(input->MidiFile.ToChar())));
-                            theme->AddMidiFile(NH::HashString(""), midiFile);
+                            auto midiFile = std::make_shared<NH::Bass::MidiFile>(theme->GetName(), NH::String(input->MidiFile.ToChar()));
+                            theme->AddMidiFile("", midiFile);
                         }
                         NH::Bass::Engine::GetInstance()->GetMusicManager().RefreshTheme(theme->GetName());
                     });

@@ -3,7 +3,7 @@
 namespace NH
 {
     CommonExecutors Executors = {
-            .IO = ThreadPool("IO", std::thread::hardware_concurrency())
+            .IO = ThreadPool("IO", 1)
     };
 
     ThreadPool::ThreadPool(const String& name, size_t threads)

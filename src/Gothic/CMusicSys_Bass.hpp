@@ -7,8 +7,8 @@ namespace GOTHIC_NAMESPACE
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
 
             NH::Bass::Event::MusicEnd data = std::get<NH::Bass::Event::MusicEnd>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
-            zSTRING name{ data.Theme->GetName() };
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
+            zSTRING name{ data.Theme->GetName().c_str() };
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             for (int i = 0; i < Globals->Event_OnEnd_Functions.GetNumInList(); i++)
@@ -25,8 +25,8 @@ namespace GOTHIC_NAMESPACE
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
 
             NH::Bass::Event::MusicTransition data = std::get<NH::Bass::Event::MusicTransition>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
-            zSTRING name{ data.Theme->GetName() };
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
+            zSTRING name{ data.Theme->GetName().c_str() };
             float timeLeft = data.TimeLeft;
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
@@ -44,8 +44,8 @@ namespace GOTHIC_NAMESPACE
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
 
             NH::Bass::Event::MusicChange data = std::get<NH::Bass::Event::MusicChange>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.ToChar() };
-            zSTRING name{ data.Theme->GetName() };
+            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
+            zSTRING name{ data.Theme->GetName().c_str() };
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             Globals->BassMusic_ActiveThemeFilename = filename;
@@ -169,7 +169,7 @@ namespace GOTHIC_NAMESPACE
 
             nowPlaying = identifier;
             m_ActiveTheme = nullptr;
-            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(NH::String(identifier.ToChar())));
+            m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
 
             if (done)
             {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <NH/Logger.h>
-#include <NH/HashString.h>
 #include <NH/Executor.h>
 #include <NH/ToString.h>
 #include <NH/Bass/MidiFile.h>
@@ -15,21 +14,22 @@
 
 namespace NH::Bass
 {
-    struct AudioFile : public HasToString
+    class AudioFile : public HasToString
     {
-        static HashString DEFAULT;
+    public:
+        static std::string DEFAULT;
 
         enum class StatusType : size_t { NOT_LOADED = 0, LOADING, READY, FAILED };
 
-        String Filename;
+        std::string Filename;
         std::vector<char> Buffer = {};
         StatusType Status = StatusType::NOT_LOADED;
-        String Error;
+        std::string Error;
 
-        [[nodiscard]] String ToString() const override
+        [[nodiscard]] std::string ToString() const override
         {
-            static String types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
-            return String("AudioFile{ Filename: ") + Filename + ", Status: " + types[(size_t) Status] + ", Error: " + Error + " }";
+            static std::string types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
+            return std::string("AudioFile{ Filename: ") + Filename + ", Status: " + types[(size_t) Status] + ", Error: " + Error + " }";
         }
     };
 
@@ -43,13 +43,13 @@ namespace NH::Bass
         struct { bool Active = false; float Volume = 1.0f; } Volume{};
         struct { bool Active = false; } Loop{};
 
-        [[nodiscard]] String ToString() const override
+        [[nodiscard]] std::string ToString() const override
         {
-            return String("AudioEffects{ \n"
-                          "\tReverbDX8: { Active: ") + String(ReverbDX8.Active) + ", Mix: " + String(ReverbDX8.Mix) + ", Time: " + String(ReverbDX8.Time) + " }, \n"
-                   + "\tFadeIn: { Active: " + String(FadeIn.Active) + ", Duration: " + String(FadeIn.Duration) + " }, \n"
-                   + "\tFadeOut: { Active: " + String(FadeOut.Active) + ", Duration: " + String(FadeOut.Duration) + " }, \n"
-                   + "\tVolume: { Active: " + String(Volume.Active) + ", Volume: " + String(Volume.Volume) + " } \n}";
+            return std::string("AudioEffects{ \n"
+                          "\tReverbDX8: { Active: ") + std::string(ReverbDX8.Active ? "yes" : "no") + ", Mix: " + std::string(ReverbDX8.Mix ? "yes" : "no") + ", Time: " + std::string(ReverbDX8.Time ? "yes" : "no") + " }, \n"
+                   + "\tFadeIn: { Active: " + std::string(FadeIn.Active ? "yes" : "no") + ", Duration: " + std::string(FadeIn.Duration ? "yes" : "no") + " }, \n"
+                   + "\tFadeOut: { Active: " + std::string(FadeOut.Active ? "yes" : "no") + ", Duration: " + std::string(FadeOut.Duration ? "yes" : "no") + " }, \n"
+                   + "\tVolume: { Active: " + std::string(Volume.Active ? "yes" : "no") + ", Volume: " + std::string(Volume.Volume ? "yes" : "no") + " } \n}";
         }
     };
 
@@ -57,27 +57,27 @@ namespace NH::Bass
     {
         static Logger* log;
 
-        String m_Name;
+        std::string m_Name;
         size_t m_SyncHandlersId = 0;
         TransitionInfo m_TransitionInfo;
-        std::unordered_map<HashString, AudioFile> m_AudioFiles;
-        std::unordered_map<HashString, AudioEffects> m_AudioEffects;
-        std::unordered_map<HashString, std::shared_ptr<MidiFile>> m_MidiFiles;
+        std::unordered_map<std::string, AudioFile> m_AudioFiles;
+        std::unordered_map<std::string, AudioEffects> m_AudioEffects;
+        std::unordered_map<std::string, std::shared_ptr<MidiFile>> m_MidiFiles;
         std::unordered_map<size_t, std::function<void()>> m_SyncHandlers;
         std::unordered_map<size_t, std::function<void(double)>> m_SyncHandlersWithDouble;
-        std::vector<HashString> m_Zones;
+        std::vector<std::string> m_Zones;
         std::vector<std::shared_ptr<IChannel>> m_AcquiredChannels;
 
     public:
         static MusicTheme None;
 
-        explicit MusicTheme(const String& name);
+        explicit MusicTheme(std::string  name);
 
-        void SetAudioFile(HashString type, const String& filename);
-        void SetAudioEffects(HashString type, const std::function<void(AudioEffects&)>& effectsSetter);
-        void AddZone(HashString zone);
-        void AddMidiFile(HashString type, std::shared_ptr<MidiFile> midiFile);
-        void AddJingle(const String& filename, double delay, HashString filter);
+        void SetAudioFile(const std::string& type, const std::string& filename);
+        void SetAudioEffects(const std::string& type, const std::function<void(AudioEffects&)>& effectsSetter);
+        void AddZone(const std::string& zone);
+        void AddMidiFile(const std::string& type, const std::shared_ptr<MidiFile>& midiFile);
+        void AddJingle(const std::string& filename, double delay, const std::string& filter);
         void LoadAudioFiles(Executor& executor);
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
@@ -87,19 +87,19 @@ namespace NH::Bass
         void Stop(IEngine& engine);
         void Stop(IEngine& engine, const struct Transition& transition);
 
-        [[nodiscard]] const String& GetName() const { return m_Name; }
+        [[nodiscard]] const std::string& GetName() const { return m_Name; }
         [[nodiscard]] TransitionInfo& GetTransitionInfo() { return m_TransitionInfo; };
-        [[nodiscard]] bool HasAudioFile(HashString type) const { return m_AudioFiles.find(type) != m_AudioFiles.end(); }
-        [[nodiscard]] bool IsAudioFileReady(HashString type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
-        [[nodiscard]] const AudioFile& GetAudioFile(HashString type) const { return m_AudioFiles.at(type); }
-        [[nodiscard]] const AudioEffects& GetAudioEffects(HashString type) const;
-        [[nodiscard]] std::shared_ptr<MidiFile> GetMidiFile(HashString type) const;
-        [[nodiscard]] const std::vector<HashString>& GetZones() const { return m_Zones; }
-        [[nodiscard]] bool HasZone(HashString zone) const;
-        [[nodiscard]] String ToString() const override;
+        [[nodiscard]] bool HasAudioFile(std::string type) const { return m_AudioFiles.find(type) != m_AudioFiles.end(); }
+        [[nodiscard]] bool IsAudioFileReady(std::string type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
+        [[nodiscard]] const AudioFile& GetAudioFile(std::string type) const { return m_AudioFiles.at(type); }
+        [[nodiscard]] const AudioEffects& GetAudioEffects(const std::string& type) const;
+        [[nodiscard]] std::shared_ptr<MidiFile> GetMidiFile(const std::string& type) const;
+        [[nodiscard]] const std::vector<std::string>& GetZones() const { return m_Zones; }
+        [[nodiscard]] bool HasZone(std::string zone) const;
+        [[nodiscard]] std::string ToString() const override;
 
     private:
-        bool ReadyToPlay(IEngine& engine, HashString audio);
+        bool ReadyToPlay(IEngine& engine);
         std::shared_ptr<IChannel> GetAcquiredChannel();
         void ReleaseChannels();
 

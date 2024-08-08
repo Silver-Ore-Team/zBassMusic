@@ -19,8 +19,8 @@ namespace NH::Bass
         if (!m_Stream)
         {
             int code = BASS_ErrorGetCode();
-            log->Error("Could not create stream: {0}\n  error: {1}\n  at {2}:{3}", audioFile.Filename, Engine::ErrorCodeToString(code), __FILE__, __LINE__);
-            return std::unexpected(Error{ IChannel::ErrorType::INVALID_BUFFER, code, Engine::ErrorCodeToString(code) });
+            log->Error("Could not create stream: {0}\n  error: {1}\n  at {2}:{3}", audioFile.Filename.c_str(), Engine::ErrorCodeToString(code), __FILE__, __LINE__);
+            return std::unexpected(Error{ IChannel::ErrorType::INVALID_BUFFER, code, Engine::ErrorCodeToString(code).ToChar() });
         }
 
         BASS_ChannelStart(m_Stream);

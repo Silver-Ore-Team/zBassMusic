@@ -1,17 +1,12 @@
 #pragma once
 
-#include <bass.h>
 #include "EventManager.h"
 #include "Channel.h"
 #include "NH/Logger.h"
-#include "NH/HashString.h"
 #include <NH/Bass/IEngine.h>
 #include <NH/Bass/MusicManager.h>
 #include <NH/Bass/Command.h>
 #include <vector>
-#include <mutex>
-#include <chrono>
-#include <unordered_map>
 
 namespace NH::Bass
 {
@@ -23,7 +18,7 @@ namespace NH::Bass
         friend class ChangeZoneCommand;
         friend class ScheduleThemeChangeCommand;
 
-        static NH::Logger* log;
+        static Logger* log;
         static Engine* s_Instance;
         bool m_Initialized = false;
         float m_MasterVolume = 1.0f;

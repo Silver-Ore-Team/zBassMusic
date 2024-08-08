@@ -110,6 +110,8 @@ namespace GOTHIC_NAMESPACE
 
         void LoadBass()
         {
+            static NH::Logger* log = NH::CreateLogger("BassLoader::LoadBass");
+
             ForEachClass<BassMusicTheme>(
                     Globals->BassMusicThemeClassName,
                     [&]() { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
@@ -127,6 +129,11 @@ namespace GOTHIC_NAMESPACE
                     [&]() { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
                     [&](BassMusicThemeAudio* input, zCPar_Symbol* symbol) {
                         std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
+                        if (!theme) {
+                            log->Error("Could not find theme '{0}' referenced by {1}(BassMusic_ThemeAudio). Skipping...", input->Theme.ToChar(), symbol->name.ToChar());
+                            log->Error("Make sure that {0}.theme == BassMusic_Theme.name.", symbol->name.ToChar());
+                            return;
+                        }
                         auto type = NH::String(input->Type.ToChar());
                         const std::string id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : type.ToChar();
                         theme->SetAudioFile(id, input->Filename.ToChar());

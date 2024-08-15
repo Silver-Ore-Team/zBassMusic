@@ -75,3 +75,6 @@ The audio `theme` field must be the same as theme's `name` to assign it for this
 The audio instance must  use `DEFAULT` as a `type`, in order to play. 
 In the future, we may introduce features that use multiple files per theme, hence this separation.
 
+The `filename` field contains the name of the file that should be played in the custom theme. 
+Note that when using Union, only the filename should be provided, regardless of whether it is located in subdirectories 
+of the Music folder.

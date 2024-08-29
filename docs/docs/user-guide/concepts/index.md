@@ -31,11 +31,7 @@ The area where a song plays. Music zone are created using Spacer and a song may 
 
 Virtual file system used by Gothic to load assets. zBassMusic supports it fully, and we may reference some directory as:
 
-### Physical
+* Physical - Located on your computer hard drive in the Gothic installation directory.
 
-Located on your computer hard drive in the Gothic installation directory
-
-### Virtual
-
-A *.vdf or *.mod file loaded by Gothic, they contain the same directory structure as physical, 
+* Virtual - A *.vdf or *.mod file loaded by Gothic, they contain the same directory structure as physical, 
 but all files are inside the file (like a ZIP archive).

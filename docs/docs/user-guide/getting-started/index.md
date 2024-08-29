@@ -37,7 +37,7 @@ Alternatively, below you should see the newest release:
 
 </script>
 
-There are different kinds of files for different use cases.
+There are different kinds of files for different use cases:
 
 * `zBassMusic-{version}.zip`<br>ZIP archive with zBassMusic.dll and its dependencies. Use for loading the plugin
   directly from the disk.

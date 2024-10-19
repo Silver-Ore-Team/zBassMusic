@@ -107,7 +107,7 @@ namespace NH
         template<class T>
         T* GetAdapter() const
         {
-            for (int i = 0; i < m_Adapters.GetCount(); i++)
+            for (size_t i = 0; i < m_Adapters.GetCount(); i++)
             {
                 ILoggerAdapter* adapter = m_Adapters[i];
                 if (T* ptr = dynamic_cast<T*>(adapter))

@@ -34,7 +34,7 @@ namespace NH::Bass
 
         m_CommandQueue.Update(*this);
 
-        BASS_Update(delta);
+        BASS_Update(static_cast<int32_t>(delta));
         GetEM().Update();
     }
 

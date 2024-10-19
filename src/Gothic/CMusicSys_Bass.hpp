@@ -2,7 +2,7 @@ namespace GOTHIC_NAMESPACE
 {
     namespace BassEvent
     {
-        inline void Event_OnEnd(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnEnd(const NH::Bass::Event& event, [[maybe_unused]] void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
 
@@ -20,7 +20,7 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        inline void Event_OnTransition(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnTransition(const NH::Bass::Event& event, [[maybe_unused]] void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
 
@@ -38,7 +38,7 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        inline void Event_OnChange(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnChange(const NH::Bass::Event& event, [[maybe_unused]] void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
 
@@ -72,14 +72,14 @@ namespace GOTHIC_NAMESPACE
         {
             static constexpr std::string_view validExt{ ".sgt" };
 
-            if (file.Length() < validExt.size())
+            if (static_cast<uint32_t>(file.Length()) < validExt.size())
             {
                 return false;
             }
 
             const auto fileLen = static_cast<size_t>(file.Length());
             const auto extStart = fileLen - validExt.size();
-            const std::string_view fileExt{ std::next(file.ToChar(), static_cast<uint32_t>(extStart)), validExt.size() };
+            const std::string_view fileExt{ std::next(file.ToChar(), extStart), validExt.size() };
 
             auto toLowerSimple = [](const char t_char)
             {
@@ -177,7 +177,7 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void PlayTheme(zCMusicTheme* theme, float const& volume, zTMus_TransType const& transition, zTMus_TransSubType const& subTransition) override
+        void PlayTheme(zCMusicTheme* theme, float const& themeVolume, zTMus_TransType const& transition, zTMus_TransSubType const& subTransition) override
         {
             if (theme == nullptr) {
                 log->Error("PlayTheme illegal argument: theme == nullptr");
@@ -190,7 +190,7 @@ namespace GOTHIC_NAMESPACE
             {
                 m_BassEngine->StopMusic();
                 m_ActiveTheme = theme;
-                m_DirectMusic->PlayTheme(theme, volume, transition, subTransition);
+                m_DirectMusic->PlayTheme(theme, themeVolume, transition, subTransition);
                 return;
             }
 
@@ -231,10 +231,10 @@ namespace GOTHIC_NAMESPACE
             return m_BassEngine->GetVolume();
         }
 
-        void SetVolume(const float volume) override
+        void SetVolume(const float masterVolume) override
         {
-            m_BassEngine->SetVolume(volume);
-            m_DirectMusic->SetVolume(volume);
+            m_BassEngine->SetVolume(masterVolume);
+            m_DirectMusic->SetVolume(masterVolume);
         }
 
         int IsAvailable(zSTRING const& id) override

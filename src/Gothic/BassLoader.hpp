@@ -120,8 +120,8 @@ namespace GOTHIC_NAMESPACE
 
             ForEachClass<BassMusicTheme>(
                     Globals->BassMusicThemeClassName,
-                    [&]() { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
-                    [&](const BassMusicTheme* input, const zCPar_Symbol* symbol) {
+                    [&] { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
+                    [&](const BassMusicTheme* input, [[maybe_unused]] const zCPar_Symbol* symbol) {
                         const auto theme = std::make_shared<NH::Bass::MusicTheme>(input->Name.ToChar());
                         theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, []([[maybe_unused]] const NH::Bass::AudioEffects& effects) {});
                         for (auto zones = NH::String(input->Zones.ToChar()).Split(","); auto& zone: zones)
@@ -134,7 +134,7 @@ namespace GOTHIC_NAMESPACE
 
             ForEachClass<BassMusicThemeAudio>(
                     Globals->BassMusicThemeAudioClassName,
-                    [&]() { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
+                    [&] { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
                     [&](const BassMusicThemeAudio* input, const zCPar_Symbol* symbol) {
                         const std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
                         if (!theme) {

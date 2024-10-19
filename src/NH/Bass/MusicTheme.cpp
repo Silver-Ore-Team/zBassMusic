@@ -337,9 +337,9 @@ namespace NH::Bass
 
     std::shared_ptr<IChannel> MusicTheme::GetAcquiredChannel() const
     {
-        for (const auto& channel: m_AcquiredChannels)
+        if (m_AcquiredChannels.size() > 0)
         {
-            return channel;
+            return m_AcquiredChannels[0];
         }
         return {};
     }
@@ -356,7 +356,7 @@ namespace NH::Bass
     std::string MusicTheme::ToString() const
     {
         std::string result = "MusicTheme{ \n\tName: " + m_Name + ", \n\tAudioFiles: {\n";
-        int i = 0;
+        size_t i = 0;
         for (auto& [type, audioFile]: m_AudioFiles)
         {
             result += "\t\t" + type + ": " + String(audioFile.ToString().c_str()).Replace("\n", "\n\tt").ToChar();

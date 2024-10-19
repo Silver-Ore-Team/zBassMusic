@@ -5,8 +5,7 @@ project(zBassMusic VERSION ${PROJECT_VERSION_CMAKE})
 
 option(BUILD_VDF "Build .VDF file with plugin" ON)
 
-set(UNION_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/union-api")
-set(GOTHIC_API_DIR "${CMAKE_SOURCE_DIR}/dependencies/gothic-api")
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(BASS_DIR "${CMAKE_SOURCE_DIR}/dependencies/bass")
 set(VDF_DIR "${CMAKE_SOURCE_DIR}/vdf")
 set(GOTHIC_USERAPI_DIR "${CMAKE_SOURCE_DIR}/gothic-userapi")
@@ -17,8 +16,24 @@ if (${CMAKE_BUILD_RELEASE_PDB})
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif ()
 
-include(cmake/union-api.cmake)
-include(cmake/gothic-api.cmake)
+include(FetchContent)
+set(GOTHIC_API_G1  ON)
+set(GOTHIC_API_G1A ON)
+set(GOTHIC_API_G2  ON)
+set(GOTHIC_API_G2A ON)
+FetchContent_Declare(
+        union-api
+        GIT_REPOSITORY https://gitlab.com/union-framework/union-api.git
+        GIT_TAG        ede619be94cb6a7349c43b6678748ad1113a8c56
+)
+FetchContent_Declare(
+        gothic-api
+        GIT_REPOSITORY https://gitlab.com/union-framework/gothic-api.git
+        GIT_TAG        ba0894b136eda163209ef58a7dad07103cb2ed10
+)
+FetchContent_MakeAvailable(union-api)
+FetchContent_MakeAvailable(gothic-api)
+
 include(cmake/bass.cmake)
 
 add_library(plugin SHARED)
@@ -35,16 +50,19 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in" "${CMAKE_CURRENT_BINA
 configure_file("${CMAKE_SOURCE_DIR}/vdf/script.vdfs.in" "${CMAKE_BINARY_DIR}/script.vdfs")
 configure_file("${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in" "${CMAKE_BINARY_DIR}/src/BuildInfo.h" @ONLY)
 
-file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp" "${UNION_API_DIR}/union-api/Union/Memory.cpp")
+file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
-add_compile_options(plugin PRIVATE /W4 /WX)
-target_compile_definitions(plugin PRIVATE _UNION_API_DLL __G1 __G1A __G2 __G2A)
+target_compile_options(plugin PRIVATE
+        /W4 /WX /permissive- /Zc:__cplusplus /Zc:preprocessor /utf-8
+        /experimental:external /external:W0 /external:anglebrackets /external:templates-
+        /external:I ${CMAKE_BINARY_DIR}/_deps
+)
+
 target_include_directories(plugin PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")
-target_link_libraries(plugin PRIVATE union-api gothic-api bass_all)
+target_link_libraries(plugin PRIVATE union_api_lib gothic_api bass_all)
 
 install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/zBassMusic.dll" TYPE BIN)
-install(FILES $<TARGET_RUNTIME_DLLS:plugin> "${CMAKE_BINARY_DIR}/UnionAPI.dll" TYPE BIN)
 if (${BUILD_VDF})
     install(FILES "${CMAKE_BINARY_DIR}/script.vdfs" DESTINATION "${CMAKE_INSTALL_PREFIX}")
     install(SCRIPT "${VDF_DIR}/vdf.cmake")
@@ -70,7 +88,6 @@ endif ()
 if (DEFINED ENV{COPY_DLL_TARGET})
     add_custom_target(copy_dll ALL
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/zBassMusic.dll" "$ENV{COPY_DLL_TARGET}/Autorun/zBassMusic.dll"
-            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/UnionAPI.dll" "$ENV{COPY_DLL_TARGET}/Autorun/UnionAPI.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bass.dll" "$ENV{COPY_DLL_TARGET}/bass.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bassmidi.dll" "$ENV{COPY_DLL_TARGET}/bassmidi.dll"
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/dependencies/bass/lib/bassopus.dll" "$ENV{COPY_DLL_TARGET}/bassopus.dll"

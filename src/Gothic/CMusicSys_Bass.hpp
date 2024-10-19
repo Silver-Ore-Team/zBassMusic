@@ -2,13 +2,13 @@ namespace GOTHIC_NAMESPACE
 {
     namespace BassEvent
     {
-        void Event_OnEnd(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnEnd(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnEnd");
 
-            NH::Bass::Event::MusicEnd data = std::get<NH::Bass::Event::MusicEnd>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
-            zSTRING name{ data.Theme->GetName().c_str() };
+            auto [theme, audioId] = std::get<NH::Bass::Event::MusicEnd>(event.Data);
+            const zSTRING filename{theme->GetAudioFile(audioId).Filename.c_str()};
+            const zSTRING name{theme->GetName().c_str()};
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             for (int i = 0; i < Globals->Event_OnEnd_Functions.GetNumInList(); i++)
@@ -20,14 +20,13 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void Event_OnTransition(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnTransition(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnTransition");
 
-            NH::Bass::Event::MusicTransition data = std::get<NH::Bass::Event::MusicTransition>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
-            zSTRING name{ data.Theme->GetName().c_str() };
-            float timeLeft = data.TimeLeft;
+            auto [theme, audioId, timeLeft] = std::get<NH::Bass::Event::MusicTransition>(event.Data);
+            const zSTRING filename{theme->GetAudioFile(audioId).Filename.c_str()};
+            const zSTRING name{theme->GetName().c_str()};
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             for (int i = 0; i < Globals->Event_OnTransition_Functions.GetNumInList(); i++)
@@ -39,13 +38,13 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void Event_OnChange(const NH::Bass::Event& event, void* userData)
+        inline void Event_OnChange(const NH::Bass::Event& event, void* userData)
         {
             static NH::Logger* log = NH::CreateLogger("zBassMusic::Event_OnChange");
 
-            NH::Bass::Event::MusicChange data = std::get<NH::Bass::Event::MusicChange>(event.Data);
-            zSTRING filename{ data.Theme->GetAudioFile(data.AudioId).Filename.c_str() };
-            zSTRING name{ data.Theme->GetName().c_str() };
+            const auto [theme, audioId] = std::get<NH::Bass::Event::MusicChange>(event.Data);
+            const zSTRING filename{theme->GetAudioFile(audioId).Filename.c_str()};
+            const zSTRING name{ theme->GetName().c_str() };
             log->Trace("{0}, {1}", name.ToChar(), filename.ToChar());
 
             Globals->BassMusic_ActiveThemeFilename = filename;
@@ -61,7 +60,7 @@ namespace GOTHIC_NAMESPACE
         }
     }
 
-    class CMusicSys_Bass : public zCMusicSystem
+    class CMusicSys_Bass final : public zCMusicSystem
     {
     private:
         NH::Logger* log = NH::CreateLogger("zBassMusic::CMusicSys_Bass");
@@ -80,7 +79,7 @@ namespace GOTHIC_NAMESPACE
 
             const auto fileLen = static_cast<size_t>(file.Length());
             const auto extStart = fileLen - validExt.size();
-            const std::string_view fileExt{ std::next(file.ToChar(), extStart), validExt.size() };
+            const std::string_view fileExt{ std::next(file.ToChar(), static_cast<uint32_t>(extStart)), validExt.size() };
 
             auto toLowerSimple = [](const char t_char)
             {
@@ -117,7 +116,7 @@ namespace GOTHIC_NAMESPACE
                 return m_ActiveTheme;
             }
 
-            zCMusicTheme* theme = new zCMusicTheme;
+            auto* theme = new zCMusicTheme;
             theme->name = identifier;
 
             if (!(NH::Bass::Options->CreateMainParserCMusicTheme && parser->CreateInstance(identifier, &theme->fileName)))
@@ -167,6 +166,7 @@ namespace GOTHIC_NAMESPACE
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
 
+            m_DirectMusic->Stop();
             nowPlaying = identifier;
             m_ActiveTheme = nullptr;
             m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
@@ -177,10 +177,7 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void PlayTheme(zCMusicTheme* theme,
-                       float const& volume = zMUS_THEME_VOL_DEFAULT,
-                       zTMus_TransType const& transition = zMUS_TR_DEFAULT,
-                       zTMus_TransSubType const& subTransition = zMUS_TRSUB_DEFAULT) override
+        void PlayTheme(zCMusicTheme* theme, float const& volume, zTMus_TransType const& transition, zTMus_TransSubType const& subTransition) override
         {
             log->Trace("PlayTheme: {0}", theme->fileName.ToChar());
 
@@ -229,7 +226,7 @@ namespace GOTHIC_NAMESPACE
             return m_BassEngine->GetVolume();
         }
 
-        void SetVolume(float volume) override
+        void SetVolume(const float volume) override
         {
             m_BassEngine->SetVolume(volume);
             m_DirectMusic->SetVolume(volume);

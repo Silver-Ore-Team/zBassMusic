@@ -5,6 +5,7 @@
 #include <NH/Bass/MusicTheme.h>
 
 #include <utility>
+#include <regex>
 
 namespace NH::Bass
 {
@@ -12,8 +13,18 @@ namespace NH::Bass
     {
         for (const auto& [key, transition]: m_FilteredTransitions)
         {
-            String regex = String(key.c_str()).Replace(",", "|").Replace(" ", "\\s*").Replace("*", ".*");;
-            if (regex.IsMatchesMask(targetTheme.c_str()))
+            String regexString = String(key.c_str())
+                // interpret comma as an OR operator, "THEME_1,THEME_2" -> "THEME_1|THEME_2"
+                .Replace(",", "|")
+                // interpret a space as zero or more whitespace characters
+                .Replace(" ", "\\s*")
+                // nasty hack to avoid replacement of .* -> ..* by the next step
+                .Replace(".*", "*")
+                // interpret wildcard (*) as any match (.*) in the regex syntax
+                .Replace("*", ".*");
+
+            const std::regex regex(regexString);
+            if (std::smatch match; std::regex_match(targetTheme, match, regex))
             {
                 return transition;
             }
@@ -35,7 +46,7 @@ namespace NH::Bass
 
     void TransitionInfo::AddMidiFile(const MidiFile& file, const std::string& filter)
     {
-        Transition* transition = filter == "" ? &m_DefaultTransition : GetFilteredTransition(filter);
+        Transition* transition = filter.empty() ? &m_DefaultTransition : GetFilteredTransition(filter);
         Transition::TimePoint timePoint{-1};
         for (const auto& [key, start, end] : file.GetTones())
         {
@@ -58,18 +69,18 @@ namespace NH::Bass
 
     void TransitionInfo::AddTimePoint(const Transition::TimePoint& timePoint, const std::string& filter)
     {
-        Transition* transition = filter == "" ? &m_DefaultTransition : GetFilteredTransition(filter);
+        Transition* transition = filter.empty() ? &m_DefaultTransition : GetFilteredTransition(filter);
         transition->TimePoints.push_back(timePoint);
     }
 
     void TransitionInfo::AddJingle(std::shared_ptr<AudioFile> jingle, const double delay, const std::string& filter)
     {
-        Transition* transition = filter == "" ? &m_DefaultTransition : GetFilteredTransition(filter);
+        Transition* transition = filter.empty() ? &m_DefaultTransition : GetFilteredTransition(filter);
         transition->Jingle = std::move(jingle);
         transition->JingleDelay = delay;
     }
 
-    Transition* TransitionInfo::GetFilteredTransition(std::string filter)
+    Transition* TransitionInfo::GetFilteredTransition(const std::string& filter)
     {
         if (!m_FilteredTransitions.contains(filter))
         {

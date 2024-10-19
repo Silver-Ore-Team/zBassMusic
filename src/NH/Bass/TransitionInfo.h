@@ -27,10 +27,10 @@ namespace NH::Bass
 
         [[nodiscard]] const Transition& GetTransition(const std::string& targetTheme) const;
         [[nodiscard]] const Transition& GetDefaultTransition() const;
-        [[nodiscard]] std::string GetSourceTheme() const { return m_SourceTheme; }
+        [[nodiscard]] const std::string& GetSourceTheme() const { return m_SourceTheme; }
 
     private:
-        Transition* GetFilteredTransition(std::string filter);
+        Transition* GetFilteredTransition(const std::string& filter);
     };
 
 }

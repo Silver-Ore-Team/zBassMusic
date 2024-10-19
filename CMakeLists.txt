@@ -57,6 +57,7 @@ target_compile_options(plugin PRIVATE
         /W4 /WX /permissive- /Zc:__cplusplus /Zc:preprocessor /utf-8
         /experimental:external /external:W0 /external:anglebrackets /external:templates-
         /external:I ${CMAKE_BINARY_DIR}/_deps
+        /wd4740 # disable warning C4740: flow in or out of inline asm code suppresses global optimization
 )
 
 target_include_directories(plugin PRIVATE "src/" "${CMAKE_BINARY_DIR}/src/")

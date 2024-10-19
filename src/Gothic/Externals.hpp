@@ -1,10 +1,6 @@
-#include <thread>
-#include <string>
-#include <sstream>
-
 namespace GOTHIC_NAMESPACE
 {
-    int BassMusic_Play()
+    inline int BassMusic_Play()
     {
         zSTRING id;
         parser->GetParameter(id);
@@ -19,7 +15,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_OnEndEvent()
+    inline int BassMusic_OnEndEvent()
     {
         int funcId;
         parser->GetParameter(funcId);
@@ -27,7 +23,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_OnTransitionEvent()
+    inline int BassMusic_OnTransitionEvent()
     {
         int funcId;
         parser->GetParameter(funcId);
@@ -35,7 +31,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_OnChangeEvent()
+    inline int BassMusic_OnChangeEvent()
     {
         int funcId;
         parser->GetParameter(funcId);
@@ -43,7 +39,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_SetFullScriptControl()
+    inline int BassMusic_SetFullScriptControl()
     {
         int active;
         parser->GetParameter(active);
@@ -55,7 +51,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMuisc_Opt_TransitionTime()
+    inline int BassMusic_Opt_TransitionTime()
     {
         float time;
         parser->GetParameter(time);
@@ -64,7 +60,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_Opt_ForceDisableReverb()
+    inline int BassMusic_Opt_ForceDisableReverb()
     {
         int enabled;
         parser->GetParameter(enabled);
@@ -73,7 +69,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    int BassMusic_Opt_ForceFadeTransition()
+    inline int BassMusic_Opt_ForceFadeTransition()
     {
         int enabled;
         parser->GetParameter(enabled);
@@ -83,7 +79,7 @@ namespace GOTHIC_NAMESPACE
     }
 
     // func void BassMusic_AddMidiFile(var string theme, var string filter, var midiFilename)
-    int BassMusic_AddMidiFile()
+    inline int BassMusic_AddMidiFile()
     {
         static NH::Logger* log = NH::CreateLogger("zBassMusic::AddMidiFile");
 
@@ -92,7 +88,7 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(theme);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
+        const auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
             log->Error("Theme {0} not found", theme.ToChar());
@@ -104,7 +100,7 @@ namespace GOTHIC_NAMESPACE
     }
 
     // func void BassMusic_AddTransitionTimePoint(var string theme, var string filter, var float start, var float duration, var int effect, var float nextStart, var float nextDuration, var int nextEffect)
-    int BassMusic_AddTransitionTimePoint()
+    inline int BassMusic_AddTransitionTimePoint()
     {
         static NH::Logger* log = NH::CreateLogger("zBassMusic::AddTransitionTimePoint");
 
@@ -120,24 +116,22 @@ namespace GOTHIC_NAMESPACE
         parser->GetParameter(filter);
         parser->GetParameter(theme);
 
-        auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
+        const auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
             log->Error("Theme {0} not found", theme.ToChar());
             return 0;
         }
 
-        NH::Bass::Transition::TimePoint tp { start, duration, (NH::Bass::TransitionEffect)effect, nextStart, nextDuration, (NH::Bass::TransitionEffect)nextEffect };
+        NH::Bass::Transition::TimePoint tp { start, duration, static_cast<NH::Bass::TransitionEffect>(effect), nextStart, nextDuration, static_cast<NH::Bass::TransitionEffect>(nextEffect) };
         target->GetTransitionInfo().AddTimePoint(tp, filter.ToChar());
 
         return 0;
     }
 
     // func void BassMusic_AddJingle(var string name, var string filter, var string jingle, var float delay)
-    int BassMusic_AddJingle()
+    inline int BassMusic_AddJingle()
     {
-        static NH::Logger* log = NH::CreateLogger("zBassMusic::AddJingle");
-
         zSTRING name, filter, jingle;
         float delay;
         parser->GetParameter(delay);
@@ -150,7 +144,7 @@ namespace GOTHIC_NAMESPACE
         return 0;
     }
 
-    void DefineExternalsMusic()
+    inline void DefineExternalsMusic()
     {
         parserMusic->AddClassOffset(Globals->BassMusicThemeClassName, sizeof(BassMusicTheme));
         parserMusic->AddClassOffset(Globals->BassMusicThemeAudioClassName, sizeof(BassMusicThemeAudio));
@@ -159,7 +153,7 @@ namespace GOTHIC_NAMESPACE
         parserMusic->DefineExternal("BassMusic_AddJingle", BassMusic_AddJingle, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
     }
 
-    void DefineExternals()
+    inline void DefineExternals()
     {
         parser->DefineExternalVar("BassMusic_ActiveThemeFilename", &Globals->BassMusic_ActiveThemeFilename, zPAR_TYPE_STRING, 1);
         parser->DefineExternalVar("BassMusic_ActiveThemeID", &Globals->BassMusic_ActiveThemeID, zPAR_TYPE_STRING, 1);
@@ -171,7 +165,7 @@ namespace GOTHIC_NAMESPACE
         parser->DefineExternal("BassMusic_OnTransitionEvent", BassMusic_OnTransitionEvent, zPAR_TYPE_VOID, zPAR_TYPE_FUNC, zPAR_TYPE_VOID);
         parser->DefineExternal("BassMusic_OnChangeEvent", BassMusic_OnChangeEvent, zPAR_TYPE_VOID, zPAR_TYPE_FUNC, zPAR_TYPE_VOID);
         parser->DefineExternal("BassMusic_SetFullScriptControl", BassMusic_SetFullScriptControl, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
-        parser->DefineExternal("BassMusic_Opt_TransitionTime", BassMuisc_Opt_TransitionTime, zPAR_TYPE_VOID, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
+        parser->DefineExternal("BassMusic_Opt_TransitionTime", BassMusic_Opt_TransitionTime, zPAR_TYPE_VOID, zPAR_TYPE_FLOAT, zPAR_TYPE_VOID);
         parser->DefineExternal("BassMusic_Opt_ForceDisableReverb", BassMusic_Opt_ForceDisableReverb, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
         parser->DefineExternal("BassMusic_Opt_ForceFadeTransition", BassMusic_Opt_ForceFadeTransition, zPAR_TYPE_VOID, zPAR_TYPE_INT, zPAR_TYPE_VOID);
 

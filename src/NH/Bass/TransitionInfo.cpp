@@ -37,7 +37,7 @@ namespace NH::Bass
         return m_DefaultTransition;
     }
 
-    void TransitionInfo::AddTransitionEffect(TransitionEffect effect, double duration, const std::string& filter)
+    void TransitionInfo::AddTransitionEffect(const TransitionEffect effect, const double duration, const std::string& filter)
     {
         Transition* transition = filter.empty() ? &m_DefaultTransition : GetFilteredTransition(filter);
         transition->Effect = effect;

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <NH/Bass/IEngine.h>
-#include <NH/ToString.h>
+#include "NH/Bass/IEngine.h"
+#include "NH/ToString.h"
+
 #include <vector>
 
 namespace NH::Bass
@@ -9,7 +10,7 @@ namespace NH::Bass
     class MusicTheme;
 
     enum class TransitionEffect { NONE = 0, CROSSFADE = 1 };
-    struct Transition : public HasToString
+    struct Transition final : HasToString
     {
         static Transition EMPTY;
 

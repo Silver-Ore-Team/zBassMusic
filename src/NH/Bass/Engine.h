@@ -2,10 +2,11 @@
 
 #include "EventManager.h"
 #include "Channel.h"
+#include "IEngine.h"
+#include "MusicManager.h"
+#include "Command.h"
 #include "NH/Logger.h"
-#include <NH/Bass/IEngine.h>
-#include <NH/Bass/MusicManager.h>
-#include <NH/Bass/Command.h>
+
 #include <vector>
 
 namespace NH::Bass
@@ -13,7 +14,7 @@ namespace NH::Bass
     class ChangeZoneCommand;
     class ScheduleThemeChangeCommand;
 
-    class Engine : public IEngine
+    class Engine final : public IEngine
     {
         friend class ChangeZoneCommand;
         friend class ScheduleThemeChangeCommand;
@@ -37,7 +38,7 @@ namespace NH::Bass
         [[nodiscard]] float GetVolume() const;
 
         std::shared_ptr<MusicTheme> GetActiveTheme();
-        void SetActiveTheme(std::shared_ptr<MusicTheme> theme);
+        void SetActiveTheme(const std::shared_ptr<MusicTheme>& theme);
 
         std::shared_ptr<IChannel> AcquireFreeChannel() override;
         void ReleaseChannel(const std::shared_ptr<IChannel>& channel) override;

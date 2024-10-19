@@ -1,6 +1,7 @@
 #pragma once
 
-#include <NH/Commons.h>
+#include "NH/Commons.h"
+
 #include <Union/String.h>
 #include <Union/Array.h>
 
@@ -21,13 +22,13 @@ namespace NH
     constexpr const char* LoggerLevelToString(LoggerLevel level)
     {
         constexpr const char* values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" };
-        return values[(size_t)level];
+        return values[static_cast<size_t>(level)];
     }
 
     constexpr const char* LoggerLevelToDisplayString(LoggerLevel level)
     {
         constexpr const char* values[] = { " NONE", "FATAL", "ERROR", " WARN", " INFO", "DEBUG", "TRACE" };
-        return values[(size_t)level];
+        return values[static_cast<size_t>(level)];
     }
 
     LoggerLevel StringToLoggerLevel(String level);
@@ -41,20 +42,19 @@ namespace NH
     protected:
         LoggerLevel m_Level;
 
-        explicit ILoggerAdapter(LoggerLevel level = LoggerLevel::Debug) : m_Level(level) {}
+        explicit ILoggerAdapter(const LoggerLevel level = LoggerLevel::Debug) : m_Level(level) {}
         virtual ~ILoggerAdapter() = default;
 
-        bool CanLog(LoggerLevel level) const { return level <= m_Level; }
+        [[nodiscard]] bool CanLog(const LoggerLevel level) const { return level <= m_Level; }
 
         virtual void Message(LoggerLevel level, const String& channel, const String& message) = 0;
 
     public:
-        void SetLoggerLevel(LoggerLevel level) { m_Level = level; };
+        void SetLoggerLevel(const LoggerLevel level) { m_Level = level; };
     };
 
     class Logger
     {
-    private:
         const String m_LoggerName;
         Union::Array<ILoggerAdapter*> m_Adapters;
 
@@ -63,14 +63,14 @@ namespace NH
 
         explicit Logger(const String& name) : m_LoggerName(name) {};
 
-        explicit Logger(const String& name, Union::Array<ILoggerAdapter*> adapters) : m_LoggerName(name), m_Adapters(adapters) {};
+        explicit Logger(const String& name, const Union::Array<ILoggerAdapter*>& adapters) : m_LoggerName(name), m_Adapters(adapters) {};
 
         void Message(LoggerLevel level, const String& message);
 
         void PrintRaw(LoggerLevel level, const String& message) const;
 
         template<typename... Args>
-        void Message(LoggerLevel level, const char* format, Args... args) { Message(level, String::Format(format, args...)); }
+        void Message(const LoggerLevel level, const char* format, Args... args) { Message(level, String::Format(format, args...)); }
 
         void Fatal(const String& message) { Message(LoggerLevel::Fatal, message); };
 
@@ -102,16 +102,15 @@ namespace NH
         template<typename... Args>
         void Trace(const char* format, Args... args) { Trace(String::Format(format, args...)); }
 
-        Union::Array<ILoggerAdapter*> GetAdapters() const { return m_Adapters; };
+        [[nodiscard]] Union::Array<ILoggerAdapter*> GetAdapters() const { return m_Adapters; };
 
         template<class T>
         T* GetAdapter() const
         {
-            for (int i = 0; i < m_Adapters.GetCount(); i++)
+            for (size_t i = 0; i < m_Adapters.GetCount(); i++)
             {
                 ILoggerAdapter* adapter = m_Adapters[i];
-                T* ptr = dynamic_cast<T*>(adapter);
-                if (ptr)
+                if (T* ptr = dynamic_cast<T*>(adapter))
                 {
                     return ptr;
                 }
@@ -120,7 +119,7 @@ namespace NH
         }
     };
 
-    class UnionConsoleLoggerAdapter : public ILoggerAdapter
+    class UnionConsoleLoggerAdapter final : public ILoggerAdapter
     {
     public:
         static LoggerLevel DEFAULT_LEVEL;
@@ -143,7 +142,7 @@ namespace NH
         Color m_ColorTable[7];
     };
 
-    class ZSpyLoggerAdapter : public ILoggerAdapter
+    class ZSpyLoggerAdapter final : public ILoggerAdapter
     {
     private:
         String m_Prefix;
@@ -151,7 +150,7 @@ namespace NH
     public:
         static LoggerLevel DEFAULT_LEVEL;
 
-        explicit ZSpyLoggerAdapter(LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
+        explicit ZSpyLoggerAdapter(const LoggerLevel level = LoggerLevel::Debug, const String& prefix = "N") : ILoggerAdapter(level), m_Prefix(prefix) {}
 
     protected:
         void Message(LoggerLevel level, const String& channel, const String& message) override;
@@ -159,7 +158,6 @@ namespace NH
 
     class LoggerFactory
     {
-    private:
         static LoggerFactory* s_Instance;
         Union::Array<Logger*> m_Loggers{};
 

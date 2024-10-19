@@ -10,7 +10,7 @@ namespace NH::Bass
         log->PrintRaw(LoggerLevel::Debug, m_Themes[id]->ToString().c_str());
     }
 
-    void MusicManager::AddJingle(const std::string& id, const String& jingleFilename, double delay, const std::string& filter)
+    void MusicManager::AddJingle(const std::string& id, const String& jingleFilename, const double delay, const std::string& filter)
     {
         if (m_Themes.contains(id))
         {
@@ -42,7 +42,7 @@ namespace NH::Bass
                 themes.emplace_back(id, theme);
             }
         }
-        return std::move(themes);
+        return themes;
     }
 
     std::shared_ptr<MusicTheme> MusicManager::GetTheme(const std::string& id)

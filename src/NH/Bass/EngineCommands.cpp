@@ -1,7 +1,9 @@
 #include "EngineCommands.h"
 
-#include <NH/Bass/Engine.h>
-#include <NH/Bass/Options.h>
+#include "NH/Bass/Engine.h"
+#include "NH/Bass/Options.h"
+
+#include <algorithm>
 
 namespace NH::Bass
 {
@@ -25,19 +27,17 @@ namespace NH::Bass
     CommandResult ScheduleThemeChangeCommand::Execute(Engine& engine)
     {
         log->Info("Scheduling theme: {0}", m_ThemeId.c_str());
-        auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
+        const auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
             log->Error("Theme {0} doesn't exist", m_ThemeId.c_str());
             return CommandResult::DONE;
         }
 
-        auto activeTheme = engine.m_ActiveTheme;
-        bool anyChannelPlaying = false;
-        for (auto& channel : engine.m_Channels)
-        {
-            if (channel->IsPlaying()) { anyChannelPlaying = true; break; }
-        }
+        const auto activeTheme = engine.m_ActiveTheme;
+        const bool anyChannelPlaying = std::ranges::any_of(engine.m_Channels, [](const std::shared_ptr<Channel>& channel) {
+            return channel->IsPlaying();
+        });
 
         if (activeTheme && anyChannelPlaying) theme->Schedule(engine, activeTheme);
         else theme->Play(engine);
@@ -49,15 +49,14 @@ namespace NH::Bass
     CommandResult PlayThemeInstantCommand::Execute(Engine& engine)
     {
         log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId.c_str());
-        auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
+        const auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
             log->Error("Theme {0} doesn't exist", m_ThemeId.c_str());
             return CommandResult::DONE;
         }
 
-        auto activeTheme = engine.GetActiveTheme();
-        if (activeTheme) { activeTheme->Stop(engine); }
+        if (const auto activeTheme = engine.GetActiveTheme()) { activeTheme->Stop(engine); }
         theme->Play(engine);
         engine.SetActiveTheme(theme);
 

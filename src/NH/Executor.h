@@ -1,6 +1,6 @@
 #pragma once
 
-#include <NH/Logger.h>
+#include "NH/Logger.h"
 
 #include <vector>
 #include <thread>
@@ -19,16 +19,16 @@ namespace NH
         virtual ~Executor() = default;
     };
 
-    class InstantExecutor : public Executor
+    class InstantExecutor final : public Executor
     {
     public:
         void AddTask(TaskFN&& task) override { task(); }
         void AddTask(const TaskFN& task) override { task(); }
     };
 
-    class ThreadPool : public Executor
+    class ThreadPool final : public Executor
     {
-        NH::Logger* log;
+        Logger* log;
         String m_Name;
         std::vector<std::thread> m_Threads;
         std::deque<TaskFN> m_Tasks;

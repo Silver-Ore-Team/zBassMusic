@@ -47,5 +47,5 @@ HOOKSPACE(Gothic_II_Addon, GetGameVersion() == ENGINE);
 #endif
 
 #undef GOTHIC_NAMESPACE
-#undef ENGNE
+#undef ENGINE
 HOOKSPACE(Global, true);

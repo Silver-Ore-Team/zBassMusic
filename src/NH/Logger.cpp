@@ -8,40 +8,38 @@ namespace NH
 {
     LoggerLevel StringToLoggerLevel(String level)
     {
-        String values[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" };
-        size_t count = sizeof(values) / sizeof(String);
+        const String values[] = {"NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"};
+        constexpr size_t count = sizeof(values) / sizeof(String);
         for (size_t i = 0; i < count; i++)
         {
             if (level.MakeUpper() == values[i])
             {
-                return (LoggerLevel)i;
+                return static_cast<LoggerLevel>(i);
             }
         }
         return LoggerLevel::None;
     }
 
-    void Logger::Message(LoggerLevel level, const String& message)
+    void Logger::Message(const LoggerLevel level, const String& message)
     {
         if (level == LoggerLevel::None)
         {
             return;
         }
 
-        size_t count = m_Adapters.GetCount();
+        const size_t count = m_Adapters.GetCount();
         for (size_t i = 0; i < count; i++)
         {
-            ILoggerAdapter* adapter = m_Adapters[i];
-            if (adapter->CanLog(level))
+            if (ILoggerAdapter* adapter = m_Adapters[i]; adapter->CanLog(level))
             {
                 adapter->Message(level, m_LoggerName, message);
             }
         }
     }
 
-    void Logger::PrintRaw(LoggerLevel level, const String& message) const
+    void Logger::PrintRaw(const LoggerLevel level, const String& message) const
     {
-        auto* adapter = GetAdapter<UnionConsoleLoggerAdapter>();
-        if ((adapter && adapter->CanLog(level)) || !adapter)
+        if (const auto* adapter = GetAdapter<UnionConsoleLoggerAdapter>(); (adapter && adapter->CanLog(level)) || !adapter)
         {
             String::Format("\x1B[0m\x1B[36;3m{0}\x1B[0m", message).StdPrintLine();
         }
@@ -64,16 +62,16 @@ namespace NH
 
     void UnionConsoleLoggerAdapter::Message(LoggerLevel level, const String& channel, const String& message)
     {
-        Color color = m_ColorTable[(size_t)level];
+        auto [channelColor, levelColor, messageColor] = m_ColorTable[static_cast<size_t>(level)];
 
         String::Format("\x1B[0m{0} {1} \x1B[0m {2}[{3}]\x1B[0m {4}{5}\x1B[0m",
-                       color.Level, LoggerLevelToDisplayString(level),
-                       color.Channel, channel,
-                       color.Message, message)
+                       levelColor, LoggerLevelToDisplayString(level),
+                       channelColor, channel,
+                       messageColor, message)
                 .StdPrintLine();
     }
 
-    void ZSpyLoggerAdapter::Message(LoggerLevel level, const String& channel, const String& message)
+    void ZSpyLoggerAdapter::Message(const LoggerLevel level, const String& channel, const String& message)
     {
         String formattedMessage = String(m_Prefix) + ":\t" + channel + ": [" + LoggerLevelToString(level) + "]" + message;
 
@@ -91,6 +89,9 @@ namespace NH
         case Engine_G2A:
             Gothic_II_Addon::zerr->Message(Gothic_II_Addon::zSTRING(formattedMessage.ToChar()));
             break;
+        default:
+            // impossible case, but let the compiler know that we are aware
+            ;
         }
     }
 

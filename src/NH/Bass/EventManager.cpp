@@ -2,7 +2,7 @@
 
 namespace NH::Bass
 {
-    NH::Logger* EventManager::log = NH::CreateLogger("zBassMusic::EventManager");
+    Logger* EventManager::log = CreateLogger("zBassMusic::EventManager");
 
     EventSubscriber*
     EventManager::AddSubscriber(const EventType type, const EventSubscriberFn function, void* userData)

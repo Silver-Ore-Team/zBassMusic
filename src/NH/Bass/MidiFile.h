@@ -1,7 +1,7 @@
 #pragma once
 
-#include <NH/Logger.h>
-#include <NH/Executor.h>
+#include "NH/Logger.h"
+#include "NH/Executor.h"
 
 #include <bass.h>
 #include <bassmidi.h>
@@ -49,7 +49,7 @@ namespace NH::Bass
 
         void LoadMidiFile(Executor& executor, const std::function<void(MidiFile&)>& onReady = nullptr);
 
-        [[nodiscard]] std::string GetThemeId() const { return m_ThemeId; }
+        [[nodiscard]] const std::string& GetThemeId() const { return m_ThemeId; }
 
         [[nodiscard]] const String& GetFilename() const { return m_Filename; }
 

@@ -30,7 +30,7 @@ namespace NH::Bass
         DataType Data;
 
         Event() = delete;
-        Event(EventType type, DataType data) : Type(type), Data(std::move(data)) {}
+        Event(const EventType type, DataType data) : Type(type), Data(std::move(data)) {}
         virtual ~Event() = default;
     };
 
@@ -52,7 +52,7 @@ namespace NH::Bass
 
     class EventManager
     {
-        static NH::Logger* log;
+        static Logger* log;
 
         friend Engine;
 
@@ -74,22 +74,19 @@ namespace NH::Bass
         EventManager() = default;
     };
 
-    struct MusicEndEvent : public Event
+    struct MusicEndEvent final : Event
     {
-        MusicEnd Data;
         MusicEndEvent(const MusicTheme* theme, const std::string& audioId) : Event(EventType::MUSIC_END, MusicEnd{theme, audioId}) {}
     };
 
-    struct MusicTransitionEvent : public Event
+    struct MusicTransitionEvent final : Event
     {
-        MusicTransition Data;
         MusicTransitionEvent(const MusicTheme* theme, const std::string& audioId, const float timeLeft)
             : Event(EventType::MUSIC_TRANSITION, MusicTransition{theme, audioId, timeLeft}) {}
     };
 
-    struct MusicChangeEvent : public Event
+    struct MusicChangeEvent final : Event
     {
-        MusicChange Data;
         MusicChangeEvent(const MusicTheme* theme, const std::string& audioId) : Event(EventType::MUSIC_CHANGE, MusicChange{theme, audioId}) {}
     };
 }

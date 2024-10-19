@@ -1,9 +1,8 @@
 #pragma once
 
-#include "EventManager.h"
 #include "NH/Logger.h"
-#include <NH/Bass/MusicTheme.h>
-#include <NH/Bass/IChannel.h>
+#include "NH/Bass/IChannel.h"
+#include "NH/Bass/MusicTheme.h"
 
 #include <functional>
 
@@ -11,16 +10,16 @@ namespace NH::Bass
 {
     enum class ChannelStatus { AVAILABLE, ACQUIRED };
 
-    class Channel : public IChannel
+    class Channel final : public IChannel
     {
-        NH::Logger* log;
+        Logger* log;
         ChannelStatus m_Status = ChannelStatus::AVAILABLE;
         HSTREAM m_Stream = 0;
 
     public:
         explicit Channel(size_t index)
         {
-            log = NH::CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
+            log = CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
         };
 
         Result<void> PlayInstant(const AudioFile& audioFile) override;

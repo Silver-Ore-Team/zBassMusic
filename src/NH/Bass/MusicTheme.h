@@ -1,12 +1,12 @@
 #pragma once
 
-#include <NH/Logger.h>
-#include <NH/Executor.h>
-#include <NH/ToString.h>
-#include <NH/Bass/MidiFile.h>
-#include <NH/Bass/IEngine.h>
-#include <NH/Bass/IChannel.h>
-#include <NH/Bass/TransitionInfo.h>
+#include "NH/Logger.h"
+#include "NH/Executor.h"
+#include "NH/ToString.h"
+#include "NH/Bass/MidiFile.h"
+#include "NH/Bass/IEngine.h"
+#include "NH/Bass/IChannel.h"
+#include "NH/Bass/TransitionInfo.h"
 
 #include <vector>
 #include <unordered_map>
@@ -14,7 +14,7 @@
 
 namespace NH::Bass
 {
-    class AudioFile : public HasToString
+    class AudioFile final : public HasToString
     {
     public:
         static std::string DEFAULT;
@@ -28,12 +28,12 @@ namespace NH::Bass
 
         [[nodiscard]] std::string ToString() const override
         {
-            static std::string types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
-            return std::string("AudioFile{ Filename: ") + Filename + ", Status: " + types[(size_t) Status] + ", Error: " + Error + " }";
+            static const std::string types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
+            return std::string("AudioFile{ Filename: ") + Filename + ", Status: " + types[static_cast<size_t>(Status)] + ", Error: " + Error + " }";
         }
     };
 
-    struct AudioEffects : public HasToString
+    struct AudioEffects final : HasToString
     {
         static AudioEffects None;
 
@@ -53,7 +53,7 @@ namespace NH::Bass
         }
     };
 
-    class MusicTheme : public HasToString
+    class MusicTheme final : public HasToString
     {
         static Logger* log;
 
@@ -83,15 +83,15 @@ namespace NH::Bass
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
         void Transition(IEngine& engine, MusicTheme& nextTheme);
         void Play(IEngine& engine);
-        void Play(IEngine& engine, const struct Transition& transition, std::optional<Transition::TimePoint> timePoint = std::nullopt);
+        void Play(IEngine& engine, const struct Transition& transition, const std::optional<Transition::TimePoint>& timePoint = std::nullopt);
         void Stop(IEngine& engine);
         void Stop(IEngine& engine, const struct Transition& transition);
 
         [[nodiscard]] const std::string& GetName() const { return m_Name; }
         [[nodiscard]] TransitionInfo& GetTransitionInfo() { return m_TransitionInfo; };
-        [[nodiscard]] bool HasAudioFile(std::string type) const { return m_AudioFiles.find(type) != m_AudioFiles.end(); }
-        [[nodiscard]] bool IsAudioFileReady(std::string type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
-        [[nodiscard]] const AudioFile& GetAudioFile(std::string type) const { return m_AudioFiles.at(type); }
+        [[nodiscard]] bool HasAudioFile(const std::string& type) const { return m_AudioFiles.contains(type); }
+        [[nodiscard]] bool IsAudioFileReady(const std::string& type) const { return HasAudioFile(type) && m_AudioFiles.at(type).Status == AudioFile::StatusType::READY; }
+        [[nodiscard]] const AudioFile& GetAudioFile(const std::string& type) const { return m_AudioFiles.at(type); }
         [[nodiscard]] const AudioEffects& GetAudioEffects(const std::string& type) const;
         [[nodiscard]] std::shared_ptr<MidiFile> GetMidiFile(const std::string& type) const;
         [[nodiscard]] const std::vector<std::string>& GetZones() const { return m_Zones; }
@@ -100,14 +100,14 @@ namespace NH::Bass
 
     private:
         bool ReadyToPlay(IEngine& engine);
-        std::shared_ptr<IChannel> GetAcquiredChannel();
+        std::shared_ptr<IChannel> GetAcquiredChannel() const;
         void ReleaseChannels();
 
         const std::function<void(double)>& CreateSyncHandler(std::function<void(double)> function)
         {
             size_t id = m_SyncHandlersId++;
             log->Trace("SyncHandler id: {0}", id);
-            auto handler = [this, function = std::move(function), id](double value) {
+            auto handler = [this, function = std::move(function), id](const double value) {
                 function(value);
                 m_SyncHandlersWithDouble.erase(id);
             };

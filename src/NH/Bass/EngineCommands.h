@@ -1,14 +1,13 @@
 #pragma once
 
-#include <NH/Logger.h>
-#include <NH/Bass/Command.h>
-#include <NH/Bass/IEngine.h>
+#include "NH/Logger.h"
+#include "Command.h"
 
 #include <utility>
 
 namespace NH::Bass
 {
-    class ChangeZoneCommand : public Command
+    class ChangeZoneCommand final : public Command
     {
         static Logger* log;
         std::string m_Zone;
@@ -17,7 +16,7 @@ namespace NH::Bass
         CommandResult Execute(Engine& engine) override;
     };
 
-    class ScheduleThemeChangeCommand : public Command
+    class ScheduleThemeChangeCommand final : public Command
     {
         static Logger* log;
         std::string m_ThemeId;
@@ -26,7 +25,7 @@ namespace NH::Bass
         CommandResult Execute(Engine& engine) override;
     };
 
-    class PlayThemeInstantCommand : public Command
+    class PlayThemeInstantCommand final : public Command
     {
         static Logger* log;
         std::string m_ThemeId;

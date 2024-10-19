@@ -1,15 +1,13 @@
 #include "Options.h"
 #include "Engine.h"
 
-#include <bassmidi.h>
 #include <bassopus.h>
-#include <bassflac.h>
 
 #include <algorithm>
 
 namespace NH::Bass
 {
-    NH::Logger* Engine::log = NH::CreateLogger("zBassMusic::Engine");
+    Logger* Engine::log = CreateLogger("zBassMusic::Engine");
 
     Engine* Engine::s_Instance = nullptr;
 
@@ -30,13 +28,13 @@ namespace NH::Bass
         }
 
         static auto lastTimestamp = std::chrono::system_clock::now();
-        auto now = std::chrono::system_clock::now();
-        uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
+        const auto now = std::chrono::system_clock::now();
+        const uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
         lastTimestamp = now;
 
         m_CommandQueue.Update(*this);
 
-        BASS_Update(delta);
+        BASS_Update(static_cast<int32_t>(delta));
         GetEM().Update();
     }
 
@@ -82,6 +80,7 @@ namespace NH::Bass
             log->Warning("SetVolume({0}f) clamped to 1.0f", volume);
             volume = 1.0f;
         }
+
         if (volume < 0.0f)
         {
             log->Warning("SetVolume({0}f) clamped to 0.0f", volume);
@@ -89,7 +88,7 @@ namespace NH::Bass
         }
 
         m_MasterVolume = volume;
-        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 10000 * m_MasterVolume);
+        BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, static_cast<uint32_t>(10000 * m_MasterVolume));
     }
 
     float Engine::GetVolume() const
@@ -102,7 +101,7 @@ namespace NH::Bass
         return m_ActiveTheme;
     }
 
-    void Engine::SetActiveTheme(std::shared_ptr<MusicTheme> theme)
+    void Engine::SetActiveTheme(const std::shared_ptr<MusicTheme>& theme)
     {
         m_ActiveTheme = theme;
     }
@@ -134,27 +133,24 @@ namespace NH::Bass
 
     Engine::Engine()
     {
-        HPLUGIN midiPlugin = BASS_PluginLoad("bassmidi.dll", 0);
-        if (midiPlugin) { BASS_PluginEnable(midiPlugin, true); }
+        if (const HPLUGIN midiPlugin = BASS_PluginLoad("bassmidi.dll", 0)) { BASS_PluginEnable(midiPlugin, true); }
         else {
             log->Warning("Could not load BASSMIDI plugin. Make sure that bassmidi.dll is in the working directory or Autorun.");
             log->Warning("BASSMIDI plugin is required for MIDI metadata. Engine may crash without it.");
         }
 
-        HPLUGIN opusPlugin = BASS_PluginLoad("bassopus.dll", 0);
-        if (opusPlugin) { BASS_PluginEnable(opusPlugin, true); }
+        if (const HPLUGIN opusPlugin = BASS_PluginLoad("bassopus.dll", 0)) { BASS_PluginEnable(opusPlugin, true); }
         else { log->Warning("Could not load BASSOPUS plugin (bassopus.dll). Opus files won't play."); }
 
-        HPLUGIN flacPlugin = BASS_PluginLoad("bassflac.dll", 0);
-        if (flacPlugin) { BASS_PluginEnable(flacPlugin, true); }
+        if (const HPLUGIN flacPlugin = BASS_PluginLoad("bassflac.dll", 0)) { BASS_PluginEnable(flacPlugin, true); }
         else { log->Warning("Could not load BASSFLAC plugin (bassflac.dll). FLAC files won't play."); }
 
         size_t deviceIndex = 0;
         BASS_DEVICEINFO deviceInfo;
         for (size_t i = 1; BASS_GetDeviceInfo(i, &deviceInfo); i++)
         {
-            bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
-            bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
+            const bool enabled = deviceInfo.flags & BASS_DEVICE_ENABLED;
+            const bool isDefault = deviceInfo.flags & BASS_DEVICE_DEFAULT;
             log->Trace("Available device: {0} {1} {2}", deviceInfo.name, enabled ? "enabled" : "disabled", isDefault ? "default" : "");
             if (enabled && isDefault)
             {
@@ -166,7 +162,7 @@ namespace NH::Bass
         BASS_GetDeviceInfo(deviceIndex, &deviceInfo);
         log->Info("Device Name: {0}", deviceInfo.name);
 
-        m_Initialized = BASS_Init((int32_t) deviceIndex, 44100, 0, nullptr, nullptr);
+        m_Initialized = BASS_Init(static_cast<int32_t>(deviceIndex), 44100, 0, nullptr, nullptr);
         if (!m_Initialized)
         {
             log->Error("Could not initialize BASS using BASS_Init\n  {0}\n  at {1}:{2}",
@@ -189,7 +185,7 @@ namespace NH::Bass
     Union::StringUTF8 Engine::ErrorCodeToString(const int code)
     {
         // @formatter:off
-        static String map[] = { "BASS_OK", "BASS_ERROR_MEM", "BASS_ERROR_FILEOPEN", "BASS_ERROR_DRIVER", "BASS_ERROR_BUFLOST", "BASS_ERROR_HANDLE", "BASS_ERROR_FORMAT", "BASS_ERROR_POSITION", "BASS_ERROR_INIT", "BASS_ERROR_START", "BASS_ERROR_SSL", "BASS_ERROR_REINIT", "BASS_ERROR_ALREADY", "BASS_ERROR_NOTAUDIO", "BASS_ERROR_NOCHAN", "BASS_ERROR_ILLTYPE", "BASS_ERROR_ILLPARAM", "BASS_ERROR_NO3D", "BASS_ERROR_NOEAX", "BASS_ERROR_DEVICE", "BASS_ERROR_NOPLAY", "BASS_ERROR_FREQ", "BASS_ERROR_NOTFILE", "BASS_ERROR_NOHW", "BASS_ERROR_EMPTY", "BASS_ERROR_NONET", "BASS_ERROR_CREATE", "BASS_ERROR_NOFX", "BASS_ERROR_NOTAVAIL", "BASS_ERROR_DECODE", "BASS_ERROR_DX", "BASS_ERROR_TIMEOUT", "BASS_ERROR_FILEFORM", "BASS_ERROR_SPEAKER", "BASS_ERROR_VERSION", "BASS_ERROR_CODEC", "BASS_ERROR_ENDED", "BASS_ERROR_BUSY", "BASS_ERROR_UNSTREAMABLE", "BASS_ERROR_PROTOCOL", "BASS_ERROR_DENIED", "BASS_ERROR_UNKNOWN" };
+        static const String map[] = { "BASS_OK", "BASS_ERROR_MEM", "BASS_ERROR_FILEOPEN", "BASS_ERROR_DRIVER", "BASS_ERROR_BUFLOST", "BASS_ERROR_HANDLE", "BASS_ERROR_FORMAT", "BASS_ERROR_POSITION", "BASS_ERROR_INIT", "BASS_ERROR_START", "BASS_ERROR_SSL", "BASS_ERROR_REINIT", "BASS_ERROR_ALREADY", "BASS_ERROR_NOTAUDIO", "BASS_ERROR_NOCHAN", "BASS_ERROR_ILLTYPE", "BASS_ERROR_ILLPARAM", "BASS_ERROR_NO3D", "BASS_ERROR_NOEAX", "BASS_ERROR_DEVICE", "BASS_ERROR_NOPLAY", "BASS_ERROR_FREQ", "BASS_ERROR_NOTFILE", "BASS_ERROR_NOHW", "BASS_ERROR_EMPTY", "BASS_ERROR_NONET", "BASS_ERROR_CREATE", "BASS_ERROR_NOFX", "BASS_ERROR_NOTAVAIL", "BASS_ERROR_DECODE", "BASS_ERROR_DX", "BASS_ERROR_TIMEOUT", "BASS_ERROR_FILEFORM", "BASS_ERROR_SPEAKER", "BASS_ERROR_VERSION", "BASS_ERROR_CODEC", "BASS_ERROR_ENDED", "BASS_ERROR_BUSY", "BASS_ERROR_UNSTREAMABLE", "BASS_ERROR_PROTOCOL", "BASS_ERROR_DENIED", "BASS_ERROR_UNKNOWN" };
         // @formatter:on
         return map[code];
     }

@@ -1,9 +1,6 @@
-#include <deque>
-
 namespace GOTHIC_NAMESPACE
 {
-    struct GlobalsDef
-    {
+    struct GlobalsDef {
         zSTRING CMusicThemeClass = "C_MUSICTHEME";
         zSTRING BassMusicThemeClassName = "C_BassMusic_Theme";
         zSTRING BassMusicThemeAudioClassName = "C_BassMusic_ThemeAudio";
@@ -17,7 +14,7 @@ namespace GOTHIC_NAMESPACE
         bool FullScriptControl = false;
     };
 
-    GlobalsDef* CreateGlobals()
+    inline GlobalsDef* CreateGlobals()
     {
         if (GetGameVersion() != ENGINE)
         {
@@ -26,5 +23,5 @@ namespace GOTHIC_NAMESPACE
         return new GlobalsDef();
     }
 
-    GlobalsDef* Globals = CreateGlobals();
+    inline GlobalsDef* Globals = CreateGlobals();
 }

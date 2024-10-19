@@ -179,6 +179,11 @@ namespace GOTHIC_NAMESPACE
 
         void PlayTheme(zCMusicTheme* theme, float const& volume, zTMus_TransType const& transition, zTMus_TransSubType const& subTransition) override
         {
+            if (theme == nullptr) {
+                log->Error("PlayTheme illegal argument: theme == nullptr");
+                return;
+            }
+
             log->Trace("PlayTheme: {0}", theme->fileName.ToChar());
 
             if (IsDirectMusicFormat(theme->fileName))

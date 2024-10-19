@@ -2,15 +2,20 @@ namespace GOTHIC_NAMESPACE
 {
     inline int BassMusic_Play()
     {
+        static NH::Logger* log = NH::CreateLogger("zBassMusic::BassMusic_Play");
+
         zSTRING id;
         parser->GetParameter(id);
         if (zCMusicSystem::s_musicSystemDisabled)
         {
-            static NH::Logger* log = NH::CreateLogger("zBassMusic::BassMusic_Play");
             log->Error("Music system disabled.");
             return 0;
         }
         zCMusicTheme* theme = zmusic->LoadThemeByScript(id);
+        if (theme == nullptr) {
+            log->Error("Illegal argument: theme == nullptr. Check BassMusic_Play(theme) call and make sure that the theme does exist.");
+            return 0;
+        }
         zmusic->PlayTheme(theme, zMUS_THEME_VOL_DEFAULT, zMUS_TR_DEFAULT, zMUS_TRSUB_DEFAULT);
         return 0;
     }
@@ -91,7 +96,7 @@ namespace GOTHIC_NAMESPACE
         const auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
-            log->Error("Theme {0} not found", theme.ToChar());
+            log->Error("Theme {0} not found. Check BassMusic_AddMidiFile(theme, filter, midi_filename) call and make sure that the theme does exist.", theme.ToChar());
             return 0;
         }
 
@@ -119,11 +124,11 @@ namespace GOTHIC_NAMESPACE
         const auto target = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(theme.ToChar());
         if (!target)
         {
-            log->Error("Theme {0} not found", theme.ToChar());
+            log->Error("Theme {0} not found. Check BassMusic_AddTransitionTimePoint(theme, filter, start, duration, effect, next_start, next_duration, next_effect) call and make sure that the theme does exist.", theme.ToChar());
             return 0;
         }
 
-        NH::Bass::Transition::TimePoint tp { start, duration, static_cast<NH::Bass::TransitionEffect>(effect), nextStart, nextDuration, static_cast<NH::Bass::TransitionEffect>(nextEffect) };
+        const NH::Bass::Transition::TimePoint tp { start, duration, static_cast<NH::Bass::TransitionEffect>(effect), nextStart, nextDuration, static_cast<NH::Bass::TransitionEffect>(nextEffect) };
         target->GetTransitionInfo().AddTimePoint(tp, filter.ToChar());
 
         return 0;

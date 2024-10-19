@@ -1,10 +1,10 @@
+#include "NH/Bass/MidiFile.h"
+
 #include <functional>
-#include <NH/Bass/MidiFile.h>
 
 namespace GOTHIC_NAMESPACE
 {
-    struct GothicMusicTheme
-    {
+    struct GothicMusicTheme {
         zSTRING fileName;
         float vol;
         bool loop;
@@ -14,17 +14,18 @@ namespace GOTHIC_NAMESPACE
         zTMus_TransSubType trSubType;
     };
 
-    enum class BassMusicThemeType : size_t { NORMAL = 0 };
-
-    struct BassMusicTheme
+    enum class BassMusicThemeType : size_t
     {
+        NORMAL = 0
+    };
+
+    struct BassMusicTheme {
         zSTRING Name;
         zSTRING Zones;
         BassMusicThemeType Type = BassMusicThemeType::NORMAL;
     };
 
-    struct BassMusicThemeAudio
-    {
+    struct BassMusicThemeAudio {
         zSTRING Theme;
         zSTRING Type;
         zSTRING Filename;
@@ -52,9 +53,15 @@ namespace GOTHIC_NAMESPACE
 
         ~BassLoader()
         {
-            for (auto theme: m_GothicThemeInstances) { delete theme; }
-            for (auto theme: m_BassThemeInstances) { delete theme; }
-            for (auto theme: m_BassThemeAudioInstances) { delete theme; }
+            for (const auto theme: m_GothicThemeInstances) {
+                delete theme;
+            }
+            for (const auto theme: m_BassThemeInstances) {
+                delete theme;
+            }
+            for (const auto theme: m_BassThemeAudioInstances) {
+                delete theme;
+            }
         }
 
         void Load()
@@ -62,9 +69,8 @@ namespace GOTHIC_NAMESPACE
             LoadGothic();
             LoadBass();
 
-            zSTRING initFuncName("BassMusic_Init");
-            zCPar_Symbol* symbol = m_Parser->GetSymbol(initFuncName);
-            if (symbol && symbol->type == zPAR_TYPE_FUNC)
+            const zSTRING initFuncName("BassMusic_Init");
+            if (const zCPar_Symbol* symbol = m_Parser->GetSymbol(initFuncName); symbol && symbol->type == zPAR_TYPE_FUNC)
             {
                 m_Parser->CallFunc(initFuncName);
             }
@@ -76,8 +82,8 @@ namespace GOTHIC_NAMESPACE
             ForEachClass<GothicMusicTheme>(
                     "C_MUSICTHEME",
                     [&]() { return m_GothicThemeInstances.emplace_back(new GothicMusicTheme{}); },
-                    [&](GothicMusicTheme* input, zCPar_Symbol* symbol) {
-                        std::shared_ptr<NH::Bass::MusicTheme> theme = std::make_shared<NH::Bass::MusicTheme>(symbol->name.ToChar());
+                    [&](const GothicMusicTheme* input, const zCPar_Symbol* symbol) {
+                        const auto theme = std::make_shared<NH::Bass::MusicTheme>(symbol->name.ToChar());
                         theme->SetAudioFile(NH::Bass::AudioFile::DEFAULT, input->fileName.ToChar());
                         theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, [&](NH::Bass::AudioEffects& effects) {
                             effects.Loop.Active = input->loop;
@@ -89,7 +95,7 @@ namespace GOTHIC_NAMESPACE
                                 effects.ReverbDX8.Mix = input->reverbMix;
                                 effects.ReverbDX8.Time = input->reverbTime;
                             }
-                            bool forceFade = NH::Bass::Options->ForceFadeTransition;
+                            const bool forceFade = NH::Bass::Options->ForceFadeTransition;
                             if (forceFade || input->trType == zMUS_TR_INTRO || input->trType == zMUS_TR_ENDANDINTRO)
                             {
                                 effects.FadeIn.Active = true;
@@ -115,11 +121,13 @@ namespace GOTHIC_NAMESPACE
             ForEachClass<BassMusicTheme>(
                     Globals->BassMusicThemeClassName,
                     [&]() { return m_BassThemeInstances.emplace_back(new BassMusicTheme{}); },
-                    [&](BassMusicTheme* input, zCPar_Symbol* symbol) {
-                        std::shared_ptr<NH::Bass::MusicTheme> theme = std::make_shared<NH::Bass::MusicTheme>(input->Name.ToChar());
-                        theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, [](NH::Bass::AudioEffects& effects){});
-                        auto zones = NH::String(input->Zones.ToChar()).Split(",");
-                        for (auto& zone: zones) { theme->AddZone(std::string(zone.MakeUpper().ToChar())); }
+                    [&](const BassMusicTheme* input, const zCPar_Symbol* symbol) {
+                        const auto theme = std::make_shared<NH::Bass::MusicTheme>(input->Name.ToChar());
+                        theme->SetAudioEffects(NH::Bass::AudioFile::DEFAULT, []([[maybe_unused]] const NH::Bass::AudioEffects& effects) {});
+                        for (auto zones = NH::String(input->Zones.ToChar()).Split(","); auto& zone: zones)
+                        {
+                            theme->AddZone(std::string(zone.MakeUpper().ToChar()));
+                        }
                         // input->Type ignored for now
                         NH::Bass::Engine::GetInstance()->GetMusicManager().AddTheme(input->Name.ToChar(), theme);
                     });
@@ -127,8 +135,8 @@ namespace GOTHIC_NAMESPACE
             ForEachClass<BassMusicThemeAudio>(
                     Globals->BassMusicThemeAudioClassName,
                     [&]() { return m_BassThemeAudioInstances.emplace_back(new BassMusicThemeAudio{}); },
-                    [&](BassMusicThemeAudio* input, zCPar_Symbol* symbol) {
-                        std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
+                    [&](const BassMusicThemeAudio* input, const zCPar_Symbol* symbol) {
+                        const std::shared_ptr<NH::Bass::MusicTheme> theme = NH::Bass::Engine::GetInstance()->GetMusicManager().GetTheme(input->Theme.ToChar());
                         if (!theme) {
                             log->Error("Could not find theme '{0}' referenced by {1}(BassMusic_ThemeAudio). Skipping...", input->Theme.ToChar(), symbol->name.ToChar());
                             log->Error("Make sure that {0}.theme == BassMusic_Theme.name.", symbol->name.ToChar());
@@ -161,7 +169,7 @@ namespace GOTHIC_NAMESPACE
                         });
                         if (!input->MidiFile.IsEmpty())
                         {
-                            auto midiFile = std::make_shared<NH::Bass::MidiFile>(theme->GetName(), NH::String(input->MidiFile.ToChar()));
+                            const auto midiFile = std::make_shared<NH::Bass::MidiFile>(theme->GetName(), NH::String(input->MidiFile.ToChar()));
                             theme->AddMidiFile("", midiFile);
                         }
                         NH::Bass::Engine::GetInstance()->GetMusicManager().RefreshTheme(theme->GetName());
@@ -171,14 +179,13 @@ namespace GOTHIC_NAMESPACE
         template<typename T>
         void ForEachClass(const zSTRING& className, const std::function<T*()>& classFactory, const std::function<void(T*, zCPar_Symbol*)>& instanceFunc)
         {
-            ForEachPrototype(className, [&](int index) {
-                T* theme = classFactory();
-                if (theme)
+            ForEachPrototype(className, [&](const int index) {
+                if (T* theme = classFactory())
                 {
                     m_Parser->CreatePrototype(index, theme);
                 }
             });
-            ForEachInstance(className, [&](int index, zCPar_Symbol* symbol) {
+            ForEachInstance(className, [&](const int index, zCPar_Symbol* symbol) {
                 T* theme = classFactory();
                 if (theme)
                 {
@@ -188,9 +195,9 @@ namespace GOTHIC_NAMESPACE
             });
         }
 
-        void ForEachPrototype(const zSTRING& className, const std::function<void(int)>& func)
+        void ForEachPrototype(const zSTRING& className, const std::function<void(int)>& func) const
         {
-            int classIndex = m_Parser->GetIndex(className);
+            const int classIndex = m_Parser->GetIndex(className);
             if (classIndex < 0)
             {
                 return;
@@ -204,9 +211,9 @@ namespace GOTHIC_NAMESPACE
             }
         }
 
-        void ForEachInstance(const zSTRING& className, const std::function<void(int, zCPar_Symbol*)>& func)
+        void ForEachInstance(const zSTRING& className, const std::function<void(int, zCPar_Symbol*)>& func) const
         {
-            int classIndex = m_Parser->GetIndex(className);
+            const int classIndex = m_Parser->GetIndex(className);
             if (classIndex < 0)
             {
                 return;
@@ -221,4 +228,4 @@ namespace GOTHIC_NAMESPACE
             }
         }
     };
-}
+}// namespace GOTHIC_NAMESPACE

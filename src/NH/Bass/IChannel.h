@@ -15,7 +15,7 @@ namespace NH::Bass
         enum class ErrorType { INVALID_BUFFER };
         constexpr static const char* ErrorTypeStrings[] = { "INVALID_BUFFER" };
 
-        class Error : public std::runtime_error
+        class Error final : public std::runtime_error
         {
             ErrorType Type;
             int32_t Code;

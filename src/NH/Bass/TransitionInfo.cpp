@@ -1,8 +1,8 @@
 #include "TransitionInfo.h"
-#include "Transition.h"
 
-#include <NH/Bass/MidiFile.h>
-#include <NH/Bass/MusicTheme.h>
+#include "Transition.h"
+#include "MidiFile.h"
+#include "MusicTheme.h"
 
 #include <utility>
 #include <regex>

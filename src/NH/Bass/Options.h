@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Union/String.h"
+#include <Union/String.h>
 
 namespace NH::Bass
 {

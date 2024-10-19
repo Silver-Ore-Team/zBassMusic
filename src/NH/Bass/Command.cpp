@@ -13,27 +13,27 @@ namespace NH::Bass
 
     void CommandQueue::AddCommand(std::shared_ptr<Command> command)
     {
-        std::lock_guard<std::mutex> lock(m_DeferredMutex);
+        std::lock_guard lock(m_DeferredMutex);
         log->Trace("Adding command to queue");
         m_DeferredCommands.push_back(std::move(command));
     }
 
     void CommandQueue::AddPerFrameCommand(std::shared_ptr<Command> command)
     {
-        std::lock_guard<std::mutex> lock(m_PerFrameDeferredMutex);
+        std::lock_guard lock(m_PerFrameDeferredMutex);
         m_PerFrameCommandsDeferred.push_back(std::move(command));
     }
 
     void CommandQueue::Update(Engine& engine)
     {
         {
-            std::lock_guard<std::mutex> lock(m_PerFrameDeferredMutex);
+            std::lock_guard lock(m_PerFrameDeferredMutex);
             m_PerFrameCommands.insert(m_PerFrameCommands.end(), m_PerFrameCommandsDeferred.begin(), m_PerFrameCommandsDeferred.end());
             m_PerFrameCommandsDeferred.clear();
         }
 
         {
-            std::lock_guard<std::mutex> lock(m_PerFrameMutex);
+            std::lock_guard lock(m_PerFrameMutex);
             std::vector<std::shared_ptr<Command>> finishedCommands{};
             for (auto& command: m_PerFrameCommands)
             {
@@ -44,29 +44,28 @@ namespace NH::Bass
             }
             std::erase_if(m_PerFrameCommands, [&finishedCommands](const std::shared_ptr<Command>& command)
             {
-                return std::find(finishedCommands.begin(), finishedCommands.end(), command) != finishedCommands.end();
+                return std::ranges::find(finishedCommands, command) != finishedCommands.end();
             });
         }
 
         {
-            std::lock_guard<std::mutex> lock(m_DeferredMutex);
+            std::lock_guard lock(m_DeferredMutex);
             m_Commands.insert(m_Commands.end(), m_DeferredCommands.begin(), m_DeferredCommands.end());
             m_DeferredCommands.clear();
         }
 
         {
-            std::lock_guard<std::mutex> lock(m_DeferredMutex);
+            std::lock_guard lock(m_DeferredMutex);
             m_Commands.insert(m_Commands.end(), m_DeferredCommands.begin(), m_DeferredCommands.end());
             m_DeferredCommands.clear();
         }
 
-        std::lock_guard<std::mutex> lock(m_Mutex);
+        std::lock_guard lock(m_Mutex);
         std::shared_ptr<Command> commandToDefer;
         bool exitEarly = false;
         while (!exitEarly && !m_Commands.empty())
         {
-            auto result = m_Commands.front()->Execute(engine);
-            switch (result)
+            switch (auto result = m_Commands.front()->Execute(engine))
             {
                 case CommandResult::DONE:
                     m_Commands.pop_front();

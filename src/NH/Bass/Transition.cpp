@@ -1,12 +1,12 @@
 #include "Transition.h"
 
-#include <NH/Bass/MusicTheme.h>
+#include "NH/Bass/MusicTheme.h"
 
 namespace NH::Bass
 {
     Transition Transition::EMPTY = {};
 
-    std::optional<Transition::TimePoint> Transition::NextAvailableTimePoint(double position) const
+    std::optional<Transition::TimePoint> Transition::NextAvailableTimePoint(const double position) const
     {
         for (const auto& timePoint : TimePoints)
         {
@@ -20,7 +20,7 @@ namespace NH::Bass
 
     std::string Transition::ToString() const
     {
-        static std::string effects[] = {"NONE", "CROSSFADE"};
+        static const std::string effects[] = {"NONE", "CROSSFADE"};
         return std::string("Transition {\n")
                 + "\tEffect: " + effects[static_cast<size_t>(Effect)] + ",\n"
                 + "\tEffectDuration: " + String(EffectDuration).ToChar() + ",\n"

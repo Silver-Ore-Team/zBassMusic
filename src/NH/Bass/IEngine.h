@@ -1,6 +1,6 @@
 #pragma once
 
-#include <NH/Bass/IChannel.h>
+#include "IChannel.h"
 
 namespace NH::Bass
 {

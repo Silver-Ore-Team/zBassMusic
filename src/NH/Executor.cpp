@@ -2,21 +2,18 @@
 
 namespace NH
 {
-    CommonExecutors Executors = {
-            .IO = ThreadPool("IO", 1)
-    };
+    CommonExecutors Executors = {.IO = ThreadPool("IO", std::thread::hardware_concurrency())};
 
-    ThreadPool::ThreadPool(const String& name, size_t threads)
-            : Executor(), m_Name(name), log(NH::CreateLogger(String::Format("zBassMusic::ThreadPool({0})", name)))
+    ThreadPool::ThreadPool(const String& name, const size_t threads)
+        : Executor(), log(CreateLogger(String::Format("zBassMusic::ThreadPool({0})", name))), m_Name(name)
     {
         for (size_t i = 0; i < threads; i++)
         {
-            auto& thread = m_Threads.emplace_back([this]()
-                                   {
-                                       log->Info("[thread-{0}] started", std::format("{}", std::this_thread::get_id()).c_str());
-                                       EventLoop();
-                                       log->Info("[thread-{0}] exiting", std::format("{}", std::this_thread::get_id()).c_str());
-                                   });
+            auto& thread = m_Threads.emplace_back([this] {
+                log->Info("[thread-{0}] started", std::format("{}", std::this_thread::get_id()).c_str());
+                EventLoop();
+                log->Info("[thread-{0}] exiting", std::format("{}", std::this_thread::get_id()).c_str());
+            });
             thread.detach();
         }
     }
@@ -35,13 +32,13 @@ namespace NH
 
     void ThreadPool::AddTask(TaskFN&& task)
     {
-        std::lock_guard<std::mutex> lock(m_TasksMutex);
+        std::lock_guard lock(m_TasksMutex);
         m_Tasks.push_back(std::move(task));
     }
 
     void ThreadPool::AddTask(const TaskFN& task)
     {
-        std::lock_guard<std::mutex> lock(m_TasksMutex);
+        std::lock_guard lock(m_TasksMutex);
         m_Tasks.push_back(task);
     }
 
@@ -51,7 +48,7 @@ namespace NH
         {
             TaskFN task;
             {
-                std::lock_guard<std::mutex> lock(m_TasksMutex);
+                std::lock_guard lock(m_TasksMutex);
                 if (!m_Tasks.empty())
                 {
                     task = std::move(m_Tasks.front());
@@ -72,4 +69,4 @@ namespace NH
         }
     }
 
-}
+}// namespace NH

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <NH/Bass/MusicTheme.h>
+#include "NH/Bass/MusicTheme.h"
+
 #include <vector>
 
 namespace NH::Bass

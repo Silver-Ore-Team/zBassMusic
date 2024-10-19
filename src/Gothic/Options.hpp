@@ -2,37 +2,35 @@
 
 namespace GOTHIC_NAMESPACE
 {
-    void ApplyOptions()
+    inline void ApplyOptions()
     {
         if (GetGameVersion() != ENGINE)
         {
             return;
         }
 
-        Union::Array<NH::Logger*> loggers = NH::LoggerFactory::GetInstance()->GetLoggers();
         {
+            Union::Array<NH::Logger*> loggers = NH::LoggerFactory::GetInstance()->GetLoggers();
             static NH::Logger* log = NH::CreateLogger("zBassMusic::GothicOptions");
-            zSTRING unionValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelUnion", "INFO");
-            zSTRING zSpyValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelZSpy", "DEBUG");
+            const zSTRING unionValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelUnion", "INFO");
+            const zSTRING zSpyValue = zoptions->ReadString("BASSMUSIC", "LoggerLevelZSpy", "DEBUG");
 
-            for (auto it = loggers.begin(); it != loggers.end(); it++)
+            for (const auto& logger : loggers)
             {
-                auto* unionAdapter = (*it)->GetAdapter<NH::UnionConsoleLoggerAdapter>();
-                if (unionAdapter)
+                if (auto* unionAdapter = logger->GetAdapter<NH::UnionConsoleLoggerAdapter>())
                 {
-                    NH::LoggerLevel level = NH::StringToLoggerLevel(unionValue.ToChar());
-                    if (level != unionAdapter->DEFAULT_LEVEL)
+                    const NH::LoggerLevel level = NH::StringToLoggerLevel(unionValue.ToChar());
+                    if (level != NH::UnionConsoleLoggerAdapter::DEFAULT_LEVEL)
                     {
                         NH::UnionConsoleLoggerAdapter::DEFAULT_LEVEL = level;
                         log->Info("Logger level for UnionConsoleLoggerAdapter: {0}", unionValue.ToChar());
                     }
                     unionAdapter->SetLoggerLevel(level);
                 }
-                auto* zSpyAdapter = (*it)->GetAdapter<NH::ZSpyLoggerAdapter>();
-                if (zSpyAdapter)
+                if (auto* zSpyAdapter = logger->GetAdapter<NH::ZSpyLoggerAdapter>())
                 {
-                    NH::LoggerLevel level = NH::StringToLoggerLevel(zSpyValue.ToChar());
-                    if (level != zSpyAdapter->DEFAULT_LEVEL)
+                    const NH::LoggerLevel level = NH::StringToLoggerLevel(zSpyValue.ToChar());
+                    if (level != NH::ZSpyLoggerAdapter::DEFAULT_LEVEL)
                     {
                         NH::ZSpyLoggerAdapter::DEFAULT_LEVEL = level;
                         log->Info("Logger level for ZSpyLoggerAdapter: {0}", unionValue.ToChar());

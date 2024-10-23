@@ -24,3 +24,18 @@ BassMusic_AddJingle(
 ```
 
 Only one Jingle can be configured for (theme, filter) pair, but you can have multiple Jingles with different filters.
+
+You can use that function for example inside `INIT_GLOBAL()` function in `Startup.d` file.
+
+```dae
+func void BassMusic_Init()
+{
+    BassMusic_AddJingle("MyThemeToTransition", "OC_DAY_STD", "JingleFile.wav", 1.0);
+};
+
+func void INIT_GLOBAL()
+{
+    // ...
+  	BassMusic_Init();
+};
+```

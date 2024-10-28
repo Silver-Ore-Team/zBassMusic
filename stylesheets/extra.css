@@ -1,0 +1,105 @@
+/* #a00*/
+[data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #830404;
+    --md-typeset-a-color: rgb(255, 143, 143);
+}
+
+.md-content {
+    max-width: 160ch;
+}
+
+.grid.cards {
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+    grid-gap: 0.8rem;
+}
+
+.grid.cards > ul > li > p > span + strong {
+    margin-left: 10px;
+    vertical-align: -2px;
+    font-size: 0.9rem;
+}
+
+.footnote {
+    margin-top: 2rem;
+}
+
+.zbassmusic-contributos {
+    margin-top: 1rem;
+}
+
+/* .md-typeset code {
+    font-size: 0.8rem;
+} */
+
+.md-typeset .admonition {
+    font-size: 0.8rem;
+}
+
+.zbassmusic-externals h2 {
+    font-weight: bold;
+    border-bottom: 1px solid #666;
+}
+
+.zbassmusic-externals h2 a {
+    color: rgba(226, 228, 233, 0.82);
+
+}
+
+.zbassmusic-externals ul code {
+    line-height: 2;
+}
+
+.zbassmusic-externals > p:has(> strong) {
+    margin-top: 1.5Srem;
+    margin-bottom: 0;
+}
+
+.zbassmusic-externals > ul {
+    margin-top: 0.5rem;
+}
+
+.gh-release {
+    background: #111;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.gh-release-title {
+    font-weight: bold;
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+.gh-release pre {
+    overflow-x: hidden;
+}
+
+.gh-release-artifacts {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 2rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1rem;
+    font-weight: bold;
+}
+
+.gh-release-artifacts li {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+}
+
+.roadmap-legend .admonition {
+    margin: 0 auto;
+    font-size: 0.7rem;
+}
+
+.md-main {
+    margin-bottom: 3rem;
+}

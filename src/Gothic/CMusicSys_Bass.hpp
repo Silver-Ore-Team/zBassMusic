@@ -88,7 +88,7 @@ namespace GOTHIC_NAMESPACE
                        : t_char;
             };
 
-            return std::ranges::equal(fileExt | std::views::transform(toLowerSimple), validExt);
+            return std::ranges::equal(fileExt | std::ranges::views::transform(toLowerSimple), validExt);
         }
 
     public:

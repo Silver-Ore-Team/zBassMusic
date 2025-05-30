@@ -52,6 +52,8 @@ jobs:
           export-path-to-vcvarsall: VCVARSALL
       - name: CMake Setup
         uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3.25.0"
       - uses: actions/checkout@v4
         with:
           persist-credentials: false

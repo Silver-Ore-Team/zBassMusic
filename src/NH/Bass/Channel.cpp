@@ -4,9 +4,9 @@
 
 namespace NH::Bass
 {
-    struct OnSyncPosition { HSTREAM Channel; const std::function<void()>& Function; };
-    struct OnSyncWhenAudioEndsData { HSTREAM Channel; const std::function<void()>& Function; };
-    struct OnSyncBeforeAudioEndsData { HSTREAM Channel; const std::function<void(double)>& Function; };
+    struct OnSyncPosition { HSTREAM Channel; std::function<void()> Function; };
+    struct OnSyncWhenAudioEndsData { HSTREAM Channel; std::function<void()> Function; };
+    struct OnSyncBeforeAudioEndsData { HSTREAM Channel; std::function<void(double)> Function; };
 
     Channel::Result<void> Channel::PlayInstant(const AudioFile& audioFile)
     {

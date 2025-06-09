@@ -103,7 +103,7 @@ namespace NH::Bass
         std::shared_ptr<IChannel> GetAcquiredChannel() const;
         void ReleaseChannels();
 
-        const std::function<void(double)>& CreateSyncHandler(const std::function<void(double)>&& function)
+        const std::function<void(double)>& CreateSyncHandler(std::function<void(double)>&& function)
         {
             size_t id = m_SyncHandlersId++;
             log->Trace("SyncHandler id: {0}", id);
@@ -115,7 +115,7 @@ namespace NH::Bass
             return m_SyncHandlersWithDouble.at(id);
         }
 
-        const std::function<void()>& CreateSyncHandler(const std::function<void()>&& function)
+        const std::function<void()>& CreateSyncHandler(std::function<void()>&& function)
         {
             size_t id = m_SyncHandlersId++;
             log->Trace("SyncHandler id: {0}", id);

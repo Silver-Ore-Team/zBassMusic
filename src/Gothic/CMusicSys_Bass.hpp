@@ -224,6 +224,7 @@ namespace GOTHIC_NAMESPACE
             log->Trace("Stop");
             m_ActiveTheme = nullptr;
             m_DirectMusic->Stop();
+            m_BassEngine->StopMusic();
         }
 
         [[nodiscard]] float GetVolume() const override

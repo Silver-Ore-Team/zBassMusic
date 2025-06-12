@@ -45,4 +45,25 @@ namespace GOTHIC_NAMESPACE
         NH::Bass::Options->ForceFadeTransition = zoptions->ReadBool("BASSMUSIC", "ForceFadeTransition", false);
         NH::Bass::Options->CreateMainParserCMusicTheme = zoptions->ReadBool("BASSMUSIC", "CreateMainParserCMusicTheme", true);
     }
+
+    void UpdateMusicOptions()
+    {
+        if (zmusic)
+        {
+            float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
+            if (zmusic->GetVolume() != volume)
+            {
+                zmusic->SetVolume(volume);
+            }
+            int musicDisabled = !zoptions->ReadInt("SOUND", "musicEnabled", 1);
+            if (musicDisabled != zCMusicSystem::s_musicSystemDisabled)
+            {
+                zCMusicSystem::DisableMusicSystem(musicDisabled);
+                zCZoneMusic::SetAutochange(!musicDisabled);
+            }
+
+        }
+    }
+
+
 }

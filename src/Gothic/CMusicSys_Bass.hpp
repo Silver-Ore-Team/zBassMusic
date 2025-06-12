@@ -148,11 +148,9 @@ namespace GOTHIC_NAMESPACE
                 return;
             }
 
-            static zSTRING nowPlaying = "";
-
             zSTRING identifier = id;
             identifier.Upper();
-            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name || nowPlaying == identifier)
+            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
             {
                 return;
             }
@@ -160,15 +158,13 @@ namespace GOTHIC_NAMESPACE
             zCMusicTheme* theme = LoadThemeByScript(id);
             if (theme && IsDirectMusicFormat(theme->fileName))
             {
-                nowPlaying = "";
                 m_ActiveTheme = theme;
                 m_BassEngine->StopMusic();
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
 
             m_DirectMusic->Stop();
-            nowPlaying = identifier;
-            m_ActiveTheme = nullptr;
+            m_ActiveTheme = theme;
             m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
 
             if (done)

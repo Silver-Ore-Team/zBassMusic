@@ -30,6 +30,13 @@ namespace GOTHIC_NAMESPACE
     // G2A: 0x004DC1C0 public: virtual int __thiscall zCMenu::HandleFrame(void)
     inline auto* zCMenu_HandleFrame = reinterpret_cast<void*>(zSwitch(0x004CF470, 0x004DFD00, 0x004D9B20, 0x004DC1C0));
 
+    // We are hooking at the end of the function here
+    //  G1: 0x0045C9F0 (+ 0x172) public: int __thiscall zCOption::WriteString(class zSTRING const &,char const *,class zSTRING,int) - 0x0045CB62 
+    // G1A: 0x00463FB0 (+ 0x156) public: int __thiscall zCOption::WriteString(class zSTRING const &,char const *,class zSTRING,int) - 0x00464106  
+    //  G2: 0x004617C0 (+ 0x172) public: int __thiscall zCOption::WriteString(class zSTRING const &,char const *,class zSTRING,int) - 0x00461932 
+    // G2A: 0x00461FD0 (+ 0x172) public: int __thiscall zCOption::WriteString(class zSTRING const &,char const *,class zSTRING,int) - 0x00462142 
+    inline auto* zCOption_WriteString = reinterpret_cast<void*>(zSwitch(0x0045CB62, 0x00464106, 0x00461932, 0x00462142));
+
     void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg);
     inline auto Partial_zCParser_Parse = Union::CreatePartialHook(zCParser_Parse, zCParser_Parse_PartialHook);
     inline void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg)
@@ -53,8 +60,7 @@ namespace GOTHIC_NAMESPACE
             if (auto* directMusic = dynamic_cast<zCMusicSys_DirectMusic*>(zmusic))
             {
                 zmusic = new CMusicSys_Bass(bassEngine, directMusic);
-                float volume = zoptions->ReadReal("SOUND", "musicVolume", 1.0f);
-                zmusic->SetVolume(volume);
+                UpdateMusicOptions();
                 log->Info("Set music system to CMusicSys_Bass");
 
                 BassLoader bassLoaderMusic(parserMusic);
@@ -92,6 +98,13 @@ namespace GOTHIC_NAMESPACE
     inline void __fastcall oCMenu_Render_PartialHook()
     {
         NH::Bass::Engine::GetInstance()->Update();
+    }
+
+    void __fastcall zCOption_WriteString_PartialHook();
+    inline auto Partial_zCOption_WriteString = Union::CreatePartialHook(zCOption_WriteString, zCOption_WriteString_PartialHook);
+    inline void __fastcall zCOption_WriteString_PartialHook()
+    {
+        UpdateMusicOptions();
     }
 
 }

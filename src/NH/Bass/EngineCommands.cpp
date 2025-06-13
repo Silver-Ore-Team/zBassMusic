@@ -32,7 +32,7 @@ namespace NH::Bass
         {
             engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(themes[0].first));
         }
-        lastTimeChange = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(static_cast<int64_t>(themes[0].second->GetTransitionInfo().GetDefaultTransition().EffectDuration));
+        lastTimeChange = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(static_cast<int64_t>(themes[0].second->GetTransitionInfo().GetDefaultTransition().EffectDuration + 50));
         return CommandResult::DONE;
     }
 

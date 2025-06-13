@@ -11,7 +11,7 @@ jobs:
     name: Build Release
     uses: ./.github/workflows/build.yml
     secrets:
-      SSH_KEY: ${{ secrets.NEKOBOCIK_SSH_KEY }}
+      SSH_KEY: ${{ secrets.NEKOWIEC_SSH_KEY }}
     with:
       cmake-preset: x86-release
       upload-artifact-dll: release-dll

@@ -70,8 +70,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path ~/.ssh
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git config --global user.name "Nekobot"
-          git config --global user.email "nekobot-service.noreply@silveroreteam.pl"
+          git config --global user.name "Nekowiec"
+          git config --global user.email "programisci@silveroreteam.pl"
           git remote set-url origin git@github.com:Silver-Ore-Team/zBassMusic.git
           git fetch --all
           git checkout ${{ inputs.push-version-branch }}

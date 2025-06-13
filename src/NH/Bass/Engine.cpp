@@ -189,4 +189,14 @@ namespace NH::Bass
         // @formatter:on
         return map[code];
     }
+
+    std::string Engine::GetCurrentZone()
+    {
+        return m_CurrentZone;
+    }
+
+    void Engine::SetCurrentZone(const std::string& zone)
+    {
+        m_CurrentZone = zone;
+    }
 }

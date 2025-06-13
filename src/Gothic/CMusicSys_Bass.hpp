@@ -66,7 +66,6 @@ namespace GOTHIC_NAMESPACE
         NH::Logger* log = NH::CreateLogger("zBassMusic::CMusicSys_Bass");
         NH::Bass::Engine* m_BassEngine;
         zCMusicSys_DirectMusic* m_DirectMusic;
-        zCMusicTheme* m_ActiveTheme = nullptr;
 
         static bool IsDirectMusicFormat(const zSTRING& file)
         {
@@ -101,36 +100,9 @@ namespace GOTHIC_NAMESPACE
             m_BassEngine->GetEM().AddSubscriber(NH::Bass::EventType::MUSIC_CHANGE, &BassEvent::Event_OnChange, this);
         }
 
-        zCMusicTheme* LoadThemeByScript(zSTRING const& id) override
+        zCMusicTheme* LoadThemeByScript([[maybe_unused]] zSTRING const& id) override
         {
-            if (s_musicSystemDisabled || id.IsEmpty())
-            {
-                return nullptr;
-            }
-
-            log->Trace("LoadThemeByScript: {0}", id.ToChar());
-
-            zSTRING identifier = id;
-            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
-            {
-                return m_ActiveTheme;
-            }
-
-            auto* theme = new zCMusicTheme;
-            theme->name = identifier;
-
-            if (!(NH::Bass::Options->CreateMainParserCMusicTheme && parser->CreateInstance(identifier, &theme->fileName)))
-            {
-                parserMusic->CreateInstance(identifier, &theme->fileName);
-            }
-
-            if (IsDirectMusicFormat(theme->fileName))
-            {
-                delete theme;
-                theme = m_DirectMusic->LoadThemeByScript(id);
-            }
-
-            return theme;
+            return nullptr; // Not used in this implementation
         }
 
         void PlayThemeByScript(zSTRING const& id, int manipulate, int* done) override
@@ -150,21 +122,24 @@ namespace GOTHIC_NAMESPACE
 
             zSTRING identifier = id;
             identifier.Upper();
-            if (m_ActiveTheme && identifier.Upper() == m_ActiveTheme->name)
+            if (m_DirectMusic->GetActiveTheme() && m_DirectMusic->GetActiveTheme()->name == identifier)
             {
                 return;
             }
 
-            zCMusicTheme* theme = LoadThemeByScript(id);
-            if (theme && IsDirectMusicFormat(theme->fileName))
+            if (m_BassEngine->GetActiveTheme() && m_BassEngine->GetActiveTheme()->GetName() == identifier.ToChar())
             {
-                m_ActiveTheme = theme;
+                return;
+            }
+
+            std::shared_ptr<NH::Bass::MusicTheme> theme = m_BassEngine->GetMusicManager().GetTheme(identifier.ToChar());
+            if (theme && IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
+            {
                 m_BassEngine->StopMusic();
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);
             }
 
             m_DirectMusic->Stop();
-            m_ActiveTheme = theme;
             m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ChangeZoneCommand>(identifier.ToChar()));
 
             if (done)
@@ -185,14 +160,12 @@ namespace GOTHIC_NAMESPACE
             if (IsDirectMusicFormat(theme->fileName))
             {
                 m_BassEngine->StopMusic();
-                m_ActiveTheme = theme;
                 m_DirectMusic->PlayTheme(theme, themeVolume, transition, subTransition);
                 return;
             }
 
             // Called from an external
             m_DirectMusic->Stop();
-            m_ActiveTheme = theme;
             zSTRING identifier = theme->name;
             identifier.Upper();
             m_BassEngine->GetCommandQueue().AddCommand(std::make_shared<NH::Bass::ScheduleThemeChangeCommand>(identifier.ToChar()));
@@ -200,7 +173,13 @@ namespace GOTHIC_NAMESPACE
 
         zCMusicTheme* GetActiveTheme() override
         {
-            return m_ActiveTheme;
+            if (m_BassEngine->GetActiveTheme())
+            {
+                auto* theme = new zCMusicTheme();
+                theme->name = m_BassEngine->GetCurrentZone().c_str();
+                return theme;
+            }
+            return m_DirectMusic->GetActiveTheme();
         }
 
         void DoMusicUpdate() override
@@ -218,7 +197,6 @@ namespace GOTHIC_NAMESPACE
         void Stop() override
         {
             log->Trace("Stop");
-            m_ActiveTheme = nullptr;
             m_DirectMusic->Stop();
             m_BassEngine->StopMusic();
         }
@@ -236,7 +214,7 @@ namespace GOTHIC_NAMESPACE
 
         int IsAvailable(zSTRING const& id) override
         {
-            return (NH::Bass::Options->CreateMainParserCMusicTheme && parser->GetSymbol(id) != nullptr) || parserMusic->GetSymbol(id) != nullptr;
+            return (NH::Bass::Options->CreateMainParserCMusicTheme && parser->GetSymbol(id) != nullptr) || parserMusic->GetSymbol(id) != nullptr  || m_BassEngine->GetMusicManager().GetThemesForZone(id.ToChar()).size() > 0;
         }
     };
 }

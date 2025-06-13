@@ -14,13 +14,25 @@ namespace NH::Bass
     CommandResult ChangeZoneCommand::Execute(Engine& engine)
     {
         log->Info("Music zone changed: {0}", m_Zone.c_str());
+        engine.SetCurrentZone(m_Zone);
         const auto themes = engine.GetMusicManager().GetThemesForZone(m_Zone);
         if (themes.empty())
         {
             log->Warning("No themes found for zone {0}", m_Zone.c_str());
             return CommandResult::DONE;
         }
-        engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(themes[0].first));
+        static std::chrono::high_resolution_clock::time_point lastTimeChange;
+        std::chrono::high_resolution_clock::time_point timeChange = std::chrono::high_resolution_clock::now();
+        
+        if (lastTimeChange > timeChange)
+        {
+            engine.GetCommandQueue().AddCommand(std::make_shared<OnTimeCommand>(lastTimeChange, std::make_shared<ScheduleThemeChangeCommand>(themes[0].first)));
+        }
+        else 
+        {
+            engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(themes[0].first));
+        }
+        lastTimeChange = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(static_cast<int64_t>(themes[0].second->GetTransitionInfo().GetDefaultTransition().EffectDuration));
         return CommandResult::DONE;
     }
 

@@ -27,5 +27,7 @@ namespace NH::Bass
         virtual EventManager& GetEM() = 0;
         virtual MusicManager& GetMusicManager() = 0;
         virtual CommandQueue& GetCommandQueue() = 0;
+        virtual std::string GetCurrentZone() = 0;
+        virtual void SetCurrentZone(const std::string& zone) = 0;
     };
 }

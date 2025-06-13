@@ -23,6 +23,7 @@ namespace NH::Bass
         static Engine* s_Instance;
         bool m_Initialized = false;
         float m_MasterVolume = 1.0f;
+        std::string m_CurrentZone;
         std::vector<std::shared_ptr<Channel>> m_Channels;
         std::shared_ptr<MusicTheme> m_ActiveTheme = nullptr;
         CommandQueue m_CommandQueue{};
@@ -46,6 +47,8 @@ namespace NH::Bass
         EventManager& GetEM() override;
         MusicManager& GetMusicManager() override;
         CommandQueue& GetCommandQueue() override;
+        std::string GetCurrentZone() override;
+        void SetCurrentZone(const std::string& zone) override;
 
     private:
         Engine();

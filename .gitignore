@@ -415,3 +415,6 @@ out
 .idea
 
 !docs/**/release
+
+# Vs Code
+.vscode/*

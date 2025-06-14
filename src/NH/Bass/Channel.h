@@ -31,7 +31,7 @@ namespace NH::Bass
         void SetVolume(float volume) override;
         void SetLoop(bool loop) override;
         void SlideVolume(float targetVolume, uint32_t time) override;
-        void SlideVolume(float targetVolume, uint32_t time, const std::function<void()>& onFinish) override;
+        void SlideVolume(float targetVolume, uint32_t time, const std::function<void(bool)>& onFinish) override;
         void SetDX8ReverbEffect(float reverbMix, float reverbTime, float inputGain, float highFreqRTRatio) override;
 
         void OnPosition(double position, const std::function<void()>& callback) override;

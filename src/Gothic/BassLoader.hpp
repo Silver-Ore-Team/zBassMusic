@@ -32,6 +32,8 @@ namespace GOTHIC_NAMESPACE
         zSTRING MidiFile;
         float Volume;
         int Loop;
+        float loopStart;
+        float loopEnd;
         int Reverb;
         float ReverbMix;
         float ReverbTime;
@@ -146,7 +148,23 @@ namespace GOTHIC_NAMESPACE
                         const std::string id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : type.ToChar();
                         theme->SetAudioFile(id, input->Filename.ToChar());
                         theme->SetAudioEffects(id, [&](NH::Bass::AudioEffects& effects) {
-                            effects.Loop.Active = input->Loop;
+                            if (input->Loop)
+                            {
+                                effects.Loop.Active = true;
+                                if (input->loopStart >= 0 && input->loopEnd > input->loopStart)
+                                {
+                                    effects.Loop.Start = input->loopStart;
+                                    effects.Loop.End = input->loopEnd;
+                                }
+                                else
+                                {
+                                    log->Error("Invalid loop range for {0} in {1}. Skipping...", id.c_str(), symbol->name.ToChar());
+                                }
+                            }
+                            else
+                            {
+                                effects.Loop.Active = false;
+                            }
                             effects.Volume.Active = true;
                             effects.Volume.Volume = input->Volume;
                             if (!NH::Bass::Options->ForceDisableReverb && input->Reverb)

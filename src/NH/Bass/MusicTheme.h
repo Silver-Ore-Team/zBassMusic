@@ -41,7 +41,7 @@ namespace NH::Bass
         struct { bool Active = false; double Duration = 0; } FadeIn{};
         struct { bool Active = false; double Duration = 0; } FadeOut{};
         struct { bool Active = false; float Volume = 1.0f; } Volume{};
-        struct { bool Active = false; } Loop{};
+        struct { bool Active = false; double Start = 0; double End =0;} Loop{};
 
         [[nodiscard]] std::string ToString() const override
         {

@@ -15,6 +15,9 @@ namespace NH::Bass
         Logger* log;
         ChannelStatus m_Status = ChannelStatus::AVAILABLE;
         HSTREAM m_Stream = 0;
+        HSYNC m_CurrentVolumeSlideSync;
+        uint32_t m_CurrentVolumeSlideTime;
+        std::function<void(bool)> m_CurrentVolumeSlideCallback;
 
     public:
         explicit Channel(size_t index)

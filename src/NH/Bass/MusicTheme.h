@@ -65,6 +65,7 @@ namespace NH::Bass
         std::unordered_map<std::string, std::shared_ptr<MidiFile>> m_MidiFiles;
         std::unordered_map<size_t, std::function<void()>> m_SyncHandlers;
         std::unordered_map<size_t, std::function<void(double)>> m_SyncHandlersWithDouble;
+        std::unordered_map<size_t, std::function<void(bool)>> m_SyncHandlersWithBoolean;
         std::vector<std::string> m_Zones;
         std::vector<std::shared_ptr<IChannel>> m_AcquiredChannels;
 
@@ -113,6 +114,18 @@ namespace NH::Bass
             };
             m_SyncHandlersWithDouble.emplace(id, std::move(handler));
             return m_SyncHandlersWithDouble.at(id);
+        }
+
+        const std::function<void(bool)>& CreateSyncHandler(std::function<void(bool)>&& function)
+        {
+            size_t id = m_SyncHandlersId++;
+            log->Trace("SyncHandler id: {0}", id);
+            auto handler = [this, function = std::move(function), id](const bool value) {
+                function(value);
+                m_SyncHandlersWithBoolean.erase(id);
+            };
+            m_SyncHandlersWithBoolean.emplace(id, std::move(handler));
+            return m_SyncHandlersWithBoolean.at(id);
         }
 
         const std::function<void()>& CreateSyncHandler(std::function<void()>&& function)

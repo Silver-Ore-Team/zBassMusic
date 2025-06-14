@@ -49,10 +49,20 @@ namespace NH::Bass
         BASS_ChannelSlideAttribute(m_Stream, BASS_ATTRIB_VOL, targetVolume, time);
     }
 
-    void Channel::SlideVolume(const float targetVolume, const uint32_t time, const std::function<void()>& onFinish)
+    void Channel::SlideVolume(const float targetVolume, const uint32_t time, const std::function<void(bool)>& onFinish)
     {
+        if (m_CurrentVolumeSlideSync && time >= m_CurrentVolumeSlideTime)
+        {
+            BASS_ChannelRemoveSync(m_Stream, m_CurrentVolumeSlideSync);
+            if (m_CurrentVolumeSlideCallback) 
+            {
+                m_CurrentVolumeSlideCallback(true);
+            }
+        }
         SlideVolume(targetVolume, time);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_SLIDE, 0, OnSlideVolumeSyncCallFunction, (void*)&onFinish);
+        m_CurrentVolumeSlideSync = BASS_ChannelSetSync(m_Stream, BASS_SYNC_SLIDE, 0, OnSlideVolumeSyncCallFunction, (void*)&onFinish);
+        m_CurrentVolumeSlideTime = time;
+        m_CurrentVolumeSlideCallback = onFinish;
     }
 
     void Channel::SetDX8ReverbEffect(float reverbMix, float reverbTime, const float inputGain, const float highFreqRTRatio)

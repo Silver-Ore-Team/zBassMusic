@@ -116,7 +116,7 @@ namespace NH::Bass
             return m_SyncHandlersWithDouble.at(id);
         }
 
-        const std::function<void(bool)>& CreateSyncHandler(std::function<void(bool)>&& function)
+        const std::function<void(bool)>& CreateSyncHandlerBool(std::function<void(bool)>&& function)
         {
             size_t id = m_SyncHandlersId++;
             log->Trace("SyncHandler id: {0}", id);

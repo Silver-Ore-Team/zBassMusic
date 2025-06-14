@@ -262,7 +262,7 @@ namespace NH::Bass
         {
             const uint32_t time = timePoint.has_value() ? static_cast<uint32_t>(timePoint.value().Duration) * 1000 : static_cast<uint32_t>(transition.EffectDuration);
             log->Trace("Fadeout, time: {0}", time);
-            channel->SlideVolume(0.0f, time, CreateSyncHandler([channel, this](bool skip = false) -> void {
+            channel->SlideVolume(0.0f, time, CreateSyncHandlerBool([channel, this](bool skip = false) -> void {
                                      if (skip) 
                                      {
                                         log->Trace("SlideVolume (fadeout) sync handler skipped without an action because newer fadeout handle took its place");

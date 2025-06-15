@@ -223,7 +223,7 @@ namespace NH::Bass
 
         if (effects.Loop.Active)
         {
-            if (effects.Loop.Start && effects.Loop.End)
+            if (effects.Loop.Start && effects.Loop.End > 0)
             {
                 channel->OnLoopEnd(effects.Loop.Start, effects.Loop.End, CreateSyncHandler([]{}));
             }

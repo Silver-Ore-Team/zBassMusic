@@ -85,7 +85,7 @@ namespace NH::Bass
 
     void Channel::OnAudioEnds(const std::function<void()>& onFinish)
     {
-        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End)
+        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End > 0)
         {
             const double position = m_Effects.Loop.End;
             const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
@@ -99,7 +99,7 @@ namespace NH::Bass
 
     void Channel::BeforeAudioEnds(const double aheadSeconds, const std::function<void(double)>& onFinish)
     {
-        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End)
+        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End > 0)
         {
             const double position = m_Effects.Loop.End - aheadSeconds;
             const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);

@@ -32,8 +32,8 @@ namespace GOTHIC_NAMESPACE
         zSTRING MidiFile;
         float Volume;
         int Loop;
-        float loopStart;
-        float loopEnd;
+        float LoopStart;
+        float LoopEnd;
         int Reverb;
         float ReverbMix;
         float ReverbTime;
@@ -151,10 +151,14 @@ namespace GOTHIC_NAMESPACE
                             if (input->Loop)
                             {
                                 effects.Loop.Active = true;
-                                if (input->loopStart >= 0 && input->loopEnd > input->loopStart)
+                                if (input->LoopStart >= 0 && input->LoopEnd > input->LoopStart)
                                 {
-                                    effects.Loop.Start = input->loopStart;
-                                    effects.Loop.End = input->loopEnd;
+                                    effects.Loop.Start = input->LoopStart;
+                                    effects.Loop.End = input->LoopEnd;
+                                }
+                                else if (input->LoopStart == 0 && input->LoopEnd == 0)
+                                {
+                                    // actually do nothing because `effects.Loop.Active = true` is enough. 
                                 }
                                 else
                                 {

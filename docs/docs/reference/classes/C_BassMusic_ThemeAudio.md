@@ -14,6 +14,8 @@ class C_BassMusic_ThemeAudio {
     var string midifile;
     var float volume;
     var int loop;
+    var float loopStart;
+	var float loopEnd;
     var int reverb;
     var float reverbMix;
     var float reverbTime;
@@ -45,6 +47,8 @@ prototype BassMusic_ThemeAudio(C_BassMusic_ThemeAudio) {
 | midifile        | string     | Filename of a MIDI file for transition control.                                     |
 | vol             | float      | Volume of the song in range [0, 1] as the % of master volume.                       |
 | loop            | int (bool) | If not zero, the theme will loop. Otherwise, it will play only once per zone enter. |
+| loopStart       | float      | Loop start position in seconds.                                                     |
+| loopEnd         | float      | Loop end position in seconds.                                                       |
 | reverb          | int (bool) | If not zero, the Reverb DX8 effect is enabled.                                      | 
 | reverbmix       | float      | Mix property for Reverb DX8 effect in range [-96, 0] dB.                            |
 | reverbtime      | float      | Time property for Reverb DX8 effect in range [0.001, 3000] ms.                      |

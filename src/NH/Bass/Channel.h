@@ -45,11 +45,15 @@ namespace NH::Bass
         void Release() override;
         bool IsAvailable() override { return m_Status == ChannelStatus::AVAILABLE; };
 
+        void ClearSyncCallbacks();
+
     private:
         static void CALLBACK OnPositionSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnAudioEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK BeforeAudioEndsSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnLoopEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
+
+        std::vector<std::shared_ptr<void>> m_SyncCallbacks;
     };
 }

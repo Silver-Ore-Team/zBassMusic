@@ -9,6 +9,7 @@
 namespace NH::Bass
 {
     class AudioFile;
+    struct AudioEffects;
 
     struct IChannel
     {
@@ -37,7 +38,7 @@ namespace NH::Bass
 
         virtual ~IChannel() = default;
 
-        virtual Result<void> PlayInstant(const AudioFile& audioFile) = 0;
+        virtual Result<void> PlayInstant(const AudioFile& audioFile, const AudioEffects& effects) = 0;
         virtual void StopInstant() = 0;
 
         virtual void SetVolume(float volume) = 0;
@@ -49,6 +50,8 @@ namespace NH::Bass
         virtual void OnPosition(double position, const std::function<void()>& callback) = 0;
         virtual void OnAudioEnds(const std::function<void()>& onFinish) = 0;
         virtual void BeforeAudioEnds(double aheadSeconds, const std::function<void(double)>& onFinish) = 0;
+        virtual void OnLoopEnd(double loopStartSeconds, double loopEndSeconds, const std::function<void()>& callback) = 0;
+
 
         [[nodiscard]] virtual bool IsPlaying() const = 0;
         [[nodiscard]] virtual double Position() const = 0;

@@ -13,6 +13,7 @@ namespace NH::Bass
         if (m_Stream > 0)
         {
             BASS_ChannelFree(m_Stream);
+            ClearSyncCallbacks();
         }
 
         m_Stream = BASS_StreamCreateFile(true, audioFile.Buffer.data(), 0, audioFile.Buffer.size(), 0);
@@ -52,7 +53,10 @@ namespace NH::Bass
     void Channel::SlideVolume(const float targetVolume, const uint32_t time, const std::function<void()>& onFinish)
     {
         SlideVolume(targetVolume, time);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_SLIDE, 0, OnSlideVolumeSyncCallFunction, (void*)&onFinish);
+
+        auto cb = std::make_shared<std::function<void()>>(onFinish);
+        m_SyncCallbacks.push_back(cb);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_SLIDE, 0, OnSlideVolumeSyncCallFunction, cb.get());
     }
 
     void Channel::SetDX8ReverbEffect(float reverbMix, float reverbTime, const float inputGain, const float highFreqRTRatio)
@@ -78,19 +82,25 @@ namespace NH::Bass
     void Channel::OnPosition(const double position, const std::function<void()>& callback)
     {
         const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, OnPositionSyncCallFunction, new OnSyncPosition{m_Stream, callback});
+        auto cb = std::make_shared<OnSyncPosition>(OnSyncPosition{m_Stream, callback});
+        m_SyncCallbacks.push_back(cb);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, OnPositionSyncCallFunction, cb.get());
     }
 
     void Channel::OnAudioEnds(const std::function<void()>& onFinish)
     {
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnAudioEndSyncCallFunction, new OnSyncWhenAudioEndsData{m_Stream, onFinish});
+        auto cb = std::make_shared<OnSyncWhenAudioEndsData>(OnSyncWhenAudioEndsData{m_Stream, onFinish});
+        m_SyncCallbacks.push_back(cb);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnAudioEndSyncCallFunction, cb.get());
     }
 
     void Channel::BeforeAudioEnds(const double aheadSeconds, const std::function<void(double)>& onFinish)
     {
         const double position = Length() - aheadSeconds;
         const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, new OnSyncBeforeAudioEndsData{m_Stream, onFinish});
+        auto cb = std::make_shared<OnSyncBeforeAudioEndsData>(OnSyncBeforeAudioEndsData{m_Stream, onFinish});
+        m_SyncCallbacks.push_back(cb);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, cb.get());
     }
 
     void Channel::Acquire()
@@ -106,6 +116,12 @@ namespace NH::Bass
     {
         m_Status = ChannelStatus::AVAILABLE;
         BASS_ChannelStop(m_Stream);
+        ClearSyncCallbacks();
+    }
+
+    void Channel::ClearSyncCallbacks()
+    {
+        m_SyncCallbacks.clear();
     }
 
     bool Channel::IsPlaying() const
@@ -133,7 +149,7 @@ namespace NH::Bass
 
     void Channel::OnPositionSyncCallFunction(HSYNC, const DWORD channel, [[maybe_unused]] DWORD data, void* userData)
     {
-        const auto* payload = static_cast<OnSyncWhenAudioEndsData*>(userData);
+        const auto* payload = static_cast<OnSyncPosition*>(userData);
         if (channel != payload->Channel) return;
         if (payload->Function) { payload->Function(); }
         else { CreateLogger("HSYNC::OnPositionSyncCallFunction")->Error("onFinish is nullptr"); }

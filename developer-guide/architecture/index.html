@@ -1,0 +1,2070 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../style-guide/">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Architecture - zBassMusic</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+  
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+  
+  <style>:root{--md-admonition-icon--note:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20448%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M64%2032C28.7%2032%200%2060.7%200%2096v320c0%2035.3%2028.7%2064%2064%2064h224V368c0-26.5%2021.5-48%2048-48h112V96c0-35.3-28.7-64-64-64zm384%20320H336c-8.8%200-16%207.2-16%2016v112l32-32%2064-64z%22/%3E%3C/svg%3E');--md-admonition-icon--abstract:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20448%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M96%200C43%200%200%2043%200%2096v320c0%2053%2043%2096%2096%2096h320c17.7%200%2032-14.3%2032-32s-14.3-32-32-32v-64c17.7%200%2032-14.3%2032-32V32c0-17.7-14.3-32-32-32H96m0%20384h256v64H96c-17.7%200-32-14.3-32-32s14.3-32%2032-32m32-240c0-8.8%207.2-16%2016-16h192c8.8%200%2016%207.2%2016%2016s-7.2%2016-16%2016H144c-8.8%200-16-7.2-16-16m16%2048h192c8.8%200%2016%207.2%2016%2016s-7.2%2016-16%2016H144c-8.8%200-16-7.2-16-16s7.2-16%2016-16%22/%3E%3C/svg%3E');--md-admonition-icon--info:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M256%20512a256%20256%200%201%200%200-512%20256%20256%200%201%200%200%20512m-40-176h24v-64h-24c-13.3%200-24-10.7-24-24s10.7-24%2024-24h48c13.3%200%2024%2010.7%2024%2024v88h8c13.3%200%2024%2010.7%2024%2024s-10.7%2024-24%2024h-80c-13.3%200-24-10.7-24-24s10.7-24%2024-24m40-208a32%2032%200%201%201%200%2064%2032%2032%200%201%201%200-64%22/%3E%3C/svg%3E');--md-admonition-icon--tip:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M480%2032c0-12.9-7.8-24.6-19.8-29.6S434.5.2%20425.3%209.3L381.7%2053c-48%2048-113.1%2075-181%2075H64c-35.3%200-64%2028.7-64%2064v96c0%2035.3%2028.7%2064%2064%2064v128c0%2017.7%2014.3%2032%2032%2032h64c17.7%200%2032-14.3%2032-32V352h8.7c67.9%200%20133%2027%20181%2075l43.6%2043.6c9.2%209.2%2022.9%2011.9%2034.9%206.9s19.8-16.6%2019.8-29.6V300.3c18.6-8.8%2032-32.5%2032-60.4s-13.4-51.6-32-60.4zm-64%2076.7v262.6C357.2%20317.8%20280.5%20288%20200.7%20288H192v-96h8.7c79.8%200%20156.5-29.8%20215.3-83.3%22/%3E%3C/svg%3E');--md-admonition-icon--success:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20448%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M438.6%20105.4c12.5%2012.5%2012.5%2032.8%200%2045.3l-256%20256c-12.5%2012.5-32.8%2012.5-45.3%200l-128-128c-12.5-12.5-12.5-32.8%200-45.3s32.8-12.5%2045.3%200L160%20338.7l233.4-233.3c12.5-12.5%2032.8-12.5%2045.3%200z%22/%3E%3C/svg%3E');--md-admonition-icon--question:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M256%20512a256%20256%200%201%200%200-512%20256%20256%200%201%200%200%20512m-86.2-346.7c7.9-22.3%2029.1-37.3%2052.8-37.3h58.3c34.9%200%2063.1%2028.3%2063.1%2063.1%200%2022.6-12.1%2043.5-31.7%2054.8L280%20264.4c-.2%2013-10.9%2023.6-24%2023.6-13.3%200-24-10.7-24-24v-13.5c0-8.6%204.6-16.5%2012.1-20.8l44.3-25.4c4.7-2.7%207.6-7.7%207.6-13.1%200-8.4-6.8-15.1-15.1-15.1h-58.3c-3.4%200-6.4%202.1-7.5%205.3l-.4%201.2c-4.4%2012.5-18.2%2019-30.6%2014.6s-19-18.2-14.6-30.6l.4-1.2zM224%20352a32%2032%200%201%201%2064%200%2032%2032%200%201%201-64%200%22/%3E%3C/svg%3E');--md-admonition-icon--warning:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M256%2032c14.2%200%2027.3%207.5%2034.5%2019.8l216%20368c7.3%2012.4%207.3%2027.7.2%2040.1S486.3%20480%20472%20480H40c-14.3%200-27.6-7.7-34.7-20.1s-7-27.8.2-40.1l216-368C228.7%2039.5%20241.8%2032%20256%2032m0%20128c-13.3%200-24%2010.7-24%2024v112c0%2013.3%2010.7%2024%2024%2024s24-10.7%2024-24V184c0-13.3-10.7-24-24-24m32%20224a32%2032%200%201%200-64%200%2032%2032%200%201%200%2064%200%22/%3E%3C/svg%3E');--md-admonition-icon--failure:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M459.1%2052.4%20442.6%206.5c-1.9-3.9-6.1-6.5-10.5-6.5s-8.5%202.6-10.4%206.5l-16.5%2045.9-46%2016.8c-4.3%201.6-7.3%205.9-7.2%2010.4%200%204.5%203%208.7%207.2%2010.2l45.7%2016.8%2016.8%2045.8c1.5%204.4%205.8%207.5%2010.4%207.5s8.9-3.1%2010.4-7.5l16.5-45.8%2045.7-16.8c4.2-1.5%207.2-5.7%207.2-10.2%200-4.6-3-8.9-7.2-10.4zm-132.4%2053c-12.5-12.5-32.8-12.5-45.3%200l-2.9%202.9c-22-8-45.8-12.3-70.5-12.3C93.1%2096%200%20189.1%200%20304s93.1%20208%20208%20208%20208-93.1%20208-208c0-24.7-4.3-48.5-12.2-70.5l2.9-2.9c12.5-12.5%2012.5-32.8%200-45.3l-80-80zM200%20192c-57.4%200-104%2046.6-104%20104v8c0%208.8-7.2%2016-16%2016s-16-7.2-16-16v-8c0-75.1%2060.9-136%20136-136h8c8.8%200%2016%207.2%2016%2016s-7.2%2016-16%2016z%22/%3E%3C/svg%3E');--md-admonition-icon--danger:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M416%20398.9c58.5-41.1%2096-104.1%2096-174.9C512%20100.3%20397.4%200%20256%200S0%20100.3%200%20224c0%2070.7%2037.5%20133.8%2096%20174.9V464c0%2026.5%2021.5%2048%2048%2048h48v-48c0-8.8%207.2-16%2016-16s16%207.2%2016%2016v48h64v-48c0-8.8%207.2-16%2016-16s16%207.2%2016%2016v48h48c26.5%200%2048-21.5%2048-48v-65.1M96%20256a64%2064%200%201%201%20128%200%2064%2064%200%201%201-128%200m256-64a64%2064%200%201%201%200%20128%2064%2064%200%201%201%200-128%22/%3E%3C/svg%3E');--md-admonition-icon--bug:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20640%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M320%200c17.7%200%2032%2014.3%2032%2032v64h120c39.8%200%2072%2032.2%2072%2072v272c0%2039.8-32.2%2072-72%2072H168c-39.8%200-72-32.2-72-72V168c0-39.8%2032.2-72%2072-72h120V32c0-17.7%2014.3-32%2032-32M208%20384c-8.8%200-16%207.2-16%2016s7.2%2016%2016%2016h32c8.8%200%2016-7.2%2016-16s-7.2-16-16-16zm96%200c-8.8%200-16%207.2-16%2016s7.2%2016%2016%2016h32c8.8%200%2016-7.2%2016-16s-7.2-16-16-16zm96%200c-8.8%200-16%207.2-16%2016s7.2%2016%2016%2016h32c8.8%200%2016-7.2%2016-16s-7.2-16-16-16zM264%20256a40%2040%200%201%200-80%200%2040%2040%200%201%200%2080%200m152%2040a40%2040%200%201%200%200-80%2040%2040%200%201%200%200%2080M48%20224h16v192H48c-26.5%200-48-21.5-48-48v-96c0-26.5%2021.5-48%2048-48m544%200c26.5%200%2048%2021.5%2048%2048v96c0%2026.5-21.5%2048-48%2048h-16V224z%22/%3E%3C/svg%3E');--md-admonition-icon--example:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20448%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M288%200H128c-17.7%200-32%2014.3-32%2032s14.3%2032%2032%2032v132.8c0%2011.8-3.3%2023.5-9.5%2033.5L10.3%20406.2C3.6%20417.2%200%20429.7%200%20442.6%200%20480.9%2031.1%20512%2069.4%20512h309.2c38.3%200%2069.4-31.1%2069.4-69.4%200-12.8-3.6-25.4-10.3-36.4L329.5%20230.4c-6.2-10.1-9.5-21.7-9.5-33.5V64c17.7%200%2032-14.3%2032-32S337.7%200%20320%200zm-96%20196.8V64h64v132.8c0%2023.7%206.6%2046.9%2019%2067.1l34.5%2056.1h-171l34.5-56.1c12.4-20.2%2019-43.4%2019-67.1%22/%3E%3C/svg%3E');--md-admonition-icon--quote:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20448%20512%22%3E%3C%21--%21%20Font%20Awesome%20Free%206.7.2%20by%20%40fontawesome%20-%20https%3A//fontawesome.com%20License%20-%20https%3A//fontawesome.com/license/free%20%28Icons%3A%20CC%20BY%204.0%2C%20Fonts%3A%20SIL%20OFL%201.1%2C%20Code%3A%20MIT%20License%29%20Copyright%202024%20Fonticons%2C%20Inc.--%3E%3Cpath%20d%3D%22M0%20216C0%20149.7%2053.7%2096%20120%2096h8c17.7%200%2032%2014.3%2032%2032s-14.3%2032-32%2032h-8c-30.9%200-56%2025.1-56%2056v8h64c35.3%200%2064%2028.7%2064%2064v64c0%2035.3-28.7%2064-64%2064H64c-35.3%200-64-28.7-64-64V216m256%200c0-66.3%2053.7-120%20120-120h8c17.7%200%2032%2014.3%2032%2032s-14.3%2032-32%2032h-8c-30.9%200-56%2025.1-56%2056v8h64c35.3%200%2064%2028.7%2064%2064v64c0%2035.3-28.7%2064-64%2064h-64c-35.3%200-64-28.7-64-64V216%22/%3E%3C/svg%3E');}</style>
+
+
+  
+  
+  
+  
+  <style>:root{--md-annotation-icon:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%202A10%2010%200%200%200%202%2012a10%2010%200%200%200%2010%2010%2010%2010%200%200%200%2010-10A10%2010%200%200%200%2012%202m0%207a3%203%200%200%201%203%203%203%203%200%200%201-3%203%203%203%200%200%201-3-3%203%203%200%200%201%203-3%22/%3E%3C/svg%3E');}</style>
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/mkdocs_puml/puml.css">
+    
+      <link rel="stylesheet" href="../../assets/mkdocs_puml/interaction.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-GPGQ5YCRVB"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-GPGQ5YCRVB",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-GPGQ5YCRVB",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="zBassMusic" class="md-header__button md-logo" aria-label="zBassMusic" data-md-component="logo">
+      
+  <img src="../../images/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            zBassMusic
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Silver-Ore-Team/zBassMusic" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="zBassMusic" class="md-nav__button md-logo" aria-label="zBassMusic" data-md-component="logo">
+      
+  <img src="../../images/logo.svg" alt="logo">
+
+    </a>
+    zBassMusic
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Silver-Ore-Team/zBassMusic" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    User Guide
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/getting-started/plugin-loading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plugin Loading
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/getting-started/music-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Music Definition
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/getting-started/cross-fading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cross-fading
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/concepts/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/theme-definition/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Themes
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Themes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/theme-definition/cmusictheme/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    C_MUSICTHEME
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/theme-definition/basstheme/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    zBassMusic Theme
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/transitions/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Transitions
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Transitions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/transitions/timing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Timing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/transitions/jingle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jingle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/transitions/midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MIDI Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/scripting/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Scripting (Daedalus)
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            Scripting (Daedalus)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/scripting/custom-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Custom Scheduler
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../user-guide/debugging/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Debugging
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            Debugging
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Classes
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Classes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/classes/C_MUSICTHEME/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    C_MUSICTHEME
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/classes/C_BassMusic_Theme/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    C_BassMusic_Theme
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/classes/C_BassMusic_ThemeAudio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    C_BassMusic_ThemeAudio
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/globals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Globals
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Globals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/externals/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Externals
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Externals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/options/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Options (.ini)
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Options (.ini)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./" class="md-nav__link md-nav__link--active">
+              
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../style-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Style Guide
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            Style Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../contributing/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../release/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Release
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            Release
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gothic-music-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gothic Music System
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Engine
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commandqueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      CommandQueue
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eventmanager" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventManager
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#musicmanager" class="md-nav__link">
+    <span class="md-ellipsis">
+      MusicManager
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MusicManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#musictheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      MusicTheme
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+
+
+
+  
+  
+
+
+<h1 id="architecture">Architecture</h1>
+<p>zBassMusic is a native plugin for Gothic games built with <a href="https://gitlab.com/union-framework/union-api">union-api</a>
+library.
+The Union API hooks into original Gothic process, loads our code and let us create hooks for the Gothic functions.
+With this approach we can run our code in Gothic and change the behavior of the original code.</p>
+<p>The core action we take is to hook into the Gothic initialization procedures and replace the global pointer to the
+original
+music system with a pointer to our own implementation. Because other parts of Gothic are using the global pointer to
+interact
+with the music system, we catch all the use cases and take full control.</p>
+<h2 id="gothic-music-system">Gothic Music System</h2>
+<p>Conveniently, Gothic defines the music system as a pure virtual class (interface) and DirectMusic is only an
+implementation,
+alongside with a Dummy implementation used when the music is disabled. Thanks to this, we can just implement the
+interface to provide our own virtual functions.</p>
+<div class='puml-container'><div class="puml light" style=""><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" data-diagram-type="CLASS" height="416px" preserveAspectRatio="xMidYMid meet" style="width:962px;height:416px;background:#FFFFFF;" version="1.1" viewBox="0 0 962 416" width="962px" zoomAndPan="magnify" class="diagram"><defs/><g><g class="entity" data-entity="zCMusicSystem" data-source-line="6" data-uid="ent0002" id="entity_zCMusicSystem"><rect fill="#F1F1F1" height="80.8594" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="424.959" x="418.2" y="151.67"/><ellipse cx="571.8479" cy="171.8028" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/><path d="M567.7698,167.5684 L567.7698,165.4122 L575.1604,165.4122 L575.1604,167.5684 L572.6917,167.5684 L572.6917,175.6466 L575.1604,175.6466 L575.1604,177.8028 L567.7698,177.8028 L567.7698,175.6466 L570.2386,175.6466 L570.2386,167.5684 L567.7698,167.5684 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="68.2031" x="612.8279" y="167.8087">«interface»</text><text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="109.1631" x="592.3479" y="183.6339">zCMusicSystem</text><line style="stroke:#181818;stroke-width:0.5;" x1="419.2" x2="842.159" y1="191.9356" y2="191.9356"/><ellipse cx="429.2" cy="205.5841" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="398.959" x="438.2" y="208.9307">PlayThemeByScript(zSTRING const&amp;, int, int*) : void = 0;</text><ellipse cx="429.2" cy="221.8809" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="304.8555" x="438.2" y="225.2276">PlayTheme(zCMusicTheme*, ...) : void  = 0;</text></g><g class="entity" data-entity="GMN3" data-source-line="11" data-uid="ent0004" id="entity_GMN3"><path d="M305.89,6 L305.89,91.6641 A0,0 0 0 0 305.89,91.6641 L626.68,91.6641 L630.68,151.6 L634.68,91.6641 L955.4667,91.6641 A0,0 0 0 0 955.4667,91.6641 L955.4667,16 L945.4667,6 L305.89,6 A0,0 0 0 0 305.89,6" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><path d="M945.4667,6 L945.4667,16 L955.4667,16 L945.4667,6" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="287.5044" x="311.89" y="23.0669">The base interface for Gothic music system.</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4.1323" x="311.89" y="38.1997"> </text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="75.3657" x="311.89" y="53.3325">Gothic calls</text><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="330.9351" x="391.388" y="53.3325">PlayThemeByScript(zSTRING const&amp;, int, int)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="214.0112" x="726.4554" y="53.3325">when it changes the music zone.</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4.1323" x="311.89" y="68.4653"> </text><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="231.9941" x="311.89" y="83.5981">PlayTheme(zCMusicTheme*, ...)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="358.9917" x="548.0165" y="83.5981">is used for our scripting API `BassMusic_Play` external.</text></g><g class="entity" data-entity="zCMusicSys_Dummy" data-source-line="17" data-uid="ent0006" id="entity_zCMusicSys_Dummy"><rect fill="#F1F1F1" height="32" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="175.6367" x="654.86" y="292.53"/><ellipse cx="669.86" cy="308.53" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/><path d="M672.8288,314.1706 Q672.2506,314.4675 671.61,314.6081 Q670.9694,314.7644 670.2663,314.7644 Q667.7663,314.7644 666.4381,313.1238 Q665.1256,311.4675 665.1256,308.3425 Q665.1256,305.2175 666.4381,303.5613 Q667.7663,301.905 670.2663,301.905 Q670.9694,301.905 671.61,302.0613 Q672.2663,302.2175 672.8288,302.5144 L672.8288,305.2331 Q672.2038,304.655 671.61,304.3894 Q671.0163,304.1081 670.3913,304.1081 Q669.0475,304.1081 668.36,305.1863 Q667.6725,306.2488 667.6725,308.3425 Q667.6725,310.4363 668.36,311.5144 Q669.0475,312.5769 670.3913,312.5769 Q671.0163,312.5769 671.61,312.3113 Q672.2038,312.03 672.8288,311.4519 L672.8288,314.1706 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="143.6367" x="683.86" y="313.3767">zCMusicSys_Dummy</text></g><g class="entity" data-entity="GMN8" data-source-line="18" data-uid="ent0009" id="entity_GMN8"><path d="M663.48,384.53 L663.48,409.6628 A0,0 0 0 0 663.48,409.6628 L935.8916,409.6628 A0,0 0 0 0 935.8916,409.6628 L935.8916,394.53 L925.8916,384.53 L750.99,384.53 L746.99,324.77 L742.99,384.53 L663.48,384.53 A0,0 0 0 0 663.48,384.53" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><path d="M925.8916,384.53 L925.8916,394.53 L935.8916,394.53 L925.8916,384.53" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="251.4116" x="669.48" y="401.5969">Dummy implementation, does nothing</text></g><g class="entity" data-entity="zCMusicSys_DirectMusic" data-source-line="20" data-uid="ent0011" id="entity_zCMusicSys_DirectMusic"><rect fill="#F1F1F1" height="32" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="202.4814" x="416.44" y="292.53"/><ellipse cx="431.44" cy="308.53" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/><path d="M434.4088,314.1706 Q433.8306,314.4675 433.19,314.6081 Q432.5494,314.7644 431.8463,314.7644 Q429.3463,314.7644 428.0181,313.1238 Q426.7056,311.4675 426.7056,308.3425 Q426.7056,305.2175 428.0181,303.5613 Q429.3463,301.905 431.8463,301.905 Q432.5494,301.905 433.19,302.0613 Q433.8463,302.2175 434.4088,302.5144 L434.4088,305.2331 Q433.7838,304.655 433.19,304.3894 Q432.5963,304.1081 431.9713,304.1081 Q430.6275,304.1081 429.94,305.1863 Q429.2525,306.2488 429.2525,308.3425 Q429.2525,310.4363 429.94,311.5144 Q430.6275,312.5769 431.9713,312.5769 Q432.5963,312.5769 433.19,312.3113 Q433.7838,312.03 434.4088,311.4519 L434.4088,314.1706 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="170.4814" x="445.44" y="313.3767">zCMusicSys_DirectMusic</text></g><g class="entity" data-entity="GMN13" data-source-line="21" data-uid="ent0014" id="entity_GMN13"><path d="M295.24,384.53 L295.24,409.6628 A0,0 0 0 0 295.24,409.6628 L628.1257,409.6628 A0,0 0 0 0 628.1257,409.6628 L628.1257,394.53 L618.1257,384.53 L521.68,384.53 L517.68,324.77 L513.68,384.53 L295.24,384.53 A0,0 0 0 0 295.24,384.53" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><path d="M618.1257,384.53 L618.1257,394.53 L628.1257,394.53 L618.1257,384.53" fill="#FEFFDD" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="311.8857" x="301.24" y="401.5969">The original implementation using DirectMusic}</text></g><g class="entity" data-entity="CMusicSys_Bass" data-source-line="23" data-uid="ent0016" id="entity_CMusicSys_Bass"><rect fill="#90EE90" height="32" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="145.8457" x="235.76" y="292.53"/><ellipse cx="250.76" cy="308.53" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/><path d="M253.7288,314.1706 Q253.1506,314.4675 252.51,314.6081 Q251.8694,314.7644 251.1663,314.7644 Q248.6663,314.7644 247.3381,313.1238 Q246.0256,311.4675 246.0256,308.3425 Q246.0256,305.2175 247.3381,303.5613 Q248.6663,301.905 251.1663,301.905 Q251.8694,301.905 252.51,302.0613 Q253.1663,302.2175 253.7288,302.5144 L253.7288,305.2331 Q253.1038,304.655 252.51,304.3894 Q251.9163,304.1081 251.2913,304.1081 Q249.9475,304.1081 249.26,305.1863 Q248.5725,306.2488 248.5725,308.3425 Q248.5725,310.4363 249.26,311.5144 Q249.9475,312.5769 251.2913,312.5769 Q251.9163,312.5769 252.51,312.3113 Q253.1038,312.03 253.7288,311.4519 L253.7288,314.1706 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113.8457" x="264.76" y="313.3767">CMusicSys_Bass</text></g><g class="entity" data-entity="GMN18" data-source-line="25" data-uid="ent0019" id="entity_GMN18"><path d="M6,164.4 L6,219.7984 A0,0 0 0 0 6,219.7984 L280.37,219.7984 L284.37,292.1 L288.37,219.7984 L383.3638,219.7984 A0,0 0 0 0 383.3638,219.7984 L383.3638,174.4 L373.3638,164.4 L6,164.4 A0,0 0 0 0 6,164.4" fill="#90EE90" style="stroke:#181818;stroke-width:0.5;"/><path d="M373.3638,164.4 L373.3638,174.4 L383.3638,174.4 L373.3638,164.4" fill="#90EE90" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="352.2314" x="12" y="181.4669">Our implementation that implements virtual functions</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="337.3589" x="12" y="196.5997">from zCMusicSystem and redirects DirectMusic files</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="175.4873" x="12" y="211.7325">to zCMusicSys_DirectMusic</text></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="zCMusicSys_Dummy" data-source-line="17" data-uid="lnk7" id="link_zCMusicSystem_zCMusicSys_Dummy"><path d="M742.68,250.82 C742.68,271.28 742.68,276.92 742.68,292.26" fill="none" id="zCMusicSystem-backto-zCMusicSys_Dummy" style="stroke:#181818;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="742.68,232.82,736.68,250.82,748.68,250.82,742.68,232.82" style="stroke:#181818;stroke-width:1;"/></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="zCMusicSys_DirectMusic" data-source-line="20" data-uid="lnk12" id="link_zCMusicSystem_zCMusicSys_DirectMusic"><path d="M518.56,250.82 C518.56,271.28 518.56,276.92 518.56,292.26" fill="none" id="zCMusicSystem-backto-zCMusicSys_DirectMusic" style="stroke:#181818;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="518.56,232.82,512.56,250.82,524.56,250.82,518.56,232.82" style="stroke:#181818;stroke-width:1;"/></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="CMusicSys_Bass" data-source-line="23" data-uid="lnk17" id="link_zCMusicSystem_CMusicSys_Bass"><path d="M399.9,226.66 C351.99,226.66 332.99,226.66 332.99,226.66 C332.99,226.66 332.99,268.49 332.99,292.35" fill="none" id="zCMusicSystem-backto-CMusicSys_Bass" style="stroke:#181818;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="417.9,226.66,399.9,220.66,399.9,232.66,417.9,226.66" style="stroke:#181818;stroke-width:1;"/></g><g class="link" data-entity-1="CMusicSys_Bass" data-entity-2="zCMusicSys_DirectMusic" data-source-line="30" data-uid="lnk22" id="link_CMusicSys_Bass_zCMusicSys_DirectMusic"><path codeLine="30" d="M382.07,308.66 C393.13,308.66 398.7,308.66 410.22,308.66" fill="none" id="CMusicSys_Bass-to-zCMusicSys_DirectMusic" style="stroke:#181818;stroke-width:1;"/><polygon fill="#181818" points="416.22,308.66,407.22,304.66,411.22,308.66,407.22,312.66,416.22,308.66" style="stroke:#181818;stroke-width:1;"/></g></g></svg></div><div class="puml dark" style=""><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" data-diagram-type="CLASS" height="416px" preserveAspectRatio="xMidYMid meet" style="width:962px;height:416px;background:#1B1B1B;" version="1.1" viewBox="0 0 962 416" width="962px" zoomAndPan="magnify" class="diagram"><defs/><g><rect fill="#1B1B1B" height="416" style="stroke:none;stroke-width:1;" width="962" x="0" y="0"/><g class="entity" data-entity="zCMusicSystem" data-source-line="6" data-uid="ent0002" id="entity_zCMusicSystem"><rect fill="#313139" height="80.8594" rx="2.5" ry="2.5" style="stroke:#E7E7E7;stroke-width:0.5;" width="424.959" x="418.2" y="151.67"/><ellipse cx="571.8479" cy="171.8028" fill="#352866" rx="11" ry="11" style="stroke:#E7E7E7;stroke-width:1;"/><path d="M567.7698,167.5684 L567.7698,165.4122 L575.1604,165.4122 L575.1604,167.5684 L572.6917,167.5684 L572.6917,175.6466 L575.1604,175.6466 L575.1604,177.8028 L567.7698,177.8028 L567.7698,175.6466 L570.2386,175.6466 L570.2386,167.5684 L567.7698,167.5684 Z " fill="#FFFFFF"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="68.2031" x="612.8279" y="167.8087">«interface»</text><text fill="#FFFFFF" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing" textLength="109.1631" x="592.3479" y="183.6339">zCMusicSystem</text><line style="stroke:#E7E7E7;stroke-width:0.5;" x1="419.2" x2="842.159" y1="191.9356" y2="191.9356"/><ellipse cx="429.2" cy="205.5841" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="398.959" x="438.2" y="208.9307">PlayThemeByScript(zSTRING const&amp;, int, int*) : void = 0;</text><ellipse cx="429.2" cy="221.8809" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="304.8555" x="438.2" y="225.2276">PlayTheme(zCMusicTheme*, ...) : void  = 0;</text></g><g class="entity" data-entity="GMN3" data-source-line="11" data-uid="ent0004" id="entity_GMN3"><path d="M305.89,6 L305.89,91.6641 A0,0 0 0 0 305.89,91.6641 L626.68,91.6641 L630.68,151.6 L634.68,91.6641 L955.4667,91.6641 A0,0 0 0 0 955.4667,91.6641 L955.4667,16 L945.4667,6 L305.89,6 A0,0 0 0 0 305.89,6" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><path d="M945.4667,6 L945.4667,16 L955.4667,16 L945.4667,6" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="287.5044" x="311.89" y="23.0669">The base interface for Gothic music system.</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4.1323" x="311.89" y="38.1997"> </text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="75.3657" x="311.89" y="53.3325">Gothic calls</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="330.9351" x="391.388" y="53.3325">PlayThemeByScript(zSTRING const&amp;, int, int)</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="214.0112" x="726.4554" y="53.3325">when it changes the music zone.</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4.1323" x="311.89" y="68.4653"> </text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="231.9941" x="311.89" y="83.5981">PlayTheme(zCMusicTheme*, ...)</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="358.9917" x="548.0165" y="83.5981">is used for our scripting API `BassMusic_Play` external.</text></g><g class="entity" data-entity="zCMusicSys_Dummy" data-source-line="17" data-uid="ent0006" id="entity_zCMusicSys_Dummy"><rect fill="#313139" height="32" rx="2.5" ry="2.5" style="stroke:#E7E7E7;stroke-width:0.5;" width="175.6367" x="654.86" y="292.53"/><ellipse cx="669.86" cy="308.53" fill="#2E5233" rx="11" ry="11" style="stroke:#E7E7E7;stroke-width:1;"/><path d="M672.8288,314.1706 Q672.2506,314.4675 671.61,314.6081 Q670.9694,314.7644 670.2663,314.7644 Q667.7663,314.7644 666.4381,313.1238 Q665.1256,311.4675 665.1256,308.3425 Q665.1256,305.2175 666.4381,303.5613 Q667.7663,301.905 670.2663,301.905 Q670.9694,301.905 671.61,302.0613 Q672.2663,302.2175 672.8288,302.5144 L672.8288,305.2331 Q672.2038,304.655 671.61,304.3894 Q671.0163,304.1081 670.3913,304.1081 Q669.0475,304.1081 668.36,305.1863 Q667.6725,306.2488 667.6725,308.3425 Q667.6725,310.4363 668.36,311.5144 Q669.0475,312.5769 670.3913,312.5769 Q671.0163,312.5769 671.61,312.3113 Q672.2038,312.03 672.8288,311.4519 L672.8288,314.1706 Z " fill="#FFFFFF"/><text fill="#FFFFFF" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="143.6367" x="683.86" y="313.3767">zCMusicSys_Dummy</text></g><g class="entity" data-entity="GMN8" data-source-line="18" data-uid="ent0009" id="entity_GMN8"><path d="M663.48,384.53 L663.48,409.6628 A0,0 0 0 0 663.48,409.6628 L935.8916,409.6628 A0,0 0 0 0 935.8916,409.6628 L935.8916,394.53 L925.8916,384.53 L750.99,384.53 L746.99,324.77 L742.99,384.53 L663.48,384.53 A0,0 0 0 0 663.48,384.53" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><path d="M925.8916,384.53 L925.8916,394.53 L935.8916,394.53 L925.8916,384.53" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="251.4116" x="669.48" y="401.5969">Dummy implementation, does nothing</text></g><g class="entity" data-entity="zCMusicSys_DirectMusic" data-source-line="20" data-uid="ent0011" id="entity_zCMusicSys_DirectMusic"><rect fill="#313139" height="32" rx="2.5" ry="2.5" style="stroke:#E7E7E7;stroke-width:0.5;" width="202.4814" x="416.44" y="292.53"/><ellipse cx="431.44" cy="308.53" fill="#2E5233" rx="11" ry="11" style="stroke:#E7E7E7;stroke-width:1;"/><path d="M434.4088,314.1706 Q433.8306,314.4675 433.19,314.6081 Q432.5494,314.7644 431.8463,314.7644 Q429.3463,314.7644 428.0181,313.1238 Q426.7056,311.4675 426.7056,308.3425 Q426.7056,305.2175 428.0181,303.5613 Q429.3463,301.905 431.8463,301.905 Q432.5494,301.905 433.19,302.0613 Q433.8463,302.2175 434.4088,302.5144 L434.4088,305.2331 Q433.7838,304.655 433.19,304.3894 Q432.5963,304.1081 431.9713,304.1081 Q430.6275,304.1081 429.94,305.1863 Q429.2525,306.2488 429.2525,308.3425 Q429.2525,310.4363 429.94,311.5144 Q430.6275,312.5769 431.9713,312.5769 Q432.5963,312.5769 433.19,312.3113 Q433.7838,312.03 434.4088,311.4519 L434.4088,314.1706 Z " fill="#FFFFFF"/><text fill="#FFFFFF" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="170.4814" x="445.44" y="313.3767">zCMusicSys_DirectMusic</text></g><g class="entity" data-entity="GMN13" data-source-line="21" data-uid="ent0014" id="entity_GMN13"><path d="M295.24,384.53 L295.24,409.6628 A0,0 0 0 0 295.24,409.6628 L628.1257,409.6628 A0,0 0 0 0 628.1257,409.6628 L628.1257,394.53 L618.1257,384.53 L521.68,384.53 L517.68,324.77 L513.68,384.53 L295.24,384.53 A0,0 0 0 0 295.24,384.53" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><path d="M618.1257,384.53 L618.1257,394.53 L628.1257,394.53 L618.1257,384.53" fill="#714137" style="stroke:#E7E7E7;stroke-width:0.5;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="311.8857" x="301.24" y="401.5969">The original implementation using DirectMusic}</text></g><g class="entity" data-entity="CMusicSys_Bass" data-source-line="23" data-uid="ent0016" id="entity_CMusicSys_Bass"><rect fill="#90EE90" height="32" rx="2.5" ry="2.5" style="stroke:#E7E7E7;stroke-width:0.5;" width="145.8457" x="235.76" y="292.53"/><ellipse cx="250.76" cy="308.53" fill="#2E5233" rx="11" ry="11" style="stroke:#E7E7E7;stroke-width:1;"/><path d="M253.7288,314.1706 Q253.1506,314.4675 252.51,314.6081 Q251.8694,314.7644 251.1663,314.7644 Q248.6663,314.7644 247.3381,313.1238 Q246.0256,311.4675 246.0256,308.3425 Q246.0256,305.2175 247.3381,303.5613 Q248.6663,301.905 251.1663,301.905 Q251.8694,301.905 252.51,302.0613 Q253.1663,302.2175 253.7288,302.5144 L253.7288,305.2331 Q253.1038,304.655 252.51,304.3894 Q251.9163,304.1081 251.2913,304.1081 Q249.9475,304.1081 249.26,305.1863 Q248.5725,306.2488 248.5725,308.3425 Q248.5725,310.4363 249.26,311.5144 Q249.9475,312.5769 251.2913,312.5769 Q251.9163,312.5769 252.51,312.3113 Q253.1038,312.03 253.7288,311.4519 L253.7288,314.1706 Z " fill="#FFFFFF"/><text fill="#FFFFFF" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113.8457" x="264.76" y="313.3767">CMusicSys_Bass</text></g><g class="entity" data-entity="GMN18" data-source-line="25" data-uid="ent0019" id="entity_GMN18"><path d="M6,164.4 L6,219.7984 A0,0 0 0 0 6,219.7984 L280.37,219.7984 L284.37,292.1 L288.37,219.7984 L383.3638,219.7984 A0,0 0 0 0 383.3638,219.7984 L383.3638,174.4 L373.3638,164.4 L6,164.4 A0,0 0 0 0 6,164.4" fill="#90EE90" style="stroke:#E7E7E7;stroke-width:0.5;"/><path d="M373.3638,164.4 L373.3638,174.4 L383.3638,174.4 L373.3638,164.4" fill="#90EE90" style="stroke:#E7E7E7;stroke-width:0.5;"/><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="352.2314" x="12" y="181.4669">Our implementation that implements virtual functions</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="337.3589" x="12" y="196.5997">from zCMusicSystem and redirects DirectMusic files</text><text fill="#FFFFFF" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="175.4873" x="12" y="211.7325">to zCMusicSys_DirectMusic</text></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="zCMusicSys_Dummy" data-source-line="17" data-uid="lnk7" id="link_zCMusicSystem_zCMusicSys_Dummy"><path d="M742.68,250.82 C742.68,271.28 742.68,276.92 742.68,292.26" fill="none" id="zCMusicSystem-backto-zCMusicSys_Dummy" style="stroke:#E7E7E7;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="742.68,232.82,736.68,250.82,748.68,250.82,742.68,232.82" style="stroke:#E7E7E7;stroke-width:1;"/></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="zCMusicSys_DirectMusic" data-source-line="20" data-uid="lnk12" id="link_zCMusicSystem_zCMusicSys_DirectMusic"><path d="M518.56,250.82 C518.56,271.28 518.56,276.92 518.56,292.26" fill="none" id="zCMusicSystem-backto-zCMusicSys_DirectMusic" style="stroke:#E7E7E7;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="518.56,232.82,512.56,250.82,524.56,250.82,518.56,232.82" style="stroke:#E7E7E7;stroke-width:1;"/></g><g class="link" data-entity-1="zCMusicSystem" data-entity-2="CMusicSys_Bass" data-source-line="23" data-uid="lnk17" id="link_zCMusicSystem_CMusicSys_Bass"><path d="M399.9,226.66 C351.99,226.66 332.99,226.66 332.99,226.66 C332.99,226.66 332.99,268.49 332.99,292.35" fill="none" id="zCMusicSystem-backto-CMusicSys_Bass" style="stroke:#E7E7E7;stroke-width:1;stroke-dasharray:7.0,7.0;"/><polygon fill="none" points="417.9,226.66,399.9,220.66,399.9,232.66,417.9,226.66" style="stroke:#E7E7E7;stroke-width:1;"/></g><g class="link" data-entity-1="CMusicSys_Bass" data-entity-2="zCMusicSys_DirectMusic" data-source-line="30" data-uid="lnk22" id="link_CMusicSys_Bass_zCMusicSys_DirectMusic"><path codeLine="30" d="M382.07,308.66 C393.13,308.66 398.7,308.66 410.22,308.66" fill="none" id="CMusicSys_Bass-to-zCMusicSys_DirectMusic" style="stroke:#E7E7E7;stroke-width:1;"/><polygon fill="#E7E7E7" points="416.22,308.66,407.22,304.66,411.22,308.66,407.22,312.66,416.22,308.66" style="stroke:#E7E7E7;stroke-width:1;"/></g></g></svg></div></div>
+
+<p>When the project started, a lot of code was inside the <code>CMusicSys_Bass</code> class to behave similar as the original system.
+After refactoring motivated by changes in v0.2.x and v0.3.x, we have moved almost all processing to the <code>NH::Bass</code>
+classes and now <code>CMusicSys_Bass</code> is just a simple bridge to get the events from Gothic and push them on a command queue. </p>
+<h2 id="control-flow">Control Flow</h2>
+<p>...</p>
+<h2 id="engine">Engine</h2>
+<p>...</p>
+<h3 id="commandqueue">CommandQueue</h3>
+<p>...</p>
+<h3 id="eventmanager">EventManager</h3>
+<p>...</p>
+<h2 id="musicmanager">MusicManager</h2>
+<p>...</p>
+<h3 id="musictheme">MusicTheme</h3>
+<p>...</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Developer Guide">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Developer Guide
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../style-guide/" class="md-footer__link md-footer__link--next" aria-label="Next: Style Guide">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Style Guide
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Silver Ore Team
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Silver-Ore-Team/zBassMusic" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/cvd6jhKB" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M524.531 69.836a1.5 1.5 0 0 0-.764-.7A485 485 0 0 0 404.081 32.03a1.82 1.82 0 0 0-1.923.91 338 338 0 0 0-14.9 30.6 447.9 447.9 0 0 0-134.426 0 310 310 0 0 0-15.135-30.6 1.89 1.89 0 0 0-1.924-.91 483.7 483.7 0 0 0-119.688 37.107 1.7 1.7 0 0 0-.788.676C39.068 183.651 18.186 294.69 28.43 404.354a2.02 2.02 0 0 0 .765 1.375 487.7 487.7 0 0 0 146.825 74.189 1.9 1.9 0 0 0 2.063-.676A348 348 0 0 0 208.12 430.4a1.86 1.86 0 0 0-1.019-2.588 321 321 0 0 1-45.868-21.853 1.885 1.885 0 0 1-.185-3.126 251 251 0 0 0 9.109-7.137 1.82 1.82 0 0 1 1.9-.256c96.229 43.917 200.41 43.917 295.5 0a1.81 1.81 0 0 1 1.924.233 235 235 0 0 0 9.132 7.16 1.884 1.884 0 0 1-.162 3.126 301.4 301.4 0 0 1-45.89 21.83 1.875 1.875 0 0 0-1 2.611 391 391 0 0 0 30.014 48.815 1.86 1.86 0 0 0 2.063.7A486 486 0 0 0 610.7 405.729a1.88 1.88 0 0 0 .765-1.352c12.264-126.783-20.532-236.912-86.934-334.541M222.491 337.58c-28.972 0-52.844-26.587-52.844-59.239s23.409-59.241 52.844-59.241c29.665 0 53.306 26.82 52.843 59.239 0 32.654-23.41 59.241-52.843 59.241m195.38 0c-28.971 0-52.843-26.587-52.843-59.239s23.409-59.241 52.843-59.241c29.667 0 53.307 26.82 52.844 59.239 0 32.654-23.177 59.241-52.844 59.241"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "content.code.copy", "content.code.select", "content.code.annotate", "navigation.indexes", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../assets/mkdocs_puml/puml.js"></script>
+      
+        <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+      
+        <script src="../../assets/mkdocs_puml/interaction.js"></script>
+      
+    
+  </body>
+</html>

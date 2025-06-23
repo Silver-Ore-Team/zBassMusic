@@ -15,6 +15,7 @@ namespace NH::Bass
         Logger* log;
         ChannelStatus m_Status = ChannelStatus::AVAILABLE;
         HSTREAM m_Stream = 0;
+        AudioEffects& m_Effects = AudioEffects::None;
 
     public:
         explicit Channel(size_t index)
@@ -22,7 +23,7 @@ namespace NH::Bass
             log = CreateLogger(Union::String::Format("zBassMusic::Channel({0})", index));
         };
 
-        Result<void> PlayInstant(const AudioFile& audioFile) override;
+        Result<void> PlayInstant(const AudioFile& audioFile, const AudioEffects& effects) override;
         void StopInstant() override;
 
         void SetVolume(float volume) override;
@@ -34,6 +35,7 @@ namespace NH::Bass
         void OnPosition(double position, const std::function<void()>& callback) override;
         void OnAudioEnds(const std::function<void()>& onFinish) override;
         void BeforeAudioEnds(double aheadSeconds, const std::function<void(double)>& onFinish) override;
+        void OnLoopEnd(double loopStartSeconds, double loopEndSeconds, const std::function<void()>& callback) override;
 
         bool IsPlaying() const override;
         [[nodiscard]] double Position() const override;
@@ -50,6 +52,7 @@ namespace NH::Bass
         static void CALLBACK OnSlideVolumeSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK OnAudioEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
         static void CALLBACK BeforeAudioEndsSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
+        static void CALLBACK OnLoopEndSyncCallFunction(HSYNC, DWORD channel, DWORD data, void* userData);
 
         std::vector<std::shared_ptr<void>> m_SyncCallbacks;
     };

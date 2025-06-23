@@ -158,7 +158,7 @@ namespace NH::Bass
             {
                 auto jingleChannel = engine.AcquireFreeChannel();
                 jingleChannel->SetLoop(false);
-                if (auto result = jingleChannel->PlayInstant(*transition.Jingle)) {
+                if (auto result = jingleChannel->PlayInstant(*transition.Jingle, AudioEffects::None)) {
                     jingleChannel->OnAudioEnds(CreateSyncHandler([jingleChannel]() { jingleChannel->Release(); }));
                 }
                 else
@@ -213,13 +213,21 @@ namespace NH::Bass
         const auto channel = m_AcquiredChannels.emplace_back(engine.AcquireFreeChannel());
         auto& effects = GetAudioEffects(AudioFile::DEFAULT);
         const auto effect = timePoint.has_value() ? timePoint.value().NextEffect : transition.Effect;
-        if (const auto result = channel->PlayInstant(GetAudioFile(AudioFile::DEFAULT)); !result)
+        if (const auto result = channel->PlayInstant(GetAudioFile(AudioFile::DEFAULT), effects); !result)
         {
             ReleaseChannels();
             return;
         }
 
         channel->SetLoop(effects.Loop.Active);
+
+        if (effects.Loop.Active)
+        {
+            if (effects.Loop.Start && effects.Loop.End > 0)
+            {
+                channel->OnLoopEnd(effects.Loop.Start, effects.Loop.End, CreateSyncHandler([]{}));
+            }
+        }
 
         if (effects.ReverbDX8.Active)
         {

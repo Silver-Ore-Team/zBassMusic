@@ -24,6 +24,8 @@ class C_BassMusic_ThemeAudio {
 	var string midifile;
 	var float volume;
 	var int loop;
+	var float loopStart;
+	var float loopEnd;
 	var int reverb;
 	var float reverbMix;
 	var float reverbTime;
@@ -78,3 +80,5 @@ In the future, we may introduce features that use multiple files per theme, henc
 The `filename` field contains the name of the file that should be played in the custom theme. 
 Note that when using Union, only the filename should be provided, regardless of whether it is located in subdirectories 
 of the Music folder.
+
+When `loop` is enabled, additionally `loopStart` and `loopEnd` can be specified to define the loop region in seconds.

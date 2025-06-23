@@ -7,14 +7,16 @@ namespace NH::Bass
     struct OnSyncPosition { HSTREAM Channel; std::function<void()> Function; };
     struct OnSyncWhenAudioEndsData { HSTREAM Channel; std::function<void()> Function; };
     struct OnSyncBeforeAudioEndsData { HSTREAM Channel; std::function<void(double)> Function; };
+    struct OnSyncLoopEndData {HSTREAM Channel; QWORD LoopStartBytes; std::function<void()> Function; };
 
-    Channel::Result<void> Channel::PlayInstant(const AudioFile& audioFile)
+    Channel::Result<void> Channel::PlayInstant(const AudioFile& audioFile, const AudioEffects& effects)
     {
         if (m_Stream > 0)
         {
             BASS_ChannelFree(m_Stream);
             ClearSyncCallbacks();
         }
+        m_Effects = effects;
 
         m_Stream = BASS_StreamCreateFile(true, audioFile.Buffer.data(), 0, audioFile.Buffer.size(), 0);
         if (!m_Stream)
@@ -91,16 +93,44 @@ namespace NH::Bass
     {
         auto cb = std::make_shared<OnSyncWhenAudioEndsData>(OnSyncWhenAudioEndsData{m_Stream, onFinish});
         m_SyncCallbacks.push_back(cb);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnAudioEndSyncCallFunction, cb.get());
+        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End > 0)
+        {
+            const double position = m_Effects.Loop.End;
+            const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
+            BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, cb.get());
+        }
+        else
+        {
+            BASS_ChannelSetSync(m_Stream, BASS_SYNC_END, 0, OnAudioEndSyncCallFunction, cb.get());
+        }
     }
 
     void Channel::BeforeAudioEnds(const double aheadSeconds, const std::function<void(double)>& onFinish)
     {
-        const double position = Length() - aheadSeconds;
-        const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
         auto cb = std::make_shared<OnSyncBeforeAudioEndsData>(OnSyncBeforeAudioEndsData{m_Stream, onFinish});
         m_SyncCallbacks.push_back(cb);
-        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, cb.get());
+        if (m_Effects.Loop.Active && m_Effects.Loop.Start && m_Effects.Loop.End > 0)
+        {
+            const double position = m_Effects.Loop.End - aheadSeconds;
+            const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
+            BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, cb.get());
+        }
+        else
+        {
+            const double position = Length() - aheadSeconds;
+            const int64_t positionBytes = BASS_ChannelSeconds2Bytes(m_Stream, position);
+            BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, positionBytes, BeforeAudioEndsSyncCallFunction, cb.get());
+        }
+    }
+
+    void Channel::OnLoopEnd(double loopStartSeconds, double loopEndSeconds, const std::function<void()>& callback)
+    {
+        const QWORD loopStartBytes = BASS_ChannelSeconds2Bytes(m_Stream, loopStartSeconds);
+        const QWORD loopEndBytes = BASS_ChannelSeconds2Bytes(m_Stream, loopEndSeconds);
+        
+        auto cb = std::make_shared<OnSyncLoopEndData>(OnSyncLoopEndData{ m_Stream, loopStartBytes, callback});
+        m_SyncCallbacks.push_back(cb);
+        BASS_ChannelSetSync(m_Stream, BASS_SYNC_POS, loopEndBytes, OnLoopEndSyncCallFunction, cb.get());
     }
 
     void Channel::Acquire()
@@ -184,5 +214,14 @@ namespace NH::Bass
         const double aheadSeconds = BASS_ChannelBytes2Seconds(channel, BASS_ChannelGetLength(channel, BASS_POS_BYTE) - BASS_ChannelGetPosition(channel, BASS_POS_BYTE));
         if (payload->Function) { payload->Function(aheadSeconds); }
         else { CreateLogger("HSYNC::BeforeAudioEndsSyncCallFunction")->Error("onFinish is nullptr"); }
+    }
+
+    void Channel::OnLoopEndSyncCallFunction(HSYNC, DWORD channel, [[maybe_unused]] DWORD data, void* userData)
+    {
+        const auto* payload = static_cast<OnSyncLoopEndData*>(userData);
+        if (channel != payload->Channel) return;
+        BASS_ChannelSetPosition(channel, payload->LoopStartBytes, BASS_POS_BYTE);
+        if (payload->Function) { payload->Function(); }
+        else { CreateLogger("HSYNC::OnLoopEndSyncCallFunction")->Error("onFinish is nullptr"); }
     }
 }

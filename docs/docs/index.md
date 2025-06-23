@@ -19,12 +19,6 @@ The most important features include:
 * Scriptable interface for controlling the system from Deadalus scripts
 * Backward compatibility with original `.sgt` music (it's redirected to the DirectMusic system)
 
-!!! tip "Project Status"
-
-    zBassMusic is still in the development phase and some APIs may be unstable, incomplete or buggy. You can help the project by
-    using the plugin and reporting bugs or proposing ideas for the next features. The current state and plans for the future are
-    on the [Roadmap](roadmap/index.md).
-
 <div class="grid cards" markdown>
 
 -  ::octicons-rocket-16:{ .lg .middle } __Release Builds__

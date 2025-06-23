@@ -8,7 +8,7 @@ namespace NH::Bass
 
     std::optional<Transition::TimePoint> Transition::NextAvailableTimePoint(const double position) const
     {
-        if (TimePoints.size() > 0)
+        if (!TimePoints.empty())
         {
             const Transition::TimePoint* nearest = nullptr;
             for (const auto& timePoint: TimePoints)

@@ -8,14 +8,24 @@ namespace NH::Bass
 
     std::optional<Transition::TimePoint> Transition::NextAvailableTimePoint(const double position) const
     {
-        for (const auto& timePoint : TimePoints)
+        if (TimePoints.size() > 0)
         {
-            if (position >= timePoint.Start && position < timePoint.Start + timePoint.Duration)
+            const Transition::TimePoint* nearest = nullptr;
+            for (const auto& timePoint: TimePoints)
             {
-                return timePoint;
+                if (position < timePoint.Start)
+                {
+                    if (!nearest || nearest->Start > timePoint.Start)
+                    {
+                        nearest = &timePoint;
+                    }
+                }
             }
+            if (nearest)
+                return *nearest;
         }
         return std::nullopt;
+        
     }
 
     std::string Transition::ToString() const
@@ -27,6 +37,6 @@ namespace NH::Bass
                 + "\tTimePoints: " + "not_impl" + ",\n"
                 + "\tJingle: " + "not_impl" + ",\n"
                 + "\tJingleDelay: " + String(JingleDelay).ToChar() + "\n"
-            + "}";
+                + "}";
     }
 }

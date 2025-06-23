@@ -157,7 +157,15 @@ namespace NH::Bass
 
     void Channel::OnSlideVolumeSyncCallFunction(HSYNC, [[maybe_unused]] DWORD channel, [[maybe_unused]] DWORD data, void* userData)
     {
-        if (const auto* onFinish = static_cast<std::function<void()>*>(userData)) { (*onFinish)(); }
+        if (const auto* onFinish = static_cast<std::function<void()>*>(userData))
+        {
+            try {
+                (*onFinish)();
+            }
+            catch (std::bad_function_call e) {
+                CreateLogger("HSYNC::OnSlideVolumeSyncCallFunction")->Error("Tried to call onFinish callback but failed: {0}", e.what());
+            }
+        }
         else { CreateLogger("HSYNC::OnSlideVolumeSyncCallFunction")->Error("onFinish is nullptr"); }
     }
 

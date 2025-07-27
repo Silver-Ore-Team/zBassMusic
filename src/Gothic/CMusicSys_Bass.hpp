@@ -100,9 +100,38 @@ namespace GOTHIC_NAMESPACE
             m_BassEngine->GetEM().AddSubscriber(NH::Bass::EventType::MUSIC_CHANGE, &BassEvent::Event_OnChange, this);
         }
 
-        zCMusicTheme* LoadThemeByScript([[maybe_unused]] zSTRING const& id) override
+        zCMusicTheme* LoadThemeByScript(zSTRING const& id) override
         {
-            return nullptr; // Not used in this implementation
+            if (s_musicSystemDisabled || id.IsEmpty())
+            {
+                return nullptr;
+            }
+
+            log->Trace("LoadThemeByScript: {0}", id.ToChar());
+
+            zSTRING identifier = id;
+            identifier.Upper();
+
+            std::shared_ptr<NH::Bass::MusicTheme> theme = m_BassEngine->GetMusicManager().GetTheme(identifier.ToChar());
+            if (!theme)
+            {
+                log->Error("LoadThemeByScript: Theme not found: {0}", id.ToChar());
+                return nullptr;
+            }
+            if (IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
+            {
+                return m_DirectMusic->LoadThemeByScript(id);
+            }
+            else 
+            {
+                auto* dmTheme = new zCMusicTheme;
+                dmTheme->name = theme->GetName().c_str();
+                if (!(NH::Bass::Options->CreateMainParserCMusicTheme && parser->CreateInstance(identifier, &dmTheme->fileName)))
+                {
+                    parserMusic->CreateInstance(identifier, &dmTheme->fileName);
+                }
+                return dmTheme;
+            }
         }
 
         void PlayThemeByScript(zSTRING const& id, int manipulate, int* done) override

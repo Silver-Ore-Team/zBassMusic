@@ -54,7 +54,7 @@ file(GLOB_RECURSE PLUGIN_SOURCES "src/**.cpp")
 target_sources(plugin PRIVATE ${PLUGIN_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
 
 target_compile_options(plugin PRIVATE
-        /W4 /WX /permissive- /Zc:__cplusplus /Zc:preprocessor /utf-8
+        /W4 /permissive- /Zc:__cplusplus /Zc:preprocessor /utf-8
         /experimental:external /external:W0 /external:anglebrackets /external:templates-
         /external:I ${CMAKE_BINARY_DIR}/_deps
         /wd4740 # disable warning C4740: flow in or out of inline asm code suppresses global optimization

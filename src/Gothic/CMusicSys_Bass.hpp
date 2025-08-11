@@ -120,7 +120,12 @@ namespace GOTHIC_NAMESPACE
             }
             if (IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
             {
-                return m_DirectMusic->LoadThemeByScript(id);
+                if (!parserMusic->GetSymbol(identifier) && parser->GetSymbol(identifier))
+                {
+                    log->Error("LoadThemeByScript: Theme: {0} uses DirectMusic format and have to be defined in the music parser", id.ToChar());
+                    return nullptr;
+                }
+                return m_DirectMusic->LoadThemeByScript(identifier);
             }
             else 
             {

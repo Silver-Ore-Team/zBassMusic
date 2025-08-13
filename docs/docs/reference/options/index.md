@@ -34,6 +34,9 @@ If true, the class [C_MUSICTHEME](../classes/C_MUSICTHEME.md) is also created wi
 and you can define music themes in Content scripts. Be aware that it doesn't provide any sharing between parsers
 so you can't use instance from music parser in the main parser - then you have to redefine it in the other
 
+!!! Danger
+    Music themes defined in the main parser cannot use DirectMusic format.
+
 ```dae
 CreateMainParserCMusicTheme=1
 ```

@@ -1,4 +1,4 @@
-# zBassMusic
+# zBassMusic test
 
 zBassMusic is a modern music system for Gothic games based on ZenGin.
 It replaces the original DirectMusic system with a

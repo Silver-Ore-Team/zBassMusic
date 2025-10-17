@@ -48,11 +48,11 @@ namespace GOTHIC_NAMESPACE
     {
         int active;
         parser->GetParameter(active);
-        Globals->FullScriptControl = static_cast<bool>(active);
-        if (Globals->FullScriptControl)
+        if (active)
         {
             zmusic->Stop();
         }
+        Globals->FullScriptControl = static_cast<bool>(active);
         return 0;
     }
 

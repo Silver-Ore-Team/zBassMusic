@@ -37,6 +37,13 @@ namespace GOTHIC_NAMESPACE
     // G2A: 0x00461FD0 (+ 0x172) public: int __thiscall zCOption::WriteString(class zSTRING const &,char const *,class zSTRING,int) - 0x00462142 
     inline auto* zCOption_WriteString = reinterpret_cast<void*>(zSwitch(0x0045CB62, 0x00464106, 0x00461932, 0x00462142));
 
+
+    //  G1: 0x0070AE80 (+ 0x91B) public: virtual void __thiscall oCZoneMusic::ProcessZoneList(class zCArraySort<class zCZone *> const &,class zCArraySort<class zCZone *> const &,class zCWorld *) - 0x0070B79B
+    // G1A: 0x00745D40 (+ 0x9D9) public: virtual void __thiscall oCZoneMusic::ProcessZoneList(class zCArraySort<class zCZone *> const &,class zCArraySort<class zCZone *> const &,class zCWorld *) - 0x00746719
+    //  G2: 0x00754FC0 (+ 0xA38) public: virtual void __thiscall oCZoneMusic::ProcessZoneList(class zCArraySort<class zCZone *> const &,class zCArraySort<class zCZone *> const &,class zCWorld *) - 0x007559F8
+    // G2A: 0x00640560 (+ 0xA38) public: virtual void __thiscall oCZoneMusic::ProcessZoneList(class zCArraySort<class zCZone *> const &,class zCArraySort<class zCZone *> const &,class zCWorld *) - 0x00640F98
+    inline auto* oCZoneMusic_ProcessZoneList = reinterpret_cast<void*>(zSwitch(0x0070B79B, 0x00746719, 0x007559F8, 0x00640F98));
+
     void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg);
     inline auto Partial_zCParser_Parse = Union::CreatePartialHook(zCParser_Parse, zCParser_Parse_PartialHook);
     inline void __fastcall zCParser_Parse_PartialHook(Union::Registers& reg)
@@ -105,6 +112,17 @@ namespace GOTHIC_NAMESPACE
     inline void __fastcall zCOption_WriteString_PartialHook()
     {
         UpdateMusicOptions();
+    }
+
+    void __fastcall oCZoneMusic_ProcessZoneList_PartialHook(Union::Registers& reg);
+    inline auto Partial_oCZoneMusic_ProcessZoneList = Union::CreatePartialHook(oCZoneMusic_ProcessZoneList, oCZoneMusic_ProcessZoneList_PartialHook);
+    inline void __fastcall oCZoneMusic_ProcessZoneList_PartialHook(Union::Registers& reg)
+    {
+        // Skip zmusic->Stop() call when FullScriptControl is enabled
+        if (Globals->FullScriptControl)
+        {
+            reg.eip = reinterpret_cast<DWORD>(reinterpret_cast<unsigned char*>(oCZoneMusic_ProcessZoneList) + 0xB);
+        }
     }
 
 }

@@ -65,6 +65,14 @@ jobs:
         if: ${{ inputs.push-version-commit == true }}
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Fix GitHub SSH issue (update OpenSSH)
+        if: ${{ inputs.push-version-commit == true }}
+        run: |
+          choco install openssh -y
+          $env:Path = "C:\Program Files\OpenSSH-Win64;" + $env:Path
+          ssh -V
+          mkdir $env:USERPROFILE\.ssh -Force
+          ssh-keyscan github.com | Out-File -Append -Encoding ascii $env:USERPROFILE\.ssh\known_hosts
       - name: Commit version change
         if: ${{ inputs.push-version-commit == true }}
         run: |

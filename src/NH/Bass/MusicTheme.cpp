@@ -104,6 +104,17 @@ namespace NH::Bass
                         return;
                     }
 
+                    // union-api VDFS implements preprocessing for .ogg files to ensure compatibility with the SystemPack,
+                    // which decoded them in a specific way to make this format work with Gothic sound system.
+                    // Therefore the data optained from .ogg files is not raw OGG data and cannot be used directly by BASS
+                    if (file->GetName().EndsWith(".OGG"))
+                    {
+                        m_AudioFiles[type].Status = AudioFile::StatusType::FAILED;
+                        m_AudioFiles[type].Error = "Rename extension to .nogg to load OGG files correctly.";
+                        log->Error("Could not load audio file {0} - {1}", file->GetName(), m_AudioFiles[type].Error.c_str());
+                        return;
+                    }
+
                     auto* stream = file->Open();
                     m_AudioFiles[type].Buffer.resize(stream->GetSize());
                     stream->Read(m_AudioFiles[type].Buffer.data(), m_AudioFiles[type].Buffer.size());

@@ -103,6 +103,14 @@ namespace NH::Bass
                         m_AudioFiles[type].Error = "File not found";
                         return;
                     }
+                    if (file->GetName().EndsWith(".OGG"))
+                    {
+                        m_AudioFiles[type].Status = AudioFile::StatusType::FAILED;
+                        m_AudioFiles[type].Error = "Rename extension to .nogg to load OGG files correctly.";
+                        log->Error("Could not load audio file {0} - {1}", file->GetName(), m_AudioFiles[type].Error.c_str());
+                        return;
+                    }
+
 
                     auto* stream = file->Open();
                     m_AudioFiles[type].Buffer.resize(stream->GetSize());

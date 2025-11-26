@@ -118,7 +118,7 @@ namespace GOTHIC_NAMESPACE
                 log->Error("LoadThemeByScript: Theme not found: {0}", id.ToChar());
                 return nullptr;
             }
-            if (IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
+            if (theme->HasAudioFile(NH::Bass::AudioFile::DEFAULT) && IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
             {
                 if (!parserMusic->GetSymbol(identifier) && parser->GetSymbol(identifier))
                 {
@@ -167,7 +167,7 @@ namespace GOTHIC_NAMESPACE
             }
 
             std::shared_ptr<NH::Bass::MusicTheme> theme = m_BassEngine->GetMusicManager().GetTheme(identifier.ToChar());
-            if (theme && IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
+            if (theme && theme->HasAudioFile(NH::Bass::AudioFile::DEFAULT) && IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
             {
                 m_BassEngine->StopMusic();
                 return m_DirectMusic->PlayThemeByScript(id, manipulate, done);

@@ -24,7 +24,7 @@ runtime is there.
     Choose either ZIP or VDF. Both work the same.
 
     From ZIP release:<br>
-    Copy `zBassMusic.dll`, `UnionAPI.dll`, `bass.dll`, `bassmidi.dll`, `bassopus.dll`, `bassflac.dll` <br>
+    Copy `zBassMusic.dll`, `bass.dll`, `bassmidi.dll`, `bassopus.dll`, `bassflac.dll` <br>
     To `<GOTHIC_DIR>/System/Autorun/`
 
     From VDF release:<br>
@@ -50,7 +50,7 @@ runtime is there.
     VDF=YourMod.mod  zBassMusic.mod 
     ```
 
-## Standalone System Pack
+## System Pack
 
 It's possible to load zBassMusic on a clean Gothic with only System Pack using `pre.load`
 file but it's always global.
@@ -58,38 +58,15 @@ file but it's always global.
 ??? danger "Global Method"
 
     From ZIP release:<br>
-    Copy `zBassMusic.dll`, `UnionAPI.dll`, `bass.dll`, `bassmidi.dll`, `bassopus.dll`, `bassflac.dll`  <br>
+    Copy `zBassMusic.dll`<br>
+    To `<GOTHIC_DIR>/System/Autorun/`<br>
+
+    Copy `bass.dll`, `bassmidi.dll`, `bassopus.dll`, `bassflac.dll`<br>
     To `<GOTHIC_DIR>/System/`
 
     Create `pre.load` file in `<GOTHIC_DIR>/System/` with content:
     ```
     zBassMusic.dll
-    ```
-
-## Standalone Ikarus
-
-!!! warning "Not supported now"
-
-    In the current release, we are hooking early into Gothic initialization, so Ikarus would load the plugin too late. In future releases, we may provide an alternative initialization that would be possible at any moment.
-
-If you are using Ikarus in your scripts, it's possible to load dynamically any DLL using `LoadLibrary("AnyLib.dll")`
-function.
-The function is conveniently provided by Ikarus and this method is always isolated.
-
-??? success "Isolated Method"
-
-    From ZIP release:<br>
-    Copy `zBassMusic.dll`, `UnionAPI.dll`, `bass.dll`, `bassmidi.dll`, `bassopus.dll`, `bassflac.dll`  <br>
-    To `<GOTHIC_DIR>/System/`
-
-    In your `Startup.d` add to Init:
-    ```dae
-    func void INIT_GLOBAL()
-    {
-	    Game_InitGerman();
-        LoadLibrary("zBassMusic.dll");
-        // ...
-    }
     ```
 
 ## Validate

@@ -118,7 +118,7 @@ namespace GOTHIC_NAMESPACE
                 log->Error("LoadThemeByScript: Theme not found: {0}", id.ToChar());
                 return nullptr;
             }
-            if (IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
+            if (theme->HasAudioFile(NH::Bass::AudioFile::DEFAULT) && IsDirectMusicFormat(theme->GetAudioFile(NH::Bass::AudioFile::DEFAULT).Filename.c_str()))
             {
                 if (!parserMusic->GetSymbol(identifier) && parser->GetSymbol(identifier))
                 {

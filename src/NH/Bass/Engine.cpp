@@ -32,6 +32,11 @@ namespace NH::Bass
         const uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTimestamp).count();
         lastTimestamp = now;
 
+        if (m_ActiveTheme && !m_ActiveTheme->IsPlaying())
+        {
+            m_ActiveTheme->RePlay(*this);
+        }
+
         m_CommandQueue.Update(*this);
 
         BASS_Update(static_cast<int32_t>(delta));

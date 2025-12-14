@@ -79,6 +79,7 @@ namespace NH::Bass
         void AddMidiFile(const std::string& type, const std::shared_ptr<MidiFile>& midiFile);
         void AddJingle(const std::string& filename, double delay, const std::string& filter);
         void LoadAudioFiles(Executor& executor);
+        bool IsPlaying();
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
         void Transition(IEngine& engine, MusicTheme& nextTheme);
@@ -86,6 +87,7 @@ namespace NH::Bass
         void Play(IEngine& engine, const struct Transition& transition, const std::optional<Transition::TimePoint>& timePoint = std::nullopt);
         void Stop(IEngine& engine);
         void Stop(IEngine& engine, const struct Transition& transition);
+        void RePlay(IEngine& engine);
 
         [[nodiscard]] const std::string& GetName() const { return m_Name; }
         [[nodiscard]] TransitionInfo& GetTransitionInfo() { return m_TransitionInfo; };

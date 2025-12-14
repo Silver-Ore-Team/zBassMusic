@@ -43,7 +43,7 @@ prototype BassMusic_ThemeAudio(C_BassMusic_ThemeAudio) {
 |-----------------|------------|-------------------------------------------------------------------------------------|
 | theme           | string     | The name (identifier) of a theme.                                                   |
 | type            | string     | Type of the audio. Use "DEFAULT" to play it as music.                               |
-| filename        | string     | Filename of the audio file.                                                         |
+| filename        | string     | Filename of the audio file (DirectMusic .sgt files are not supported).              |
 | midifile        | string     | Filename of a MIDI file for transition control.                                     |
 | vol             | float      | Volume of the song in range [0, 1] as the % of master volume.                       |
 | loop            | int (bool) | If not zero, the theme will loop. Otherwise, it will play only once per zone enter. |

@@ -380,6 +380,11 @@ namespace NH::Bass
 
     void MusicTheme::RePlay(IEngine& engine)
     {
+        if (!HasAudioFile(AudioFile::DEFAULT) || GetAudioFile(AudioFile::DEFAULT).Status == AudioFile::StatusType::FAILED)
+        {
+            return;
+        }
+        log->Debug("Re-playing active theme: {0}", GetName().c_str());
         ReleaseChannels();
         Play(engine);
     }

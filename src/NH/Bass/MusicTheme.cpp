@@ -372,6 +372,12 @@ namespace NH::Bass
         m_AcquiredChannels.clear();
     }
 
+    bool MusicTheme::IsPlaying(IEngine& engine)
+    {
+        auto channel = GetAcquiredChannel();
+        return channel && channel->IsPlaying();
+    }
+
     std::string MusicTheme::ToString() const
     {
         std::string result = "MusicTheme{ \n\tName: " + m_Name + ", \n\tAudioFiles: {\n";

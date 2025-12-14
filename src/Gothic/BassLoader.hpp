@@ -146,7 +146,14 @@ namespace GOTHIC_NAMESPACE
                         }
                         auto type = NH::String(input->Type.ToChar());
                         const std::string id = type == "DEFAULT" ? NH::Bass::AudioFile::DEFAULT : type.ToChar();
-                        theme->SetAudioFile(id, input->Filename.ToChar());
+                        if (!CMusicSys_Bass::IsDirectMusicFormat(input->Filename.ToChar()))
+                        {
+                            theme->SetAudioFile(id, input->Filename.ToChar());
+                        }
+                        else
+                        {
+                            log->Error("BassMusic_ThemeAudio '{0}' uses DirectMusic format which is only supported by C_MUSICTHEME. Skipping...", symbol->name.ToChar());
+                        }
                         theme->SetAudioEffects(id, [&](NH::Bass::AudioEffects& effects) {
                             if (input->Loop)
                             {

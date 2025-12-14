@@ -67,6 +67,7 @@ namespace GOTHIC_NAMESPACE
         NH::Bass::Engine* m_BassEngine;
         zCMusicSys_DirectMusic* m_DirectMusic;
 
+    public:
         static bool IsDirectMusicFormat(const zSTRING& file)
         {
             static constexpr std::string_view validExt{ ".sgt" };
@@ -89,8 +90,6 @@ namespace GOTHIC_NAMESPACE
 
             return std::ranges::equal(fileExt | std::ranges::views::transform(toLowerSimple), validExt);
         }
-
-    public:
 
         CMusicSys_Bass(NH::Bass::Engine* bassEngine, zCMusicSys_DirectMusic* directMusic)
                 : m_BassEngine(bassEngine), m_DirectMusic(directMusic)

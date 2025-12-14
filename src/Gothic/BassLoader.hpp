@@ -153,6 +153,7 @@ namespace GOTHIC_NAMESPACE
                         else
                         {
                             log->Error("C_BassMusic_ThemeAudio '{0}' uses DirectMusic format which is only supported by C_MUSICTHEME. Skipping...", symbol->name.ToChar());
+                            return;
                         }
                         theme->SetAudioEffects(id, [&](NH::Bass::AudioEffects& effects) {
                             if (input->Loop)

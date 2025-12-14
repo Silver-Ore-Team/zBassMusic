@@ -372,7 +372,7 @@ namespace NH::Bass
         m_AcquiredChannels.clear();
     }
 
-    bool MusicTheme::IsPlaying(IEngine& engine)
+    bool MusicTheme::IsPlaying()
     {
         auto channel = GetAcquiredChannel();
         return channel && channel->IsPlaying();

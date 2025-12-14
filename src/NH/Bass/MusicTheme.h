@@ -79,7 +79,7 @@ namespace NH::Bass
         void AddMidiFile(const std::string& type, const std::shared_ptr<MidiFile>& midiFile);
         void AddJingle(const std::string& filename, double delay, const std::string& filter);
         void LoadAudioFiles(Executor& executor);
-        bool IsPlaying(IEngine& engine);
+        bool IsPlaying();
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
         void Transition(IEngine& engine, MusicTheme& nextTheme);

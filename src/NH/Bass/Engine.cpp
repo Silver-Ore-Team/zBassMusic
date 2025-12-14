@@ -34,7 +34,7 @@ namespace NH::Bass
 
         if (m_ActiveTheme && !m_ActiveTheme->IsPlaying())
         {
-            m_ActiveTheme->Play(*this);
+            m_ActiveTheme->RePlay(*this);
             log->Debug("Re-playing active theme: {0}", m_ActiveTheme->GetName().c_str());
         }
 

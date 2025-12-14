@@ -378,6 +378,12 @@ namespace NH::Bass
         return channel && channel->IsPlaying();
     }
 
+    void MusicTheme::RePlay(IEngine& engine)
+    {
+        ReleaseChannels();
+        Play(engine);
+    }
+
     std::string MusicTheme::ToString() const
     {
         std::string result = "MusicTheme{ \n\tName: " + m_Name + ", \n\tAudioFiles: {\n";

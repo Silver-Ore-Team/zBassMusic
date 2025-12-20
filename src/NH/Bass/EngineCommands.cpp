@@ -38,7 +38,6 @@ namespace NH::Bass
 
     CommandResult ScheduleThemeChangeCommand::Execute(Engine& engine)
     {
-        log->Info("Scheduling theme: {0}", m_ThemeId.c_str());
         const auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
@@ -64,6 +63,9 @@ namespace NH::Bass
             return CommandResult::DONE;
         }
 
+        // Only log once we actually proceed (theme is loaded)
+        log->Info("Scheduling theme: {0}", m_ThemeId.c_str());
+
         const auto activeTheme = engine.m_ActiveTheme;
         const bool anyChannelPlaying = std::ranges::any_of(engine.m_Channels, [](const std::shared_ptr<Channel>& channel) {
             return channel->IsPlaying();
@@ -78,7 +80,6 @@ namespace NH::Bass
 
     CommandResult PlayThemeInstantCommand::Execute(Engine& engine)
     {
-        log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId.c_str());
         const auto theme = engine.GetMusicManager().GetTheme(m_ThemeId);
         if (!theme)
         {
@@ -103,6 +104,9 @@ namespace NH::Bass
             engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeInstantCommand>(m_ThemeId));
             return CommandResult::DONE;
         }
+
+        // Only log once we actually proceed (theme is loaded)
+        log->Info("Playing theme: {0} instantly, because PlayThemeInstantCommand forced it.", m_ThemeId.c_str());
 
         if (const auto activeTheme = engine.GetActiveTheme()) { activeTheme->Stop(engine); }
         theme->Play(engine);

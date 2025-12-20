@@ -79,23 +79,24 @@ namespace NH::Bass
         }
     }
 
+    // Lazy loading only callback from MusicTheme to signal tahat theme is ready
+    // Increments loaded theme count and signals eviction needed
+    // It does NOT touch the theme or evict anything itself 
+    // but sygnals the Engine::Update to do so to avoid threading issues
     void MusicManager::OnThemeReady(const std::string& id)
     {
         if (!m_Themes.contains(id) || !m_lazyLoading)
         {
             return;
         }
-        // Increment counter from background thread (atomic, thread-safe)
-        // Main thread will sync LRU in EvictOldThemes and may adjust if needed
         ++m_LoadedThemesCount;
-        m_NeedsEviction = true;  // Signal main thread to evict
+        m_NeedsEviction = true;
         log->Trace("OnThemeReady: {0} is READY;", id.c_str());
-        // Do NOT call TouchTheme or check m_LRUIterators here - that's main thread's job
     }
 
+    // Add/Move theme to back of LRU
     void MusicManager::TouchTheme(const std::string& id)
     {
-        // If already in LRU, remove from current position
         if (m_LRUIterators.contains(id))
         {
             m_LRUOrder.erase(m_LRUIterators[id]);
@@ -111,7 +112,7 @@ namespace NH::Bass
         {
             if (IsThemeLoaded(id) && !m_LRUIterators.contains(id))
             {
-                TouchTheme(id);  // Add newly loaded themes to LRU
+                TouchTheme(id);
             }
         }
 
@@ -121,28 +122,20 @@ namespace NH::Bass
         }
 
         // Evict from front (oldest) until we're under the limit
-        size_t playingSkipCount = 0;
         while (!m_LRUOrder.empty() && m_LoadedThemesCount > m_MaxLoadedThemes)
         {
-            const std::string oldestId = m_LRUOrder.front();  // Copy, not reference (TouchTheme invalidates iterators)
+            const std::string oldestId = m_LRUOrder.front(); // Copy to avoid any invalidation issues
 
-            // Should never happen, but just in case
+            // Just in case, skip if currently playing
             if (IsThemePlaying(oldestId))
             {
                 log->Debug("Skipping eviction of theme {0} because it is currently playing.", oldestId.c_str());
                 // Move to back to avoid repeated checks
                 TouchTheme(oldestId);
-                ++playingSkipCount;
-                // Prevent infinite loop if only playing themes remain
-                if (playingSkipCount >= m_LRUOrder.size())
-                {
-                    log->Warning("Cannot evict: all loaded themes are currently playing.");
-                    break;
-                }
-                continue;
+                // Defer further eviction to next update
+                m_NeedsEviction = true;
+                return;
             }
-
-            playingSkipCount = 0;  // Reset on successful processing
 
             // Only evict if it's actually loaded
             if (m_Themes.contains(oldestId) && IsThemeLoaded(oldestId))

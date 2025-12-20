@@ -57,4 +57,21 @@ Sets the logger level for ZSpy logs
 LoggerLevelZSpy=DEBUG
 ```
 
+## <a href="#lazyloading">LazyLoading</a>
+
+If true, themes are loaded only when they are played for the first time. This can reduce memory usage
+but may introduce a slight delay when a theme is played for the first time.
+
+```dae
+LazyLoading=1
+```
+
+## <a href="#maxloadedthemes">MaxLoadedThemes</a>
+Specifies the maximum number of themes that can be loaded in memory at the same time. If the limit is reached, the least recently used theme will be unloaded
+when a new theme is loaded.
+
+```dae
+MaxLoadedThemes=5
+```
+
 </div>

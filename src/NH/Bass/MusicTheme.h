@@ -26,6 +26,12 @@ namespace NH::Bass
         StatusType Status = StatusType::NOT_LOADED;
         std::string Error;
 
+        void ReleaseBuffer()
+        {
+            std::vector<char>().swap(Buffer);
+            Status = StatusType::NOT_LOADED;
+            Error.clear();
+        }
         [[nodiscard]] std::string ToString() const override
         {
             static const std::string types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
@@ -80,6 +86,7 @@ namespace NH::Bass
         void AddJingle(const std::string& filename, double delay, const std::string& filter);
         void LoadAudioFiles(Executor& executor);
         bool IsPlaying();
+        void ReleaseAudioBuffers();
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
         void Transition(IEngine& engine, MusicTheme& nextTheme);

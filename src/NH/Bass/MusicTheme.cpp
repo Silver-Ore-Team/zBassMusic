@@ -3,6 +3,7 @@
 #include "EngineCommands.h"
 #include "NH/Bass/Command.h"
 #include "NH/Bass/EventManager.h"
+#include "NH/Bass/Engine.h"
 
 #include <Union/VDFS.h>
 
@@ -121,6 +122,10 @@ namespace NH::Bass
                     stream->Close();
 
                     m_AudioFiles[type].Status = AudioFile::StatusType::READY;
+                    if (type == AudioFile::DEFAULT)
+                    {
+                        Engine::GetInstance()->GetMusicManager().OnThemeReady(m_Name);
+                    }
                 });
             }
         }
@@ -387,6 +392,18 @@ namespace NH::Bass
         log->Debug("Re-playing active theme: {0}", GetName().c_str());
         ReleaseChannels();
         Play(engine);
+    }
+
+    void MusicTheme::ReleaseAudioBuffers()
+    {
+        for (auto& [type, audioFile] : m_AudioFiles)
+        {
+            if (audioFile.Status == AudioFile::StatusType::READY)
+            {
+                log->Trace("Releasing buffer for {0}: {1}", m_Name.c_str(), type.c_str());
+                audioFile.ReleaseBuffer();
+            }
+        }
     }
 
     std::string MusicTheme::ToString() const

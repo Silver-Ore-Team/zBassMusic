@@ -44,6 +44,12 @@ namespace GOTHIC_NAMESPACE
         NH::Bass::Options->ForceDisableReverb = zoptions->ReadBool("BASSMUSIC", "ForceDisableReverb", false);
         NH::Bass::Options->ForceFadeTransition = zoptions->ReadBool("BASSMUSIC", "ForceFadeTransition", false);
         NH::Bass::Options->CreateMainParserCMusicTheme = zoptions->ReadBool("BASSMUSIC", "CreateMainParserCMusicTheme", true);
+        NH::Bass::Options->LazyLoading = zoptions->ReadBool("BASSMUSIC", "LazyLoading", true);
+        NH::Bass::Options->MaxLoadedThemes = zoptions->ReadInt("BASSMUSIC", "MaxLoadedThemes", 5);
+        if (NH::Bass::Options->MaxLoadedThemes < 1)
+        {
+            NH::Bass::Options->MaxLoadedThemes = 1;
+        }
     }
 
     void UpdateMusicOptions()

@@ -46,6 +46,16 @@ namespace NH::Bass
             return CommandResult::DONE;
         }
 
+        // Lazy loading: trigger load if not already loaded
+        if (NH::Bass::Options->LazyLoading && !engine.GetMusicManager().IsThemeLoaded(m_ThemeId))
+        {
+            log->Debug("Theme {0} not loaded yet. Triggering lazy load.", m_ThemeId.c_str());
+            engine.GetMusicManager().LoadTheme(m_ThemeId);
+            // Re-queue this command to execute after loading completes
+            engine.GetCommandQueue().AddCommand(std::make_shared<ScheduleThemeChangeCommand>(m_ThemeId));
+            return CommandResult::DONE;
+        }
+
         const auto activeTheme = engine.m_ActiveTheme;
         const bool anyChannelPlaying = std::ranges::any_of(engine.m_Channels, [](const std::shared_ptr<Channel>& channel) {
             return channel->IsPlaying();
@@ -65,6 +75,16 @@ namespace NH::Bass
         if (!theme)
         {
             log->Error("Theme {0} doesn't exist", m_ThemeId.c_str());
+            return CommandResult::DONE;
+        }
+
+        // Lazy loading: trigger load if not already loaded
+        if (NH::Bass::Options->LazyLoading && !engine.GetMusicManager().IsThemeLoaded(m_ThemeId))
+        {
+            log->Debug("Theme {0} not loaded yet. Triggering lazy load.", m_ThemeId.c_str());
+            engine.GetMusicManager().LoadTheme(m_ThemeId);
+            // Re-queue this command to execute after loading completes
+            engine.GetCommandQueue().AddCommand(std::make_shared<PlayThemeInstantCommand>(m_ThemeId));
             return CommandResult::DONE;
         }
 

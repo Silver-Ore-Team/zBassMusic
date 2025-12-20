@@ -15,7 +15,7 @@ namespace NH::Bass
         std::list<std::string> m_LRUOrder;  // Most recent at back, oldest at front
         std::unordered_map<std::string, std::list<std::string>::iterator> m_LRUIterators;
         size_t m_MaxLoadedThemes = 5;
-        size_t m_LoadedThemesCount = 0;  // Counter for loaded themes (incremented on ready, decremented on evict)
+        std::atomic<size_t> m_LoadedThemesCount{0};  // Counter for loaded themes (atomic for thread-safe increment)
         std::atomic<bool> m_NeedsEviction{false};  // Signaled by OnThemeReady, checked by Engine::Update
     public:
         void AddTheme(const std::string& id, const std::shared_ptr<MusicTheme>& theme);
@@ -25,6 +25,7 @@ namespace NH::Bass
         void LoadTheme(const std::string& id);
         bool IsThemeLoaded(const std::string& id) const;
         bool IsThemeLoading(const std::string& id) const;
+        bool IsThemeFailed(const std::string& id) const;
         bool IsThemePlaying(const std::string& id) const;
         void OnThemeReady(const std::string& id); // Callback when a theme finishes loading (for lazy loading)
         void SetMaxLoadedThemes(size_t maxThemes) { m_MaxLoadedThemes = maxThemes; };

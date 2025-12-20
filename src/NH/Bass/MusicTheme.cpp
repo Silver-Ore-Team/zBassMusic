@@ -129,6 +129,7 @@ namespace NH::Bass
                     if (type == AudioFile::DEFAULT && m_OnReadyCallback)
                     {
                         m_OnReadyCallback(m_Name);
+                        m_OnReadyCallback = nullptr;
                     }
                 });
             }

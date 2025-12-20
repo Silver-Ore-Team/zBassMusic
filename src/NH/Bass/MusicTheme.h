@@ -30,7 +30,6 @@ namespace NH::Bass
         {
             std::vector<char>().swap(Buffer);
             Status = StatusType::NOT_LOADED;
-            Error.clear();
         }
         [[nodiscard]] std::string ToString() const override
         {

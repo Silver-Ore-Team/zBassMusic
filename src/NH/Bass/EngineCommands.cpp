@@ -49,6 +49,11 @@ namespace NH::Bass
         // Lazy loading: trigger load if not already loaded
         if (NH::Bass::Options->LazyLoading && !engine.GetMusicManager().IsThemeLoaded(m_ThemeId))
         {
+            if (engine.GetMusicManager().IsThemeFailed(m_ThemeId))
+            {
+                log->Error("Theme {0} failed to load. Cannot schedule.", m_ThemeId.c_str());
+                return CommandResult::DONE;
+            }
             if (!engine.GetMusicManager().IsThemeLoading(m_ThemeId))
             {
                 log->Debug("Theme {0} not loaded yet. Triggering lazy load.", m_ThemeId.c_str());
@@ -84,6 +89,11 @@ namespace NH::Bass
         // Lazy loading: trigger load if not already loaded
         if (NH::Bass::Options->LazyLoading && !engine.GetMusicManager().IsThemeLoaded(m_ThemeId))
         {
+            if (engine.GetMusicManager().IsThemeFailed(m_ThemeId))
+            {
+                log->Error("Theme {0} failed to load. Cannot play.", m_ThemeId.c_str());
+                return CommandResult::DONE;
+            }
             if (!engine.GetMusicManager().IsThemeLoading(m_ThemeId))
             {
                 log->Debug("Theme {0} not loaded yet. Triggering lazy load.", m_ThemeId.c_str());

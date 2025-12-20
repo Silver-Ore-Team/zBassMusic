@@ -85,10 +85,12 @@ namespace NH::Bass
         {
             return;
         }
+        // Increment counter from background thread (atomic, thread-safe)
+        // Main thread will sync LRU in EvictOldThemes and may adjust if needed
         ++m_LoadedThemesCount;
         m_NeedsEviction = true;  // Signal main thread to evict
         log->Trace("OnThemeReady: {0} is READY;", id.c_str());
-        // Do NOT call TouchTheme here it would be called from EvictOldThemes on Engine::Update
+        // Do NOT call TouchTheme or check m_LRUIterators here - that's main thread's job
     }
 
     void MusicManager::TouchTheme(const std::string& id)
@@ -119,9 +121,10 @@ namespace NH::Bass
         }
 
         // Evict from front (oldest) until we're under the limit
+        size_t playingSkipCount = 0;
         while (!m_LRUOrder.empty() && m_LoadedThemesCount > m_MaxLoadedThemes)
         {
-            const std::string& oldestId = m_LRUOrder.front();
+            const std::string oldestId = m_LRUOrder.front();  // Copy, not reference (TouchTheme invalidates iterators)
 
             // Should never happen, but just in case
             if (IsThemePlaying(oldestId))
@@ -129,8 +132,17 @@ namespace NH::Bass
                 log->Debug("Skipping eviction of theme {0} because it is currently playing.", oldestId.c_str());
                 // Move to back to avoid repeated checks
                 TouchTheme(oldestId);
+                ++playingSkipCount;
+                // Prevent infinite loop if only playing themes remain
+                if (playingSkipCount >= m_LRUOrder.size())
+                {
+                    log->Warning("Cannot evict: all loaded themes are currently playing.");
+                    break;
+                }
                 continue;
             }
+
+            playingSkipCount = 0;  // Reset on successful processing
 
             // Only evict if it's actually loaded
             if (m_Themes.contains(oldestId) && IsThemeLoaded(oldestId))
@@ -163,6 +175,16 @@ namespace NH::Bass
         }
         const auto& file = m_Themes.at(id)->GetAudioFile(AudioFile::DEFAULT);
         return file.Status == AudioFile::StatusType::LOADING;
+    }
+
+    bool MusicManager::IsThemeFailed(const std::string& id) const
+    {
+        if (!m_Themes.contains(id))
+        {
+            return false;
+        }
+        const auto& file = m_Themes.at(id)->GetAudioFile(AudioFile::DEFAULT);
+        return file.Status == AudioFile::StatusType::FAILED;
     }
 
     bool MusicManager::IsThemePlaying(const std::string& id) const

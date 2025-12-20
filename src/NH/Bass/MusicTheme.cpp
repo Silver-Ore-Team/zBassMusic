@@ -88,8 +88,12 @@ namespace NH::Bass
         log->Info("New jingle created {0}: {1}", filter.c_str(), filename.c_str());
     }
 
-    void MusicTheme::LoadAudioFiles(Executor& executor)
+    void MusicTheme::LoadAudioFiles(Executor& executor, std::function<void(const std::string&)> onReadyCallback)
     {
+        if (onReadyCallback)
+        {
+            m_OnReadyCallback = std::move(onReadyCallback);
+        }
         for (auto& [type, audioFile]: m_AudioFiles)
         {
             if (audioFile.Status == AudioFile::StatusType::NOT_LOADED)
@@ -122,9 +126,9 @@ namespace NH::Bass
                     stream->Close();
 
                     m_AudioFiles[type].Status = AudioFile::StatusType::READY;
-                    if (type == AudioFile::DEFAULT)
+                    if (type == AudioFile::DEFAULT && m_OnReadyCallback)
                     {
-                        Engine::GetInstance()->GetMusicManager().OnThemeReady(m_Name);
+                        m_OnReadyCallback(m_Name);
                     }
                 });
             }

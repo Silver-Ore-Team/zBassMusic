@@ -71,8 +71,7 @@ namespace NH::Bass
         if (m_Themes.contains(id))
         {
             log->Info("Loading theme {0}", id.c_str());
-            m_Themes[id]->LoadAudioFiles(Executors.IO);
-            // Do NOT touch or evict here — LRU updates when the theme is READY via OnThemeReady
+            m_Themes[id]->LoadAudioFiles(Executors.IO, [this](const std::string& themeId) { OnThemeReady(themeId); });
         }
         else
         {
@@ -86,9 +85,10 @@ namespace NH::Bass
         {
             return;
         }
-        TouchTheme(id);
-        EvictOldThemes();
-        log->Debug("OnThemeReady: {0} is READY; LRU updated and eviction checked.", id.c_str());
+        ++m_LoadedThemesCount;
+        m_NeedsEviction = true;  // Signal main thread to evict
+        log->Trace("OnThemeReady: {0} is READY;", id.c_str());
+        // Do NOT call TouchTheme here it would be called from EvictOldThemes on Engine::Update
     }
 
     void MusicManager::TouchTheme(const std::string& id)
@@ -104,25 +104,26 @@ namespace NH::Bass
 
     void MusicManager::EvictOldThemes()
     {
-        size_t loadedCount = 0;
-        for (const auto& id : m_LRUOrder)
+        // Ensure all loaded themes are tracked in LRU (newly ready themes from OnThemeReady)
+        for (const auto& [id, theme] : m_Themes)
         {
-            if (m_Themes.contains(id) && IsThemeLoaded(id))
+            if (IsThemeLoaded(id) && !m_LRUIterators.contains(id))
             {
-                ++loadedCount;
+                TouchTheme(id);  // Add newly loaded themes to LRU
             }
         }
-        if (loadedCount <= m_MaxLoadedThemes)
+
+        if (m_LoadedThemesCount <= m_MaxLoadedThemes)
         {
             return;
         }
 
         // Evict from front (oldest) until we're under the limit
-        while (!m_LRUOrder.empty() && loadedCount > m_MaxLoadedThemes)
+        while (!m_LRUOrder.empty() && m_LoadedThemesCount > m_MaxLoadedThemes)
         {
             const std::string& oldestId = m_LRUOrder.front();
 
-            // Shold never happen, but just in case
+            // Should never happen, but just in case
             if (IsThemePlaying(oldestId))
             {
                 log->Debug("Skipping eviction of theme {0} because it is currently playing.", oldestId.c_str());
@@ -130,15 +131,15 @@ namespace NH::Bass
                 TouchTheme(oldestId);
                 continue;
             }
-            
+
             // Only evict if it's actually loaded
             if (m_Themes.contains(oldestId) && IsThemeLoaded(oldestId))
             {
                 log->Info("Evicting theme from memory: {0}", oldestId.c_str());
                 m_Themes[oldestId]->ReleaseAudioBuffers();
-                --loadedCount;
+                --m_LoadedThemesCount;
             }
-            
+
             // Remove from LRU tracking
             m_LRUIterators.erase(oldestId);
             m_LRUOrder.pop_front();
@@ -154,6 +155,16 @@ namespace NH::Bass
         return m_Themes.at(id)->IsAudioFileReady(AudioFile::DEFAULT);
     }
 
+    bool MusicManager::IsThemeLoading(const std::string& id) const
+    {
+        if (!m_Themes.contains(id))
+        {
+            return false;
+        }
+        const auto& file = m_Themes.at(id)->GetAudioFile(AudioFile::DEFAULT);
+        return file.Status == AudioFile::StatusType::LOADING;
+    }
+
     bool MusicManager::IsThemePlaying(const std::string& id) const
     {
         if (!m_Themes.contains(id))
@@ -162,5 +173,5 @@ namespace NH::Bass
         }
         return m_Themes.at(id)->IsPlaying();
     }
-    
+
 }

@@ -68,6 +68,9 @@ namespace GOTHIC_NAMESPACE
             {
                 zmusic = new CMusicSys_Bass(bassEngine, directMusic);
                 UpdateMusicOptions();
+                // Update music manager settings
+                bassEngine->GetMusicManager().SetLazyLoading(NH::Bass::Options->LazyLoading);
+                bassEngine->GetMusicManager().SetMaxLoadedThemes(NH::Bass::Options->MaxLoadedThemes);
                 log->Info("Set music system to CMusicSys_Bass");
 
                 BassLoader bassLoaderMusic(parserMusic);

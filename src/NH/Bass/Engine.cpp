@@ -39,6 +39,12 @@ namespace NH::Bass
 
         m_CommandQueue.Update(*this);
 
+        // Check if MusicManager needs eviction (set by background thread)
+        if (m_MusicManager.ShouldEvict())
+        {
+            m_MusicManager.EvictOldThemes();
+        }
+
         BASS_Update(static_cast<int32_t>(delta));
         GetEM().Update();
     }

@@ -3,6 +3,7 @@
 #include "EngineCommands.h"
 #include "NH/Bass/Command.h"
 #include "NH/Bass/EventManager.h"
+#include "NH/Bass/Engine.h"
 
 #include <Union/VDFS.h>
 
@@ -87,8 +88,12 @@ namespace NH::Bass
         log->Info("New jingle created {0}: {1}", filter.c_str(), filename.c_str());
     }
 
-    void MusicTheme::LoadAudioFiles(Executor& executor)
+    void MusicTheme::LoadAudioFiles(Executor& executor, std::function<void(const std::string&)> onReadyCallback)
     {
+        if (onReadyCallback)
+        {
+            m_OnReadyCallback = std::move(onReadyCallback);
+        }
         for (auto& [type, audioFile]: m_AudioFiles)
         {
             if (audioFile.Status == AudioFile::StatusType::NOT_LOADED)
@@ -121,6 +126,11 @@ namespace NH::Bass
                     stream->Close();
 
                     m_AudioFiles[type].Status = AudioFile::StatusType::READY;
+                    if (type == AudioFile::DEFAULT && m_OnReadyCallback)
+                    {
+                        m_OnReadyCallback(m_Name);
+                        m_OnReadyCallback = nullptr;
+                    }
                 });
             }
         }
@@ -387,6 +397,18 @@ namespace NH::Bass
         log->Debug("Re-playing active theme: {0}", GetName().c_str());
         ReleaseChannels();
         Play(engine);
+    }
+
+    void MusicTheme::ReleaseAudioBuffers()
+    {
+        for (auto& [type, audioFile] : m_AudioFiles)
+        {
+            if (audioFile.Status == AudioFile::StatusType::READY)
+            {
+                log->Trace("Releasing buffer for {0}: {1}", m_Name.c_str(), type.c_str());
+                audioFile.ReleaseBuffer();
+            }
+        }
     }
 
     std::string MusicTheme::ToString() const

@@ -26,6 +26,11 @@ namespace NH::Bass
         StatusType Status = StatusType::NOT_LOADED;
         std::string Error;
 
+        void ReleaseBuffer()
+        {
+            std::vector<char>().swap(Buffer);
+            Status = StatusType::NOT_LOADED;
+        }
         [[nodiscard]] std::string ToString() const override
         {
             static const std::string types[] = { "NOT_LOADED", "LOADING", "READY", "FAILED" };
@@ -67,6 +72,7 @@ namespace NH::Bass
         std::unordered_map<size_t, std::function<void(double)>> m_SyncHandlersWithDouble;
         std::vector<std::string> m_Zones;
         std::vector<std::shared_ptr<IChannel>> m_AcquiredChannels;
+        std::function<void(const std::string&)> m_OnReadyCallback;
 
     public:
         static MusicTheme None;
@@ -78,8 +84,9 @@ namespace NH::Bass
         void AddZone(const std::string& zone);
         void AddMidiFile(const std::string& type, const std::shared_ptr<MidiFile>& midiFile);
         void AddJingle(const std::string& filename, double delay, const std::string& filter);
-        void LoadAudioFiles(Executor& executor);
+        void LoadAudioFiles(Executor& executor, std::function<void(const std::string&)> onReadyCallback = nullptr);
         bool IsPlaying();
+        void ReleaseAudioBuffers();
 
         void Schedule(IEngine& engine, const std::shared_ptr<MusicTheme>& currentTheme);
         void Transition(IEngine& engine, MusicTheme& nextTheme);

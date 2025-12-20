@@ -12,6 +12,8 @@ namespace NH::Bass
         bool CreateMainParserCMusicTheme;
         Union::StringUTF8 LoggerLevelUnion = "DEBUG";
         Union::StringUTF8 LoggerLevelZSpy = "DEBUG";
+        bool LazyLoading;
+        int MaxLoadedThemes;
     };
 
     extern OptionsType* Options;

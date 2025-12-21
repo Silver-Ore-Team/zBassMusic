@@ -105,7 +105,7 @@ Currently, the project is maintained under the [Silver Ore Team](https://silvero
 
 * Discord: [@muczc1wek](https://discordapp.com/users/667438896594026517).
 
-Early development support also came from [Boguś](https://github.com/bogu9821), who helped sorting some things up.
+Early development support also came from [Boguś](https://github.com/bogu9821), who helped sort some things out.
 If you'd like to help zBassMusic development, check out the [Developer Guide](developer-guide/index.md) and feel free to
 submit a Pull Request. One accepted merge and you will join the gallery.
 

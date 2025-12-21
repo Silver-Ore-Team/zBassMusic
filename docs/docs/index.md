@@ -99,16 +99,15 @@ Union SDK 1.0m
 was rewritten for [union&#8209;api](https://gitlab.com/union-framework/union-api) &mdash;&nbsp;the successor of Union
 SDK, and published as an open source project.
 
-The project is maintained under [Silver Ore Team](https://silveroreteam.pl) modding group
-by [tehe](https://github.com/piotrmacha):
+The original author of zBassMusic is [tehe](https://github.com/piotrmacha), who maintained the project until late 2024.
 
-* Email: [piotr.macha@silveroreteam.pl](mailto:piotr.macha@silveroreteam.pl)
-* Discord: [@tehe.official](https://discordapp.com/users/1014655735856111678)
+Currently, the project is maintained under the [Silver Ore Team](https://silveroreteam.pl) modding group by [muczc1wek](https://github.com/muczc1wek) (Emu).
 
-The mentionable contributors for the early stage development are [Boguś](https://github.com/bogu9821)
-and [Emu](https://github.com/muczc1wek) who have helped sorting some things up. If you'd like to also help zBassMusic
-development, check out [Developer Guide](developer-guide/index.md)
-and feel free to submit a Pull Request. One accepted merge and you will join the gallery.
+* Discord: [@muczc1wek](https://discordapp.com/users/667438896594026517).
+
+Early development support also came from [Boguś](https://github.com/bogu9821), who helped sorting some things up.
+If you'd like to help zBassMusic development, check out the [Developer Guide](developer-guide/index.md) and feel free to
+submit a Pull Request. One accepted merge and you will join the gallery.
 
 <div class="zbassmusic-contributos" markdown>
 

@@ -64,7 +64,7 @@ See [Debugging](https://silver-ore-team.github.io/zBassMusic/user-guide/debuggin
 ### Discord
 
 You can contact the authors and maintainers on Discord. 
-Look for [@tehe.official](https://discordapp.com/users/1014655735856111678).
+Look for [@muczc1wek](https://discordapp.com/users/667438896594026517).
 
 #### Gothic Modding Community
 

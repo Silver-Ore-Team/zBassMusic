@@ -3,7 +3,7 @@ name: Bug
 about: 'Report a bug or crash '
 title: "[BUG] "
 labels: bug
-assignees: piotrmacha
+assignees: muczc1wek
 
 ---
 
